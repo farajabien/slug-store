@@ -2,6 +2,11 @@
 
 This guide covers the advanced features of Slug Store for enterprise applications and complex use cases.
 
+## 📦 NPM Packages
+
+- **[@farajabien/slug-store-core](https://www.npmjs.com/package/@farajabien/slug-store-core)** - Framework-agnostic core library
+- **[@farajabien/slug-store-react](https://www.npmjs.com/package/@farajabien/slug-store-react)** - React hooks with Zustand-like API
+
 ## State Schema Validation with Zod
 
 Slug Store provides built-in support for state validation using Zod or any compatible schema library.

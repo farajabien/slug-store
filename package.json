@@ -16,7 +16,9 @@
     "test:react": "turbo test --filter=@farajabien/slug-store-react",
     "docs": "cd docs && python -m http.server 3001",
     "benchmark": "turbo test --filter=@farajabien/slug-store-core -- --run --reporter=verbose",
-    "validate": "turbo lint && turbo test && turbo build"
+    "validate": "turbo lint && turbo test && turbo build",
+    "use:workspace": "cd packages/react && pnpm pkg set dependencies.@farajabien/slug-store-core=workspace:* && pnpm install",
+    "use:published": "cd packages/react && pnpm pkg set dependencies.@farajabien/slug-store-core=^0.1.0 && pnpm install"
   },
   "devDependencies": {
     "@workspace/eslint-config": "workspace:*",

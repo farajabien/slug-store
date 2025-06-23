@@ -30,7 +30,7 @@ From **solo developer projects** to **enterprise applications** - one approach s
 - **Medium Apps**: User auth + URL state, minimal backend  
 - **Enterprise**: User data in DB + complex state in URLs
 
-## Quick Start
+## 🚀 Quick Start
 
 ### React Apps (2 minutes)
 ```bash
@@ -67,6 +67,13 @@ const slug = await encodeState(state, { compress: true })
 const urlSlug = new URLSearchParams(window.location.search).get('state')
 const restoredState = await decodeState(urlSlug)
 ```
+
+## 📦 NPM Packages
+
+- **@farajabien/slug-store-core** - Framework-agnostic core library
+- **@farajabien/slug-store-react** - React hooks with Zustand-like API
+
+Both packages are **production-ready** and available on NPM!
 
 ## Live Demo
 
@@ -107,7 +114,7 @@ slug-store/
 
 ## Package Status
 
-### ✅ Core Package (`@farajabien/slug-store-core`)
+### ✅ Core Package ([@farajabien/slug-store-core](https://www.npmjs.com/package/@farajabien/slug-store-core))
 **Production Ready** - The foundation of Slug Store
 
 **Key Features:**
@@ -130,7 +137,7 @@ const slug = await encodeState(state, { compress: true });
 const restoredState = await decodeState(urlSlug);
 ```
 
-### ✅ React Package (`@farajabien/slug-store-react`) 
+### ✅ React Package ([@farajabien/slug-store-react](https://www.npmjs.com/package/@farajabien/slug-store-react)) 
 **Production Ready** - Zustand-like simplicity
 
 **Key Features:**
@@ -260,6 +267,15 @@ pnpm dev:react      # Develop React package
 pnpm dev:web        # Start demo app
 pnpm build          # Build all packages
 pnpm test           # Run tests
+```
+
+### Development Workflow
+```bash
+# Use workspace dependencies (for local development)
+pnpm use:workspace
+
+# Use published versions (for production testing)
+pnpm use:published
 ```
 
 ### Project Structure

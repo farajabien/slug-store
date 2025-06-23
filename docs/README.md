@@ -20,10 +20,10 @@
 ## 🎯 Quick Navigation
 
 ### By Framework
-- **React**: ✅ Production-ready with Zustand-like hooks
+- **React**: ✅ Production-ready with Zustand-like hooks - [@farajabien/slug-store-react](https://www.npmjs.com/package/@farajabien/slug-store-react)
 - **Vue**: 🔄 Coming Q1 2025 - Vue 3 composition API
 - **Angular**: 🔄 Coming Q2 2025 - Service injection pattern
-- **Vanilla JS**: ✅ Framework-agnostic core package
+- **Vanilla JS**: ✅ Framework-agnostic core package - [@farajabien/slug-store-core](https://www.npmjs.com/package/@farajabien/slug-store-core)
 
 ### By Use Case
 | Category | Examples | Difficulty |
@@ -79,6 +79,13 @@ const slug = await encodeState(state, { compress: true })
 const urlSlug = new URLSearchParams(window.location.search).get('state')
 const restoredState = await decodeState(urlSlug)
 ```
+
+## 📦 NPM Packages
+
+- **[@farajabien/slug-store-core](https://www.npmjs.com/package/@farajabien/slug-store-core)** - Framework-agnostic core library
+- **[@farajabien/slug-store-react](https://www.npmjs.com/package/@farajabien/slug-store-react)** - React hooks with Zustand-like API
+
+Both packages are **production-ready** and available on NPM!
 
 ## 🔍 FAQs Preview
 
@@ -214,4 +221,6 @@ Documentation is MIT licensed, same as the project.
 
 **Project**: [Slug Store](https://github.com/farajabien/slug-store)  
 **Live Demo**: [slugstore.fbien.com](https://slugstore.fbien.com)  
+**NPM Core**: [@farajabien/slug-store-core](https://www.npmjs.com/package/@farajabien/slug-store-core)  
+**NPM React**: [@farajabien/slug-store-react](https://www.npmjs.com/package/@farajabien/slug-store-react)  
 **Made by**: [Faraja Bien](https://github.com/farajabien) 
