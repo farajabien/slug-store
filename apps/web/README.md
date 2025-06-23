@@ -96,6 +96,8 @@ RESEND_API_KEY=your_resend_key
 NEXT_PUBLIC_GA_ID=your_ga_id
 ```
 
+**Note**: The app gracefully handles missing API keys - email sharing will be disabled but all other features work normally.
+
 ### Customization
 - **Branding**: Update `components/header.tsx` and `components/footer.tsx`
 - **Examples**: Modify `components/wishlist-demo.tsx` for your use case
@@ -118,6 +120,11 @@ vercel
 
 # Or connect GitHub repo for auto-deployment
 ```
+
+**Deployment Notes**:
+- The app automatically handles missing environment variables
+- Email sharing requires `RESEND_API_KEY` but is optional
+- All other features work without additional configuration
 
 ### Other Platforms
 Standard Next.js deployment works on:
