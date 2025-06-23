@@ -117,12 +117,20 @@ getSlugInfo(slug) // { version, compressed, encrypted, size }
 - **Password protection** for sensitive data
 - **Tamper detection** with built-in validation
 
-## Framework Adapters
+## 📦 Related Packages
 
-- **React**: `@farajabien/slug-store-react` - Zustand-like hooks
-- **Vue**: Coming soon
-- **Angular**: Coming soon
-- **Svelte**: Coming soon
+| Package | Description | NPM |
+|---------|-------------|-----|
+| [@farajabien/slug-store-react](https://www.npmjs.com/package/@farajabien/slug-store-react) | React hooks with Zustand-like API | [![npm](https://img.shields.io/npm/v/@farajabien/slug-store-react.svg)](https://www.npmjs.com/package/@farajabien/slug-store-react) |
+| [@farajabien/slug-store-ui](https://www.npmjs.com/package/@farajabien/slug-store-ui) | UI components and themes | [![npm](https://img.shields.io/npm/v/@farajabien/slug-store-ui.svg)](https://www.npmjs.com/package/@farajabien/slug-store-ui) |
+| [@farajabien/slug-store-eslint-config](https://www.npmjs.com/package/@farajabien/slug-store-eslint-config) | Shared ESLint configuration | [![npm](https://img.shields.io/npm/v/@farajabien/slug-store-eslint-config.svg)](https://www.npmjs.com/package/@farajabien/slug-store-eslint-config) |
+
+## 🎨 Framework Adapters
+
+- **[React](https://www.npmjs.com/package/@farajabien/slug-store-react)** - Zustand-like hooks with URL persistence
+- **Vue** - Coming soon
+- **Angular** - Coming soon  
+- **Svelte** - Coming soon
 
 ## 🤝 Contributing
 
@@ -143,4 +151,5 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 **Live Demo**: [https://slugstore.fbien.com](https://slugstore.fbien.com)  
 **Documentation**: [https://slugstore.fbien.com/docs](https://slugstore.fbien.com/docs)  
+**GitHub**: [https://github.com/farajabien/slug-store](https://github.com/farajabien/slug-store)  
 **Made by**: [Faraja Bien](https://github.com/farajabien) 

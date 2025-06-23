@@ -124,6 +124,21 @@ const buttonVariants = cva(
 )
 ```
 
+## 📦 Related Packages
+
+| Package | Description | NPM |
+|---------|-------------|-----|
+| [@farajabien/slug-store-core](https://www.npmjs.com/package/@farajabien/slug-store-core) | Framework-agnostic core library | [![npm](https://img.shields.io/npm/v/@farajabien/slug-store-core.svg)](https://www.npmjs.com/package/@farajabien/slug-store-core) |
+| [@farajabien/slug-store-react](https://www.npmjs.com/package/@farajabien/slug-store-react) | React hooks with Zustand-like API | [![npm](https://img.shields.io/npm/v/@farajabien/slug-store-react.svg)](https://www.npmjs.com/package/@farajabien/slug-store-react) |
+| [@farajabien/slug-store-eslint-config](https://www.npmjs.com/package/@farajabien/slug-store-eslint-config) | Shared ESLint configuration | [![npm](https://img.shields.io/npm/v/@farajabien/slug-store-eslint-config.svg)](https://www.npmjs.com/package/@farajabien/slug-store-eslint-config) |
+
+## 🎯 Perfect For
+
+- **Slug Store apps** - Consistent UI across the ecosystem
+- **React applications** - Drop-in components with great defaults
+- **Design systems** - Foundation for custom component libraries
+- **Prototyping** - Quick UI development with accessible components
+
 ## 🤝 Development
 
 Part of the [Slug Store monorepo](https://github.com/farajabien/slug-store):
@@ -151,5 +166,7 @@ MIT License - part of the Slug Store ecosystem.
 
 ---
 
-**Part of**: [Slug Store](https://github.com/farajabien/slug-store)  
+**Live Demo**: [https://slugstore.fbien.com](https://slugstore.fbien.com)  
+**Documentation**: [https://slugstore.fbien.com/docs](https://slugstore.fbien.com/docs)  
+**GitHub**: [https://github.com/farajabien/slug-store](https://github.com/farajabien/slug-store)  
 **Made by**: [Faraja Bien](https://github.com/farajabien) 

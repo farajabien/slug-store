@@ -201,120 +201,88 @@ const useProductFilters = create((set) => ({
 
 ```tsx
 const useDashboardStore = create((set) => ({
+  widgets: ['sales', 'users', 'revenue'],
   layout: 'grid',
-  widgets: ['sales', 'traffic', 'revenue'],
   dateRange: { start: '2024-01-01', end: '2024-12-31' },
-  refreshInterval: 30000,
-  setLayout: (layout) => set({ layout }),
   addWidget: (widget) => set(state => ({ 
     widgets: [...state.widgets, widget] 
   })),
-  removeWidget: (widget) => set(state => ({ 
-    widgets: state.widgets.filter(w => w !== widget) 
-  }))
+  setLayout: (layout) => set({ layout })
 }), { compress: true, key: 'dashboard' })
 ```
 
-### 3. Form State with Encryption
+### 3. AI Chat Conversations
 
 ```tsx
-const { state, setState } = useSlugStore({
-  personalInfo: { name: '', email: '' },
-  preferences: { newsletter: true, theme: 'light' },
-  step: 1
-}, { 
+const useChatStore = create((set) => ({
+  messages: [],
+  model: 'gpt-4',
+  temperature: 0.7,
+  addMessage: (message) => set(state => ({ 
+    messages: [...state.messages, message] 
+  })),
+  setModel: (model) => set({ model }),
+  setTemperature: (temp) => set({ temperature })
+}), { 
+  compress: true, 
   encrypt: true, 
-  password: 'user-session-key',
-  key: 'form-data'
+  password: userSessionKey,
+  key: 'chat' 
 })
 ```
 
-## 🎨 Advanced Features
+## 📦 Related Packages
 
-### Sharing State via URL
+| Package | Description | NPM |
+|---------|-------------|-----|
+| [@farajabien/slug-store-core](https://www.npmjs.com/package/@farajabien/slug-store-core) | Framework-agnostic core library | [![npm](https://img.shields.io/npm/v/@farajabien/slug-store-core.svg)](https://www.npmjs.com/package/@farajabien/slug-store-core) |
+| [@farajabien/slug-store-ui](https://www.npmjs.com/package/@farajabien/slug-store-ui) | UI components and themes | [![npm](https://img.shields.io/npm/v/@farajabien/slug-store-ui.svg)](https://www.npmjs.com/package/@farajabien/slug-store-ui) |
+| [@farajabien/slug-store-eslint-config](https://www.npmjs.com/package/@farajabien/slug-store-eslint-config) | Shared ESLint configuration | [![npm](https://img.shields.io/npm/v/@farajabien/slug-store-eslint-config.svg)](https://www.npmjs.com/package/@farajabien/slug-store-eslint-config) |
 
-```tsx
-const shareCurrentState = async () => {
-  const slug = await getSlug()
-  const shareUrl = `${window.location.origin}${window.location.pathname}?state=${slug}`
-  
-  await navigator.clipboard.writeText(shareUrl)
-  alert('Shareable URL copied to clipboard!')
-}
-```
+## 🎨 UI Components
 
-### Loading State from External Source
+Enhance your app with our UI components:
 
 ```tsx
-const loadSharedState = async (sharedSlug: string) => {
-  try {
-    await loadFromSlug(sharedSlug)
-    alert('State loaded successfully!')
-  } catch (error) {
-    alert('Failed to load shared state')
-  }
-}
+import { Button, Card, Badge } from '@farajabien/slug-store-ui'
+
+// Use with your slug store
+const { state, setState } = useSlugStore({ theme: 'light' })
+
+return (
+  <Card>
+    <Badge>{state.theme}</Badge>
+    <Button onClick={() => setState({ theme: 'dark' })}>
+      Toggle Theme
+    </Button>
+  </Card>
+)
 ```
 
-### Multiple Stores
+## 🔒 Security Features
 
-```tsx
-// Each store uses a different URL parameter
-const useWishlistStore = create(/* ... */, { key: 'wishlist' })
-const useFiltersStore = create(/* ... */, { key: 'filters' })
-const useUIStore = create(/* ... */, { key: 'ui' })
+- **Password protection** for sensitive conversations
+- **Client-side encryption** using Web Crypto API
+- **Tamper detection** with built-in validation
+- **No server dependencies** - all processing in browser
 
-// URL becomes: ?wishlist=...&filters=...&ui=...
+## ⚡ Performance
+
+- **Debounced updates** to prevent excessive URL changes
+- **Compression** reduces URL size by 30-70%
+- **Tree-shakeable** - only import what you use
+- **Minimal bundle impact** - ~5KB additional
+
+## 🤝 Contributing
+
+This is part of the [Slug Store monorepo](https://github.com/farajabien/slug-store).
+
+```bash
+git clone https://github.com/farajabien/slug-store.git
+cd slug-store
+pnpm install
+pnpm dev:react
 ```
-
-## 🔒 Security & Privacy
-
-### Encryption for Sensitive Data
-
-```tsx
-const useSecureStore = create((set) => ({
-  userId: null,
-  sessionData: {},
-  preferences: {}
-}), {
-  encrypt: true,
-  password: generateUserPassword(), // Your password generation logic
-  compress: true
-})
-```
-
-### Data Validation
-
-```tsx
-const useValidatedStore = create((set) => ({
-  items: [],
-  addItem: (item) => {
-    // Validate item before adding
-    if (isValidItem(item)) {
-      set(state => ({ items: [...state.items, item] }))
-    }
-  }
-}))
-```
-
-## ⚡ Performance Tips
-
-1. **Use compression for large state**: `{ compress: true }`
-2. **Debounce rapid updates**: `{ debounceMs: 300 }`
-3. **Separate concerns**: Multiple small stores vs one large store
-4. **Selective syncing**: `{ syncToUrl: false }` when needed
-
-## 🔄 Migration from useState
-
-```tsx
-// Before
-const [state, setState] = useState(initialState)
-
-// After  
-const { state, setState } = useSlugStore(initialState)
-```
-
-That's it! Your state is now automatically persisted in the URL.
 
 ## 📄 License
 
@@ -322,4 +290,7 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 ---
 
-**Made with ❤️ by [Faraja Bien](https://github.com/farajabien)** 
+**Live Demo**: [https://slugstore.fbien.com](https://slugstore.fbien.com)  
+**Documentation**: [https://slugstore.fbien.com/docs](https://slugstore.fbien.com/docs)  
+**GitHub**: [https://github.com/farajabien/slug-store](https://github.com/farajabien/slug-store)  
+**Made by**: [Faraja Bien](https://github.com/farajabien) 
