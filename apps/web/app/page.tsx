@@ -1,3 +1,5 @@
+'use client'
+
 import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
 import { WishlistDemo } from '@/components/wishlist-demo'
@@ -25,12 +27,27 @@ import {
 } from 'lucide-react'
 
 export default function HomePage() {
+  const scrollToDemo = () => {
+    const demoSection = document.getElementById('demo-section')
+    if (demoSection) {
+      demoSection.scrollIntoView({ behavior: 'smooth' })
+    }
+  }
+
+  const openNpmPackage = () => {
+    window.open('https://www.npmjs.com/package/@farajabien/slug-store-react', '_blank')
+  }
+
+  const openGitHub = () => {
+    window.open('https://github.com/farajabien/slug-store', '_blank')
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
       
       {/* Hero Section */}
-      <section className="relative py-20 bg-gradient-to-b from-primary/5 to-background">
+      <section className="relative py-16 bg-gradient-to-b from-primary/5 to-background">
         <div className="container mx-auto px-4">
           <div className="text-center space-y-6 max-w-5xl mx-auto">
             <div className="flex items-center justify-center gap-2 mb-4">
@@ -56,11 +73,11 @@ export default function HomePage() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-6">
-              <Button size="lg" className="text-lg px-8 py-4">
+              <Button size="lg" className="text-lg px-8 py-4" onClick={scrollToDemo}>
                 <Rocket className="mr-2 h-5 w-5" />
                 Try Live Demo
               </Button>
-              <Button variant="outline" size="lg" className="text-lg px-8 py-4">
+              <Button variant="outline" size="lg" className="text-lg px-8 py-4" onClick={openNpmPackage}>
                 <Code2 className="mr-2 h-5 w-5" />
                 Get Started
               </Button>
@@ -86,9 +103,9 @@ export default function HomePage() {
       </section>
 
       {/* AI Use Cases */}
-      <section className="py-16 bg-muted/30">
+      <section className="py-12 bg-muted/30">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
+          <div className="text-center mb-10">
             <h2 className="text-3xl font-bold mb-4">Perfect for AI Apps</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               From ChatGPT clones to creative AI tools - give users the persistence they expect
@@ -151,7 +168,7 @@ export default function HomePage() {
       </section>
 
       {/* The Problem */}
-      <section className="py-16">
+      <section className="py-12">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-3xl font-bold mb-6 text-red-600">The AI App Problem</h2>
@@ -202,9 +219,9 @@ export default function HomePage() {
       </section>
 
       {/* Quick Start for AI Apps */}
-      <section className="py-16 bg-muted/50">
+      <section className="py-12 bg-muted/50">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
+          <div className="text-center mb-10">
             <h2 className="text-3xl font-bold mb-4">Add to Your AI App in 2 Minutes</h2>
             <p className="text-lg text-muted-foreground">
               From ChatGPT clone to production-ready app with shareable conversations
@@ -311,9 +328,9 @@ function ChatApp() {
       </section>
 
       {/* Feature Grid */}
-      <section className="py-16">
+      <section className="py-12">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
+          <div className="text-center mb-10">
             <h2 className="text-3xl font-bold mb-4">Why AI Apps Love Slug Store</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               Built specifically for the needs of modern AI applications
@@ -358,9 +375,9 @@ function ChatApp() {
       </section>
 
       {/* Demo Section */}
-      <section className="py-16 bg-muted/50">
+      <section id="demo-section" className="py-12 bg-muted/50">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
+          <div className="text-center mb-10">
             <h2 className="text-3xl font-bold mb-4">See It In Action</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               Try our interactive demo - every change is automatically saved and shareable
@@ -381,7 +398,7 @@ function ChatApp() {
       </section> */}
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-primary/10 to-primary/5">
+      <section className="py-16 bg-gradient-to-r from-primary/10 to-primary/5">
         <div className="container mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto">
             <h2 className="text-4xl font-bold mb-6">
@@ -393,11 +410,11 @@ function ChatApp() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Button size="lg" className="text-lg px-8 py-4">
+              <Button size="lg" className="text-lg px-8 py-4" onClick={openNpmPackage}>
                 <Code2 className="mr-2 h-5 w-5" />
                 npm install @farajabien/slug-store-react
               </Button>
-              <Button variant="outline" size="lg" className="text-lg px-8 py-4">
+              <Button variant="outline" size="lg" className="text-lg px-8 py-4" onClick={openGitHub}>
                 <Star className="mr-2 h-5 w-5" />
                 View on GitHub
               </Button>

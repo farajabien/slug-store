@@ -1,7 +1,7 @@
 'use client'
 
 import { Button } from '@workspace/ui/components/button'
-import { Moon, Sun, Github, ExternalLink } from 'lucide-react'
+import { Moon, Sun, Github, ExternalLink, HelpCircle } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 
@@ -21,6 +21,13 @@ export function Header() {
         </div>
 
         <div className="flex items-center space-x-4">
+          <Button variant="ghost" size="sm" asChild>
+            <Link href="/faq">
+              <HelpCircle className="h-4 w-4" />
+              <span className="sr-only">FAQ</span>
+            </Link>
+          </Button>
+
           <Button
             variant="ghost"
             size="sm"

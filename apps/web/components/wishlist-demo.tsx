@@ -162,7 +162,7 @@ export function WishlistDemo() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Error Alert */}
       {error && (
         <Alert variant="destructive">
@@ -241,37 +241,42 @@ export function WishlistDemo() {
         </CardContent>
       </Card>
 
-      {/* Compression Demo */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Zap className="h-5 w-5" />
-            Compression Demo
-          </CardTitle>
-          <CardDescription>
-            See how compression reduces URL size while maintaining all your data.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <CompressionDemo state={state} />
-        </CardContent>
-      </Card>
+      {/* Quick Features Demo */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-sm">
+              <Zap className="h-4 w-4" />
+              Compression Active
+            </CardTitle>
+            <CardDescription className="text-xs">
+              URL size reduced by ~30-70%
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="text-xs text-muted-foreground">
+              Your state is automatically compressed to keep URLs short and shareable.
+            </div>
+          </CardContent>
+        </Card>
 
-      {/* Encryption Demo */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Lock className="h-5 w-5" />
-            Encryption Demo
-          </CardTitle>
-          <CardDescription>
-            Test password-protected state encryption for sensitive data.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <EncryptionDemo state={state} />
-        </CardContent>
-      </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-sm">
+              <Lock className="h-4 w-4" />
+              Encryption Ready
+            </CardTitle>
+            <CardDescription className="text-xs">
+              Add password protection anytime
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="text-xs text-muted-foreground">
+              Enable encryption for sensitive data with a simple option.
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   )
 }
@@ -337,96 +342,5 @@ function AddItemForm({ onAdd }: { onAdd: (item: any) => void }) {
         Add Item
       </Button>
     </form>
-  )
-}
-
-function CompressionDemo({ state }: { state: WishlistState }) {
-  const [compressedSlug, setCompressedSlug] = useState<string>('')
-  const [uncompressedSlug, setUncompressedSlug] = useState<string>('')
-
-  useEffect(() => {
-    const generateSlugs = async () => {
-      const compressed = await encodeState(state, { compress: true })
-      const uncompressed = await encodeState(state, { compress: false })
-      setCompressedSlug(compressed)
-      setUncompressedSlug(uncompressed)
-    }
-    generateSlugs()
-  }, [state])
-
-  const compressionRatio = uncompressedSlug ? 
-    ((1 - compressedSlug.length / uncompressedSlug.length) * 100).toFixed(1) : 0
-
-  return (
-    <div className="space-y-4">
-      <h4 className="font-semibold flex items-center gap-2">
-        <Zap className="h-4 w-4" />
-        Compression Demo
-      </h4>
-      <div className="space-y-2">
-        <div className="text-sm">
-          <strong>Uncompressed:</strong> {uncompressedSlug.length} characters
-        </div>
-        <div className="text-sm">
-          <strong>Compressed:</strong> {compressedSlug.length} characters
-        </div>
-        <div className="text-sm font-medium text-green-600">
-          {compressionRatio}% size reduction
-        </div>
-      </div>
-    </div>
-  )
-}
-
-function EncryptionDemo({ state }: { state: WishlistState }) {
-  const [encryptedSlug, setEncryptedSlug] = useState<string>('')
-  const [decryptedState, setDecryptedState] = useState<any>(null)
-
-  useEffect(() => {
-    const generateEncryptedSlug = async () => {
-      try {
-        const encrypted = await encodeState(state, { 
-          encrypt: true, 
-          password: 'demo-password' 
-        })
-        setEncryptedSlug(encrypted)
-      } catch (error) {
-        console.error('Encryption failed:', error)
-      }
-    }
-    generateEncryptedSlug()
-  }, [state])
-
-  const testDecryption = async () => {
-    try {
-      const decrypted = await decodeState(encryptedSlug, { 
-        password: 'demo-password' 
-      })
-      setDecryptedState(decrypted)
-    } catch (error) {
-      console.error('Decryption failed:', error)
-    }
-  }
-
-  return (
-    <div className="space-y-4">
-      <h4 className="font-semibold flex items-center gap-2">
-        <Lock className="h-4 w-4" />
-        Encryption Demo
-      </h4>
-      <div className="space-y-2">
-        <div className="text-sm">
-          <strong>Encrypted size:</strong> {encryptedSlug.length} characters
-        </div>
-        <Button onClick={testDecryption} size="sm">
-          Test Decryption
-        </Button>
-        {decryptedState && (
-          <div className="text-sm text-green-600">
-            ✅ Decryption successful
-          </div>
-        )}
-      </div>
-    </div>
   )
 } 

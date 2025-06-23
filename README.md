@@ -199,119 +199,93 @@ Built-in hooks for tracking state changes and user interactions.
 ### 🗄️ Persistence Adapters
 Support for localStorage, sessionStorage, and custom storage backends.
 
-## Use Cases
+## 🤝 Contributing
 
-### Design Tools
-- **Excalidraw-like Drawing Apps**: Shareable canvas with elements and tools
-- **Architecture Diagrams**: System design tools with component sharing
+We love contributions! Here's how to get started:
 
-### E-commerce
-- **Product Filters**: Bookmarkable search results with applied filters
-- **Shopping Carts**: Cross-device cart persistence and sharing
-
-### Productivity
-- **Todo Apps**: Shareable task lists with filters and projects
-- **Kanban Boards**: Trello-like project boards with state sharing
-
-### AI Applications
-- **Chat Interfaces**: Persistent conversations with shareable links
-- **Prompt Engineering**: Collaborative AI prompt development tools
-
-### Dashboards
-- **Analytics Dashboards**: Customizable widget layouts and configurations
-- **Admin Panels**: SaaS management interfaces with workspace persistence
-
-### Personal Apps
-- **Finance Trackers**: Private expense management with encryption
-- **Habit Trackers**: Personal goal monitoring with progress sharing
-
-## Performance
-
-### Bundle Size
-- **Core Package**: ~15KB minified
-- **React Package**: Additional ~5KB
-- **Tree-shakeable**: Only import what you use
-
-### Encoding Speed
-- **Small State**: <1ms encode/decode
-- **Large State**: <10ms with compression
-- **Encryption**: <5ms additional overhead
-
-### URL Limits
-- **Chrome**: 2MB (practical limit: 2000+ characters)
-- **Firefox**: 65KB
-- **Safari**: 80KB
-- **With Compression**: 30-70% size reduction
-
-## Browser Support
-
-- **Modern Browsers**: Chrome 37+, Firefox 34+, Safari 7+
-- **Web APIs**: URL/URLSearchParams, Web Crypto API
-- **SSR Support**: Next.js, Nuxt.js, SvelteKit compatibility
-- **Graceful Degradation**: Encryption features degrade to compression-only
-
-## Development
-
-### Setup
+### 1. Fork the Repository
 ```bash
-git clone https://github.com/farajabien/slug-store.git
+# Go to https://github.com/farajabien/slug-store
+# Click "Fork" button in the top right
+# This creates your own copy: https://github.com/YOUR_USERNAME/slug-store
+```
+
+### 2. Clone Your Fork
+```bash
+git clone https://github.com/YOUR_USERNAME/slug-store.git
 cd slug-store
+```
+
+### 3. Add Upstream Remote
+```bash
+git remote add upstream https://github.com/farajabien/slug-store.git
+```
+
+### 4. Install Dependencies
+```bash
 pnpm install
 ```
 
-### Development Commands
+### 5. Create Feature Branch
 ```bash
-pnpm dev:all        # Run all projects in parallel
-pnpm dev:core       # Develop core package
-pnpm dev:react      # Develop React package  
-pnpm dev:web        # Start demo app
-pnpm build          # Build all packages
-pnpm test           # Run tests
+git checkout -b feature/your-feature-name
 ```
 
-### Development Workflow
+### 6. Make Your Changes
 ```bash
-# Use workspace dependencies (for local development)
-pnpm use:workspace
-
-# Use published versions (for production testing)
-pnpm use:published
+# Make your changes to the code
+# Test everything works
+pnpm build
+pnpm test
 ```
 
-### Project Structure
-- **packages/core**: Core encoding/decoding logic
-- **packages/react**: React hooks and Zustand-like API
-- **packages/ui**: Shared UI components
-- **apps/web**: Demo application and documentation
-- **docs**: Comprehensive documentation and examples
+### 7. Commit and Push
+```bash
+git add .
+git commit -m "feat: add your feature description"
+git push origin feature/your-feature-name
+```
 
-## Contributing
+### 8. Create Pull Request
+- Go to https://github.com/farajabien/slug-store
+- You'll see a prompt to create PR from your recently pushed branch
+- Or go to "Pull requests" tab and click "New pull request"
 
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+### 9. Keep Your Fork Updated
+```bash
+git fetch upstream
+git checkout main
+git merge upstream/main
+git push origin main
+```
 
-### Development Areas
-- **Framework Support**: Vue.js, Angular, Svelte adapters
-- **Performance**: Optimization and benchmarking
-- **Documentation**: Examples and guides
-- **Testing**: Test coverage and integration tests
+## 📋 PR Guidelines
 
-## License
+When creating your PR, include:
+- **Clear title**: What the change does
+- **Description**: Why the change is needed
+- **Testing**: How you tested it
+- **Screenshots**: If UI changes
+- **Checklist**: Confirm all requirements met
+
+## 🐛 Reporting Issues
+
+Found a bug? Have a feature request?
+
+- **[GitHub Issues](https://github.com/farajabien/slug-store/issues)** - Report bugs and request features
+- **[GitHub Discussions](https://github.com/farajabien/slug-store/discussions)** - Ask questions and share ideas
+
+## 📄 License
 
 MIT License - see [LICENSE](LICENSE) for details.
 
-## Support
+## 🙏 Acknowledgments
 
-- **Documentation**: [docs/README.md](docs/README.md)
-- **Live Demo**: [slugstore.fbien.com](https://slugstore.fbien.com)
-- **Issues**: [GitHub Issues](https://github.com/farajabien/slug-store/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/farajabien/slug-store/discussions)
+- Built with ❤️ for the developer community
+- Inspired by the need for simple, shareable state persistence
+- Made possible by modern web APIs and the open source community
 
 ---
 
-**Author:** Faraja Bien  
-**Email:** hello@fbien.com  
-**Website:** https://slugstore.fbien.com  
-**GitHub:** https://github.com/farajabien  
-**NPM:** https://npmjs.com/~farajabien
-
-**The future of web development is here. No databases required.**
+**Made by [Faraja Bien](https://github.com/farajabien)**  
+**Star us on [GitHub](https://github.com/farajabien/slug-store) ⭐**
