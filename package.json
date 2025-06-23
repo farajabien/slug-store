@@ -1,12 +1,22 @@
 {
-  "name": "shadcn-ui-monorepo",
-  "version": "0.0.1",
+  "name": "slug-store",
+  "version": "0.1.0",
   "private": true,
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev",
+    "dev:core": "turbo dev --filter=@farajabien/slug-store-core",
+    "dev:react": "turbo dev --filter=@farajabien/slug-store-react",
+    "dev:web": "turbo dev --filter=web",
+    "dev:all": "turbo dev",
     "lint": "turbo lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "test": "turbo test",
+    "test:core": "turbo test --filter=@farajabien/slug-store-core",
+    "test:react": "turbo test --filter=@farajabien/slug-store-react",
+    "docs": "cd docs && python -m http.server 3001",
+    "benchmark": "turbo test --filter=@farajabien/slug-store-core -- --run --reporter=verbose",
+    "validate": "turbo lint && turbo test && turbo build"
   },
   "devDependencies": {
     "@workspace/eslint-config": "workspace:*",

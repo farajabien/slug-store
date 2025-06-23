@@ -1,0 +1,76 @@
+{
+  "name": "@farajabien/slug-store-react",
+  "version": "0.1.0",
+  "description": "React hooks for URL state persistence with Zustand-like simplicity",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist/**/*",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "lint": "eslint . --max-warnings 0",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest",
+    "test:watch": "vitest --watch",
+    "test:coverage": "vitest --coverage",
+    "prepublishOnly": "pnpm build"
+  },
+  "keywords": [
+    "react",
+    "hooks",
+    "url-state",
+    "state-management",
+    "zustand",
+    "url-persistence",
+    "slug-store",
+    "typescript"
+  ],
+  "author": "Faraja Bien <hello@fbien.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/farajabien/slug-store.git"
+  },
+  "bugs": {
+    "url": "https://github.com/farajabien/slug-store/issues"
+  },
+  "homepage": "https://slugstore.fbien.com",
+  "dependencies": {
+    "@farajabien/slug-store-core": "workspace:*"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.3.0",
+    "@types/react": "^19",
+    "@workspace/eslint-config": "workspace:*",
+    "@workspace/typescript-config": "workspace:*",
+    "eslint": "^9.0.0",
+    "jsdom": "^26.1.0",
+    "tsup": "^8.5.0",
+    "typescript": "^5.7.3",
+    "vitest": "^2.1.9"
+  },
+  "peerDependencies": {
+    "react": ">=16.8.0"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
