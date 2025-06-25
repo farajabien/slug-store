@@ -1,6 +1,6 @@
 {
   "name": "@farajabien/slug-store",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Universal state persistence for client and server - URLs, databases, cache, and more",
   "keywords": [
     "react",
