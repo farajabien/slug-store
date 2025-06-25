@@ -4,6 +4,106 @@
 
 Two simple use cases. Everything else is noise.
 
+## 🚀 Quick Start
+
+```bash
+npm install @farajabien/slug-store
+```
+
+## 📚 Complete API Reference
+
+### **Everything Import** (Recommended)
+```typescript
+import { 
+  // Client-Side (React Hooks)
+  useSlugStore,           // useState-like hook with URL persistence
+  create,                 // Zustand-like store creator with URL sync
+  
+  // Server-Side (Universal Functions)
+  createShareableUrl,     // Create URLs with embedded state
+  loadFromShareableUrl,   // Extract state from shareable URLs
+  createUserState,        // Encode state for database storage
+  loadUserState,          // Decode state from database
+  saveUserState,          // Save state and return slug
+  persistState,           // Universal state persistence
+  restoreState,           // Universal state restoration
+  
+  // Core (Encoding/Decoding)
+  encodeState,            // Convert state to compressed slug
+  decodeState,            // Convert slug back to state
+  validateSlug,           // Validate slug format
+  getSlugInfo             // Get metadata about a slug
+} from '@farajabien/slug-store'
+```
+
+### **Client-Side Only** (React Apps)
+```typescript
+import { 
+  useSlugStore,           // useState-like hook with URL persistence
+  create                  // Zustand-like store creator with URL sync
+} from '@farajabien/slug-store/client'
+
+// Types
+import type {
+  SlugStoreOptions,       // Options for useSlugStore
+  UseSlugStoreOptions,    // Hook-specific options
+  UseSlugStoreReturn,     // Return type of useSlugStore
+  SlugStoreCreator,       // Type for create function
+  SlugStore               // Store instance type
+} from '@farajabien/slug-store/client'
+```
+
+### **Server-Side Only** (Node.js, Next.js, Remix)
+```typescript
+import {
+  // URL Sharing (Use Case 1)
+  createShareableUrl,     // Create URLs with embedded state
+  loadFromShareableUrl,   // Extract state from shareable URLs
+  
+  // Database Storage (Use Case 2)
+  createUserState,        // Encode state for database storage
+  loadUserState,          // Decode state from database
+  saveUserState,          // Save state and return slug
+  
+  // Unified Interface (Recommended)
+  persistState,           // Universal state persistence
+  restoreState,           // Universal state restoration
+  
+  // Legacy Server Hook
+  useSlugStore as useServerSlugStore,  // Server-side hook
+  fromDatabase,           // Load from database with slug
+  createSlugForDatabase   // Create slug for database storage
+} from '@farajabien/slug-store/server'
+
+// Types
+import type {
+  ShareableOptions,       // Options for URL sharing
+  UserStateOptions,       // Options for database storage
+  DatabaseStateResult,    // Result from saveUserState
+  UniversalOptions,       // Options for persistState
+  SlugStoreServerOptions, // Server hook options
+  SlugStoreServerReturn   // Server hook return type
+} from '@farajabien/slug-store/server'
+```
+
+### **Core Only** (Framework-agnostic)
+```typescript
+import {
+  encodeState,            // Convert state to compressed slug
+  decodeState,            // Convert slug back to state
+  validateSlug,           // Validate slug format
+  getSlugInfo             // Get metadata about a slug
+} from '@farajabien/slug-store-core'
+
+// Types
+import type {
+  EncodeOptions,          // Options for encoding
+  DecodeOptions,          // Options for decoding
+  SlugInfo,               // Slug metadata
+  SlugStoreError          // Error types
+} from '@farajabien/slug-store-core'
+```
+
 ## 🎯 The Two Use Cases
 
 ### 1. **Share State via URLs** 
@@ -52,47 +152,6 @@ const userPreferences = await loadUserState(profile.app_state)
 ```
 
 That's it. **No configuration, no setup, no learning curve.**
-
-## 🚀 Quick Start
-
-```bash
-npm install @farajabien/slug-store
-```
-
-### Client-Side (React)
-
-```typescript
-import { useSlugStore } from '@farajabien/slug-store'
-
-function MyComponent() {
-  const { state, setState } = useSlugStore({
-    filters: { status: 'active' },
-    view: 'grid'
-  })
-
-  return (
-    <div>
-      <button onClick={() => setState({ ...state, view: 'list' })}>
-        Switch to List View
-      </button>
-    </div>
-  )
-}
-```
-
-### Server-Side (Universal)
-
-```typescript
-// Works in Next.js, Remix, Node.js, anywhere
-import { persistState, restoreState } from '@farajabien/slug-store'
-
-// Save state (auto-optimized for purpose)
-const shareableSlug = await persistState(data, 'share')  // For URLs
-const userSlug = await persistState(data, 'user')        // For database
-
-// Load state (auto-detects format)
-const state = await restoreState(slugOrUrl)
-```
 
 ## 🎨 Real-World Examples
 

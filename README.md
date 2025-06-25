@@ -17,6 +17,88 @@ That's it. No other packages needed. Works everywhere:
 - ✅ **Node.js** (any server)
 - ✅ **Supabase, Firebase, PostgreSQL** (any database)
 
+## 📚 Complete API Reference
+
+### **Client-Side Exports** (React Hooks)
+```typescript
+import { 
+  useSlugStore,           // useState-like hook with URL persistence
+  create                  // Zustand-like store creator with URL sync
+} from '@farajabien/slug-store'
+
+// Types
+import type {
+  SlugStoreOptions,       // Options for useSlugStore
+  UseSlugStoreOptions,    // Hook-specific options
+  UseSlugStoreReturn,     // Return type of useSlugStore
+  SlugStoreCreator,       // Type for create function
+  SlugStore               // Store instance type
+} from '@farajabien/slug-store'
+```
+
+### **Server-Side Exports** (Universal Functions)
+```typescript
+import {
+  // URL Sharing (Use Case 1)
+  createShareableUrl,     // Create URLs with embedded state
+  loadFromShareableUrl,   // Extract state from shareable URLs
+  
+  // Database Storage (Use Case 2)
+  createUserState,        // Encode state for database storage
+  loadUserState,          // Decode state from database
+  saveUserState,          // Save state and return slug
+  
+  // Unified Interface (Recommended)
+  persistState,           // Universal state persistence
+  restoreState,           // Universal state restoration
+  
+  // Legacy Server Hook
+  useSlugStore as useServerSlugStore,  // Server-side hook
+  fromDatabase,           // Load from database with slug
+  createSlugForDatabase   // Create slug for database storage
+} from '@farajabien/slug-store'
+
+// Types
+import type {
+  ShareableOptions,       // Options for URL sharing
+  UserStateOptions,       // Options for database storage
+  DatabaseStateResult,    // Result from saveUserState
+  UniversalOptions,       // Options for persistState
+  SlugStoreServerOptions, // Server hook options
+  SlugStoreServerReturn   // Server hook return type
+} from '@farajabien/slug-store'
+```
+
+### **Core Exports** (Encoding/Decoding)
+```typescript
+import {
+  encodeState,            // Convert state to compressed slug
+  decodeState,            // Convert slug back to state
+  validateSlug,           // Validate slug format
+  getSlugInfo             // Get metadata about a slug
+} from '@farajabien/slug-store'
+
+// Types
+import type {
+  EncodeOptions,          // Options for encoding
+  DecodeOptions,          // Options for decoding
+  SlugInfo,               // Slug metadata
+  SlugStoreError          // Error types
+} from '@farajabien/slug-store'
+```
+
+### **Targeted Imports** (Smaller Bundles)
+```typescript
+// Client-only (React hooks)
+import { useSlugStore, create } from '@farajabien/slug-store/client'
+
+// Server-only (Universal functions)
+import { persistState, restoreState } from '@farajabien/slug-store/server'
+
+// Core-only (Encoding/decoding)
+import { encodeState, decodeState } from '@farajabien/slug-store-core'
+```
+
 ## 🎯 The Two Use Cases
 
 ### 1. **Share State via URLs** 
