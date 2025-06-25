@@ -1,7 +1,7 @@
 {
-  "name": "@farajabien/slug-store",
+  "name": "@farajabien/slug-store-server",
   "version": "2.0.0",
-  "description": "React hooks for Slug Store - a lightweight solution for persisting application state in URL slugs.",
+  "description": "Server-side state persistence with multiple backends for Slug Store",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -11,6 +11,16 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
+    },
+    "./adapters": {
+      "types": "./dist/adapters/index.d.ts",
+      "import": "./dist/adapters/index.js",
+      "require": "./dist/adapters/index.cjs"
+    },
+    "./frameworks": {
+      "types": "./dist/frameworks/index.d.ts",
+      "import": "./dist/frameworks/index.js",
+      "require": "./dist/frameworks/index.cjs"
     },
     "./package.json": "./package.json"
   },
@@ -30,14 +40,17 @@
     "prepublishOnly": "pnpm build"
   },
   "keywords": [
-    "react",
-    "hooks",
-    "url-state",
+    "server-side",
     "state-management",
-    "zustand",
-    "url-persistence",
+    "caching",
+    "persistence",
+    "redis",
     "slug-store",
-    "typescript"
+    "nextjs",
+    "remix",
+    "astro",
+    "typescript",
+    "node"
   ],
   "author": "Faraja Bien <hello@fbien.com>",
   "license": "MIT",
@@ -53,19 +66,21 @@
     "@farajabien/slug-store-core": "workspace:*"
   },
   "devDependencies": {
-    "@testing-library/jest-dom": "^6.6.3",
-    "@testing-library/react": "^16.3.0",
-    "@types/react": "^19",
+    "@types/node": "^22.0.0",
     "@workspace/eslint-config": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
     "eslint": "^9.0.0",
-    "jsdom": "^26.1.0",
     "tsup": "^8.5.0",
     "typescript": "^5.7.3",
-    "vitest": "^2.1.9"
+    "vitest": "^2.1.8"
   },
   "peerDependencies": {
-    "react": ">=16.8.0"
+    "redis": "^4.0.0",
+    "ioredis": "^5.0.0"
+  },
+  "peerDependenciesMeta": {
+    "redis": { "optional": true },
+    "ioredis": { "optional": true }
   },
   "engines": {
     "node": ">=18"
@@ -73,4 +88,4 @@
   "publishConfig": {
     "access": "public"
   }
-}
+} 

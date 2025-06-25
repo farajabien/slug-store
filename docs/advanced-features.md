@@ -1,17 +1,24 @@
-# Advanced Features
+# Advanced Features: Full-Stack Persistence
 
-This guide covers the advanced features of Slug Store for enterprise applications and complex use cases.
+This guide covers advanced features across Slug Store's **three pillars of persistence**: URL State, Server Caching, and Hybrid Architecture.
 
 ## 📦 NPM Packages
 
+### Client-Side Packages
 - **[@farajabien/slug-store-core](https://www.npmjs.com/package/@farajabien/slug-store-core)** - Framework-agnostic core library
 - **[@farajabien/slug-store-react](https://www.npmjs.com/package/@farajabien/slug-store-react)** - React hooks with Zustand-like API
 
-## State Schema Validation with Zod
+### Server-Side Packages (NEW!)
+- **[@farajabien/slug-store-server](https://www.npmjs.com/package/@farajabien/slug-store-server)** - Multi-backend server caching
+- **[@farajabien/slug-store-frameworks](https://www.npmjs.com/package/@farajabien/slug-store-frameworks)** - Framework integrations (Next.js, Remix, Astro)
 
-Slug Store provides built-in support for state validation using Zod or any compatible schema library.
+## 🌟 The Three Pillars
 
-### Basic Validation
+### 1. 🌐 URL Persistence (Client-Side)
+
+Perfect for applications requiring instant shareability without backend complexity.
+
+#### State Schema Validation with Zod
 
 ```typescript
 import { z } from 'zod'
@@ -53,7 +60,7 @@ try {
 }
 ```
 
-### Safe Validation
+#### Safe Validation
 
 ```typescript
 // Safe validation with detailed error handling
@@ -66,7 +73,7 @@ if (result.success) {
 }
 ```
 
-### React Hook with Validation
+#### React Hook with Validation
 
 ```typescript
 import { useSlugStore } from '@farajabien/slug-store-react'
@@ -112,6 +119,248 @@ function TodoApp() {
   return (
     <div>
       {/* Your todo UI */}
+    </div>
+  )
+}
+```
+
+### 2. ⚡ Server Caching (Server-Side)
+
+High-performance caching with multiple backend support and intelligent invalidation.
+
+#### Basic Server Usage
+
+```typescript
+import { useServerSlugStore } from '@farajabien/slug-store-server'
+
+// Next.js App Router example
+export default async function DashboardPage({ params, searchParams }) {
+  const { data, cached, stale, revalidate } = await useServerSlugStore(
+    // Fetcher function
+    async (params, searchParams) => {
+      return await db.analytics.getMetrics({
+        dateRange: searchParams.dateRange,
+        userId: params.userId
+      })
+    },
+    params,
+    searchParams,
+    {
+      persist: 'redis',           // Backend adapter
+      ttl: 1800,                 // 30 minutes cache
+      staleWhileRevalidate: true, // Background updates
+      fallback: true,            // Graceful error handling
+      tags: ['analytics', `user:${params.userId}`] // Cache tags for invalidation
+    }
+  )
+
+  return (
+    <div>
+      <h1>Analytics Dashboard</h1>
+      {cached && <Badge>Cached {stale ? '(stale)' : '(fresh)'}</Badge>}
+      <AnalyticsChart data={data} />
+    </div>
+  )
+}
+```
+
+#### Multi-Backend Configuration
+
+```typescript
+import { createAdapterChain, MemoryAdapter, RedisAdapter, FileAdapter } from '@farajabien/slug-store-server'
+
+// Create fallback chain: Redis → Memory → File
+const adapter = createAdapterChain([
+  new RedisAdapter({ url: process.env.REDIS_URL }),
+  new MemoryAdapter({ maxSize: 1000 }),
+  new FileAdapter({ directory: './cache' })
+])
+
+const { data } = await useServerSlugStore(
+  fetchExpensiveData,
+  params,
+  searchParams,
+  { 
+    adapter,  // Use custom adapter chain
+    ttl: 3600,
+    onCacheHit: (key, data) => console.log(`Cache hit: ${key}`),
+    onCacheMiss: (key) => console.log(`Cache miss: ${key}`)
+  }
+)
+```
+
+#### Performance Monitoring
+
+```typescript
+const { data, getCacheInfo } = await useServerSlugStore(
+  fetchData,
+  params,
+  searchParams,
+  { persist: 'redis', ttl: 300 }
+)
+
+// Get detailed cache information
+const cacheInfo = await getCacheInfo()
+console.log({
+  hitRate: cacheInfo.hitRate,
+  missRate: cacheInfo.missRate,
+  averageResponseTime: cacheInfo.avgResponseTime,
+  totalRequests: cacheInfo.totalRequests
+})
+```
+
+#### Cache Invalidation
+
+```typescript
+import { invalidateCache, revalidateCache } from '@farajabien/slug-store-server'
+
+// Invalidate specific cache entries
+await invalidateCache({
+  tags: ['user:123'],           // By tags
+  patterns: ['analytics:*'],    // By patterns
+  keys: ['specific-cache-key']  // By specific keys
+})
+
+// Revalidate cache entries (fetch fresh data)
+await revalidateCache({
+  tags: ['analytics'],
+  background: true  // Don't wait for completion
+})
+```
+
+### 3. 🏗️ Hybrid Architecture
+
+Combine URL state, server caching, and traditional databases for maximum flexibility.
+
+#### E-commerce Example
+
+```typescript
+// app/products/page.tsx - Next.js App Router
+import { useSlugStore } from '@farajabien/slug-store-react'
+import { useServerSlugStore } from '@farajabien/slug-store-server'
+
+export default async function ProductsPage({ params, searchParams }) {
+  // Server-side: Cache expensive product queries
+  const { data: products } = await useServerSlugStore(
+    async (params, searchParams) => {
+      return await db.products.findMany({
+        where: buildProductFilters(searchParams),
+        include: { categories: true, reviews: true }
+      })
+    },
+    params,
+    searchParams,
+    {
+      persist: 'redis',
+      ttl: 900, // 15 minutes
+      tags: ['products', 'catalog']
+    }
+  )
+
+  return (
+    <div>
+      <ProductFilters />
+      <ProductGrid products={products} />
+    </div>
+  )
+}
+
+// components/ProductFilters.tsx - Client component
+'use client'
+
+function ProductFilters() {
+  // Client-side: URL state for UI preferences (shareable!)
+  const { state: filters, setState: setFilters } = useSlugStore({
+    category: 'all',
+    priceRange: [0, 1000],
+    sortBy: 'popularity',
+    view: 'grid'
+  }, { compress: true })
+
+  const updateFilter = (key: string, value: any) => {
+    setFilters({ ...filters, [key]: value })
+    // URL automatically updates, filters become shareable
+  }
+
+  return (
+    <div>
+      <CategoryFilter 
+        value={filters.category}
+        onChange={(category) => updateFilter('category', category)}
+      />
+      <PriceRangeFilter
+        value={filters.priceRange}
+        onChange={(range) => updateFilter('priceRange', range)}
+      />
+      {/* Filters are persisted in URL, instantly shareable */}
+    </div>
+  )
+}
+```
+
+#### Analytics Dashboard Example
+
+```typescript
+// app/dashboard/page.tsx
+export default async function DashboardPage({ params, searchParams }) {
+  // Server caching for expensive analytics queries
+  const { data: metrics, cached } = await useServerSlugStore(
+    async (params, searchParams) => {
+      const queries = await Promise.all([
+        db.analytics.getPageViews(searchParams),
+        db.analytics.getUserMetrics(searchParams),
+        db.analytics.getConversionRates(searchParams)
+      ])
+      
+      return {
+        pageViews: queries[0],
+        userMetrics: queries[1],
+        conversions: queries[2],
+        generatedAt: new Date().toISOString()
+      }
+    },
+    params,
+    searchParams,
+    {
+      persist: 'redis',
+      ttl: 1800,
+      staleWhileRevalidate: true,
+      tags: ['analytics', 'dashboard']
+    }
+  )
+
+  return (
+    <div>
+      <DashboardControls />
+      <MetricsDisplay data={metrics} cached={cached} />
+    </div>
+  )
+}
+
+// components/DashboardControls.tsx
+'use client'
+
+function DashboardControls() {
+  // URL state for dashboard configuration (shareable reports!)
+  const { state: config, setState: setConfig } = useSlugStore({
+    dateRange: 'last_30_days',
+    metrics: ['pageviews', 'users', 'conversions'],
+    breakdown: 'daily',
+    filters: {}
+  })
+
+  return (
+    <div>
+      <DateRangePicker
+        value={config.dateRange}
+        onChange={(range) => setConfig({ ...config, dateRange: range })}
+      />
+      <MetricSelector
+        selected={config.metrics}
+        onChange={(metrics) => setConfig({ ...config, metrics })}
+      />
+      {/* Share dashboard configuration via URL */}
+      <ShareButton />
     </div>
   )
 }
@@ -190,308 +439,201 @@ function AppWithMigration() {
 }
 ```
 
-## Persistence Adapters
+## Server Adapters
 
-Slug Store includes adapters for various storage backends.
+Slug Store Server includes multiple backend adapters for different use cases.
 
-### localStorage Adapter
+### Memory Adapter (Development/Testing)
 
 ```typescript
-import { adapters, StorageManager } from '@farajabien/slug-store-core'
+import { MemoryAdapter } from '@farajabien/slug-store-server'
 
-// Create storage manager with localStorage
-const storage = new StorageManager(adapters.localStorage('myapp:'))
-
-// Store state
-await storage.store('user-preferences', {
-  theme: 'dark',
-  language: 'en'
+const adapter = new MemoryAdapter({
+  maxSize: 1000,           // Maximum number of entries
+  ttl: 3600,              // Default TTL in seconds
+  cleanupInterval: 300,    // Cleanup interval in seconds
+  onEviction: (key, value) => {
+    console.log(`Evicted: ${key}`)
+  }
 })
-
-// Retrieve state
-const preferences = await storage.retrieve('user-preferences')
-
-// List all stored keys
-const keys = await storage.list()
-
-// Clear all stored data
-await storage.clear()
 ```
 
-### sessionStorage Adapter
+### Redis Adapter (Production)
 
 ```typescript
-// For session-only persistence
-const sessionStorage = new StorageManager(adapters.sessionStorage())
+import { RedisAdapter } from '@farajabien/slug-store-server'
 
-await sessionStorage.store('temp-data', { draft: 'content' })
-```
-
-### Memory Adapter (Testing/SSR)
-
-```typescript
-// For testing or server-side rendering
-const memoryStorage = new StorageManager(adapters.memory())
-
-await memoryStorage.store('test-state', { value: 42 })
-```
-
-### Custom Adapter
-
-```typescript
-import { StorageAdapter } from '@farajabien/slug-store-core'
-
-class DatabaseAdapter implements StorageAdapter {
-  async get(key: string): Promise<string | null> {
-    // Implement database read
-    const record = await db.states.findOne({ key })
-    return record?.value || null
-  }
-
-  async set(key: string, value: string): Promise<void> {
-    // Implement database write
-    await db.states.upsert({ key }, { value })
-  }
-
-  async remove(key: string): Promise<void> {
-    await db.states.delete({ key })
-  }
-
-  async clear(): Promise<void> {
-    await db.states.deleteMany({})
-  }
-
-  async keys(): Promise<string[]> {
-    const records = await db.states.findMany({}, { select: { key: true } })
-    return records.map(r => r.key)
-  }
-}
-
-// Use custom adapter
-const dbStorage = new StorageManager(new DatabaseAdapter())
-```
-
-## React Hook with All Features
-
-```typescript
-import { useSlugStore } from '@farajabien/slug-store-react'
-import { z } from 'zod'
-
-const AppStateSchema = z.object({
-  version: z.string(),
-  user: z.object({
-    id: z.string(),
-    name: z.string(),
-    preferences: z.object({
-      theme: z.enum(['light', 'dark']),
-      language: z.string()
-    })
-  }),
-  data: z.array(z.any())
+const adapter = new RedisAdapter({
+  url: process.env.REDIS_URL,
+  keyPrefix: 'slug-store:',
+  retryAttempts: 3,
+  retryDelay: 1000,
+  onConnect: () => console.log('Redis connected'),
+  onError: (error) => console.error('Redis error:', error)
 })
+```
 
-function AdvancedApp() {
-  const { state, setState, resetState, getShareableUrl } = useSlugStore(
-    { 
-      version: '2.0.0',
-      user: { 
-        id: '', 
-        name: '', 
-        preferences: { theme: 'light', language: 'en' } 
-      },
-      data: []
-    },
-    {
-      // URL persistence
-      key: 'app-state',
-      compress: true,
-      encrypt: false,
-      debounceMs: 500,
-      
-      // Validation
-      validator: createStateValidator(AppStateSchema),
-      
-      // Migration
-      migrationManager,
-      
-      // Storage backup
-      storageAdapter: adapters.localStorage('myapp:'),
-      autoBackup: true,
-      
-      // Error handling
-      onError: (error) => {
-        console.error('State error:', error)
-        // Report to analytics
-      },
-      
-      // Callbacks
-      onStateChange: (newState, prevState) => {
-        console.log('State changed from', prevState, 'to', newState)
-      },
-      
-      onMigration: (fromVersion, toVersion) => {
-        console.log(`Migrated from ${fromVersion} to ${toVersion}`)
+### File Adapter (Simple Persistence)
+
+```typescript
+import { FileAdapter } from '@farajabien/slug-store-server'
+
+const adapter = new FileAdapter({
+  directory: './cache',
+  extension: '.json',
+  encoding: 'utf8',
+  atomic: true,           // Use atomic writes
+  compression: 'gzip'     // Optional compression
+})
+```
+
+### URL Adapter (Serverless/Edge)
+
+```typescript
+import { URLAdapter } from '@farajabien/slug-store-server'
+
+const adapter = new URLAdapter({
+  compress: true,
+  encrypt: true,
+  secretKey: process.env.ENCRYPTION_KEY
+})
+```
+
+## Framework Integrations
+
+### Next.js App Router
+
+```typescript
+// app/api/revalidate/route.ts
+import { revalidateCache } from '@farajabien/slug-store-server'
+
+export async function POST(request: Request) {
+  const { tags } = await request.json()
+  
+  await revalidateCache({ tags })
+  
+  return Response.json({ revalidated: true })
       }
-    }
-  )
 
-  return (
-    <div>
-      <h1>Advanced Slug Store App</h1>
-      <p>Current version: {state.version}</p>
-      <p>User: {state.user.name}</p>
-      
-      <button onClick={() => setState({
-        ...state,
-        user: {
-          ...state.user,
-          preferences: {
-            ...state.user.preferences,
-            theme: state.user.preferences.theme === 'light' ? 'dark' : 'light'
-          }
-        }
-      })}>
-        Toggle Theme
-      </button>
-      
-      <button onClick={resetState}>
-        Reset State
-      </button>
-      
-      <button onClick={async () => {
-        const url = await getShareableUrl()
-        navigator.clipboard.writeText(url)
-      }}>
-        Copy Share URL
-      </button>
-    </div>
-  )
+// app/dashboard/loading.tsx
+export default function DashboardLoading() {
+  return <div>Loading dashboard data...</div>
 }
+```
+
+### Remix
+
+```typescript
+// app/routes/dashboard.tsx
+import { useServerSlugStore } from '@farajabien/slug-store-server'
+
+export const loader = async ({ request, params }) => {
+  const url = new URL(request.url)
+  const searchParams = Object.fromEntries(url.searchParams)
+  
+  const { data } = await useServerSlugStore(
+    fetchDashboardData,
+    params,
+    searchParams,
+    { persist: 'redis', ttl: 900 }
+  )
+  
+  return json({ data })
+}
+```
+
+### Astro
+
+```typescript
+---
+// src/pages/products.astro
+import { useServerSlugStore } from '@farajabien/slug-store-server'
+
+const { data: products } = await useServerSlugStore(
+  fetchProducts,
+  Astro.params,
+  Object.fromEntries(Astro.url.searchParams),
+  { persist: 'memory', ttl: 600 }
+)
+---
+
+<html>
+  <body>
+    <ProductList products={products} />
+  </body>
+</html>
 ```
 
 ## Performance Optimization
 
-### Selective Encoding
+### Preloading and Prefetching
 
 ```typescript
-// Only encode specific parts of state
-const optimizedState = {
-  // Include in URL
-  filters: state.filters,
-  view: state.view,
-  
-  // Exclude large data from URL (store separately)
-  // data: state.data  // Skip this
-}
+import { preloadCache, prefetchCache } from '@farajabien/slug-store-server'
 
-const slug = await encodeState(optimizedState, { compress: true })
+// Preload critical data
+await preloadCache([
+  { key: 'user:123', fetcher: () => fetchUser('123'), ttl: 3600 },
+  { key: 'settings', fetcher: fetchSettings, ttl: 1800 }
+])
+
+// Prefetch likely-needed data
+prefetchCache([
+  { key: 'recommendations:123', fetcher: () => fetchRecommendations('123') }
+])
 ```
 
-### Compression Analysis
+### Batch Operations
 
 ```typescript
-import { getSlugInfo } from '@farajabien/slug-store-core'
+import { batchGet, batchSet, batchInvalidate } from '@farajabien/slug-store-server'
 
-const slug = await encodeState(state, { compress: true })
-const info = getSlugInfo(slug)
+// Batch get multiple cache entries
+const results = await batchGet([
+  'user:123',
+  'settings:123',
+  'preferences:123'
+])
 
-console.log({
-  size: info.size,
-  compressed: info.compressed,
-  compressionRatio: info.originalSize 
-    ? ((1 - info.size / info.originalSize) * 100).toFixed(1) + '%'
-    : 'N/A'
-})
+// Batch set multiple entries
+await batchSet([
+  { key: 'user:123', value: userData, ttl: 3600 },
+  { key: 'settings:123', value: settingsData, ttl: 1800 }
+])
+
+// Batch invalidate
+await batchInvalidate(['user:*', 'settings:*'])
 ```
 
-### Debounced Updates
+### Monitoring and Observability
 
 ```typescript
-const { state, setState } = useSlugStore(initialState, {
-  debounceMs: 1000, // Wait 1 second before URL update
-  syncToUrl: true
-})
-```
+import { createMetricsCollector } from '@farajabien/slug-store-server'
 
-## Security Best Practices
-
-### Encryption for Sensitive Data
-
-```typescript
-const { state, setState } = useSlugStore(sensitiveData, {
-  encrypt: true,
-  password: await getUserPassword(),
-  compress: true
-})
-```
-
-### Data Sanitization
-
-```typescript
-const SanitizedSchema = z.object({
-  publicData: z.object({
-    theme: z.string(),
-    language: z.string()
-  })
-  // Don't include sensitive fields in URL state
-})
-
-// Separate sensitive data
-const publicState = validator.validateState(state.publicData)
-const slug = await encodeState(publicState, { compress: true })
-```
-
-## Analytics Integration
-
-```typescript
-import { useSlugStore } from '@farajabien/slug-store-react'
-
-function AnalyticsApp() {
-  const { state, setState } = useSlugStore(initialState, {
-    onStateChange: (newState, prevState) => {
-      // Track state changes
-      analytics.track('state_changed', {
-        from: prevState,
-        to: newState,
-        timestamp: Date.now()
-      })
+const metrics = createMetricsCollector({
+  onCacheHit: (key, duration) => {
+    // Log to your monitoring service
+    logger.info('cache.hit', { key, duration })
     },
-    
-    onUrlUpdate: (url) => {
-      // Track URL updates
-      analytics.track('url_updated', {
-        url: url.length, // Don't send actual URL for privacy
-        compressed: url.includes('compressed'),
-        encrypted: url.includes('encrypted')
-      })
-    }
-  })
-
-  return <div>{/* Your app */}</div>
-}
-```
-
-## Testing Utilities
-
-```typescript
-import { adapters } from '@farajabien/slug-store-core'
-
-describe('App State', () => {
-  let storage: StorageManager
-
-  beforeEach(() => {
-    // Use memory adapter for tests
-    storage = new StorageManager(adapters.memory())
-  })
-
-  it('should persist state', async () => {
-    const state = { count: 42 }
-    await storage.store('test', state)
-    
-    const retrieved = await storage.retrieve('test')
-    expect(retrieved).toEqual(state)
-  })
+  onCacheMiss: (key, duration) => {
+    logger.info('cache.miss', { key, duration })
+  },
+  onError: (error, operation) => {
+    logger.error('cache.error', { error: error.message, operation })
+  }
 })
+
+// Use with server store
+const { data } = await useServerSlugStore(
+  fetchData,
+  params,
+  searchParams,
+  { 
+    persist: 'redis',
+    metrics,
+    ttl: 300
+  }
+)
 ```
 
-This comprehensive feature set makes Slug Store suitable for everything from simple demos to enterprise applications with complex state management requirements. 
+This advanced guide showcases how Slug Store's three-pillar architecture enables you to build sophisticated applications that scale from simple prototypes to enterprise-grade systems without architectural rewrites. 

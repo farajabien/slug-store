@@ -4,35 +4,116 @@
 
 Perfect for the modern era where **simplicity meets persistence**.
 
-## The New Paradigm
+## 🌟 **NEW: Server-Side Persistence** 
 
-### 🔄 Beyond Traditional State
-- **Traditional State**: Lost on refresh, device-specific, not shareable
-- **Slug Store**: Persistent, cross-device, instantly shareable
-- **Traditional Database**: Complex setup, server requirements, overkill for many use cases
-- **Slug Store + Simple DB**: User data in database, application state in URLs
+**Slug Store v2 is here!** Now with **server-side caching and persistence** alongside our revolutionary client-side URL state management.
+
+```tsx
+// Client-side: URL state management
+const { state, setState } = useSlugStore({ items: [] })
+
+// Server-side: Multi-backend caching  
+const { data, cached } = await useServerSlugStore(
+  fetchData, params, searchParams, 
+  { persist: 'redis', ttl: 300 }
+)
+```
+
+## 🎯 What is Slug Store?
+
+Slug Store revolutionizes how we think about data persistence in web applications by providing **multiple layers of intelligent state management**:
+
+### 🔄 The Three Pillars
+
+1. **🌐 URL Persistence** (Client-side)
+   - State lives in URLs, instantly shareable
+   - No database needed for application state
+   - Perfect for demos, prototypes, and stateless apps
+
+2. **⚡ Server Caching** (Server-side)  
+   - Intelligent multi-backend caching (Redis, Memory, File)
+   - Stale-while-revalidate for optimal performance
+   - Framework-agnostic server-side persistence
+
+3. **🔗 Hybrid Architecture** (Full-stack)
+   - Combine both for maximum flexibility
+   - User data in database, app state in URLs
+   - Server cache for performance, URLs for shareability
 
 ### 🎯 The Sweet Spot
 ```
 Ephemeral State ←→ [SLUG STORE] ←→ Full Database
                     ↑
                Perfect Balance:
-               • Instant persistence
-               • Zero infrastructure  
-               • Unlimited scalability
-               • Maximum simplicity
+               • Instant persistence (URLs)
+               • High performance (Server cache)
+               • Zero infrastructure (for simple apps)
+               • Infinite scalability (for complex apps)
 ```
 
-### 🚀 Enterprise-Ready Simplicity
-From **solo developer projects** to **enterprise applications** - one approach scales infinitely:
+## 🚀 Who Should Use Slug Store?
 
-- **Small Apps**: 100% URL state, zero backend
-- **Medium Apps**: User auth + URL state, minimal backend  
-- **Enterprise**: User data in DB + complex state in URLs
+### 👨‍💻 **Solo Developers & Startups**
+- **AI/ChatGPT clones**: Every conversation is a shareable URL
+- **Creative tools**: Share designs, configs, and creations instantly
+- **Demos & prototypes**: Zero backend, maximum impact
+- **MVP development**: Focus on features, not infrastructure
 
-## 🚀 Quick Start
+### 🏢 **Growing Companies**
+- **SaaS dashboards**: Shareable filtered views and configurations
+- **E-commerce**: Persistent shopping carts across devices
+- **Analytics platforms**: Shareable reports and visualizations
+- **Collaboration tools**: URL-based state sharing
 
-### React Apps (2 minutes)
+### 🏗️ **Enterprise Applications**
+- **Complex workflows**: Multi-step processes with URL checkpoints
+- **A/B testing**: Configuration sharing via URLs
+- **Customer support**: Reproducible issue states
+- **Training platforms**: Shareable lesson states and progress
+
+## 🔥 Why Slug Store?
+
+### ❌ **The Problem**
+Modern web development forces you to choose:
+
+- **Client State**: Fast but lost on refresh, not shareable
+- **Server State**: Persistent but requires complex infrastructure
+- **Databases**: Overkill for application state, slow setup
+- **Local Storage**: Device-specific, not shareable, limited
+
+### ✅ **The Slug Store Solution**
+
+**🎯 For Simple Apps**: 100% URL-based state, zero backend required
+```tsx
+// Entire app state in URLs - instantly shareable!
+const { state, setState } = useSlugStore({
+  chatMessages: [],
+  settings: { model: 'gpt-4', temperature: 0.7 }
+})
+```
+
+**⚡ For Performance Apps**: Server caching with URL fallback
+```tsx
+// Server caching for speed, URLs for sharing
+const { data, cached } = await useServerSlugStore(
+  fetchExpensiveData,
+  params,
+  searchParams,
+  { persist: 'redis', staleWhileRevalidate: true }
+)
+```
+
+**🏗️ For Enterprise Apps**: Hybrid architecture with intelligent persistence
+```tsx
+// User data in DB, app state in URLs, cache for performance
+const userData = await db.users.find(userId)
+const { state } = useSlugStore(appState)
+const { data } = await useServerSlugStore(fetchReports, params, searchParams)
+```
+
+## 📦 Packages & Installation
+
+### 🌐 **Client-Side State** (React)
 ```bash
 npm install @farajabien/slug-store-react
 ```
@@ -44,14 +125,48 @@ function ChatApp() {
   const { state, setState } = useSlugStore({
     messages: [],
     model: "gpt-4"
-  }, { compress: true })
+  }, { compress: true, encrypt: true })
   
   // ✨ Auto-saved to URL, instantly shareable!
   return <ChatInterface messages={state.messages} />
 }
 ```
 
-### Other Frameworks
+### ⚡ **Server-Side Caching** (NEW!)
+```bash
+npm install @farajabien/slug-store-server
+```
+
+```tsx
+// Next.js App Router example
+export default async function UserDashboard({ params, searchParams }) {
+  const { data: userData, cached, stale } = await useServerSlugStore(
+    async (params, searchParams) => {
+      return await prisma.user.findMany({
+        where: { status: searchParams.filter },
+        skip: (parseInt(searchParams.page) - 1) * 10
+      })
+    },
+    params,
+    searchParams,
+    {
+      persist: 'redis',           // Redis, Memory, File, URL adapters
+      ttl: 600,                  // 10 minutes
+      staleWhileRevalidate: true // Background updates
+    }
+  )
+
+  return (
+    <div>
+      {cached && <span>⚡ From cache</span>}
+      {stale && <span>🔄 Updating...</span>}
+      <UserList users={userData} />
+    </div>
+  )
+}
+```
+
+### 🔧 **Core Library** (Framework Agnostic)
 ```bash
 npm install @farajabien/slug-store-core
 ```
@@ -68,212 +183,199 @@ const urlSlug = new URLSearchParams(window.location.search).get('state')
 const restoredState = await decodeState(urlSlug)
 ```
 
-## 📦 NPM Packages
+## 🎛️ Server Persistence Backends
 
-- **@farajabien/slug-store-core** - Framework-agnostic core library
+### 🧠 **Memory** (Development)
+```tsx
+{ persist: 'memory', maxSize: 1000 }
+```
+- ⚡ Sub-millisecond access
+- 🔄 Auto-cleanup of expired entries
+- 💾 Lost on restart (perfect for dev)
+
+### 🔴 **Redis** (Production)
+```tsx
+{ persist: 'redis', host: 'localhost', ttl: 3600 }
+```
+- ⚡ 1-5ms access time
+- 🌐 Distributed caching
+- 📈 Production-ready scaling
+
+### 📁 **File System**
+```tsx
+{ persist: 'file', baseDir: './cache', maxFiles: 10000 }
+```
+- 💾 Persistent across restarts
+- 📊 Good for analytics data
+- 🔧 Simple setup
+
+### 🔗 **URL** (Shareable)
+```tsx
+{ persist: 'url', compress: true, encrypt: true }
+```
+- 📤 Instantly shareable
+- 🗜️ Automatic compression
+- 🔐 Optional encryption
+
+### ⛓️ **Fallback Chain**
+```tsx
+{ persist: ['memory', 'redis', 'file'] }
+```
+- 🛡️ Automatic failover
+- ⚡ Best performance with redundancy
+
+## 💡 Real-World Use Cases
+
+### 🤖 **AI Applications**
+```tsx
+// ChatGPT Clone with persistence
+const { state, setState } = useSlugStore({
+  conversation: [],
+  model: 'gpt-4',
+  systemPrompt: 'You are a helpful assistant'
+})
+
+// Every conversation becomes a shareable link!
+// No database needed for the entire app
+```
+
+### 📊 **Analytics Dashboard**
+```tsx
+// Server caching for expensive queries
+const { data: analytics } = await useServerSlugStore(
+  async (params, searchParams) => {
+    return await runExpensiveAnalyticsQuery(searchParams)
+  },
+  params,
+  searchParams,
+  { persist: 'redis', ttl: 1800 } // 30 min cache
+)
+
+// URL state for UI preferences
+const { state: filters } = useSlugStore({
+  dateRange: 'last_30_days',
+  metrics: ['revenue', 'users'],
+  breakdown: 'daily'
+})
+```
+
+### 🛒 **E-commerce Cart**
+```tsx
+// Cart state in URL - works across devices!
+const { state: cart } = useSlugStore({
+  items: [],
+  coupon: null,
+  shippingAddress: null
+})
+
+// Product data cached on server
+const { data: products } = await useServerSlugStore(
+  fetchProducts,
+  { category: params.category },
+  searchParams,
+  { persist: 'memory', ttl: 300 }
+)
+```
+
+## 📋 Package Status
+
+### ✅ **Production Ready**
+- **@farajabien/slug-store-core** - Framework-agnostic encoding/decoding
 - **@farajabien/slug-store-react** - React hooks with Zustand-like API
+- **@farajabien/slug-store-server** - Multi-backend server caching (**NEW!**)
 
-Both packages are **production-ready** and available on NPM!
+### 🔧 **Development Tools**
+- **@workspace/ui** - Shared component library
+- **@workspace/eslint-config** - Shared linting rules
+- **@workspace/typescript-config** - TypeScript configurations
 
-## Live Demo
+### 🌐 **Live Demo**
+**Try it**: [slugstore.fbien.com](https://slugstore.fbien.com)
 
-🌐 **Try it live**: [slugstore.fbien.com](https://slugstore.fbien.com)
-
-- Interactive wishlist with real-time URL persistence
-- Compression and encryption demonstrations
-- Complete documentation and examples
-
-## Perfect for AI Apps
-
-### The AI App Problem
-- **Users**: Lose conversations on refresh, can't share AI outputs
-- **Developers**: Complex database setup for simple state
-- **Solution**: Slug Store - instant persistence, zero backend
-
-### AI Use Cases
-- **ChatGPT Clones**: Every conversation becomes a shareable link
-- **Creative AI Tools**: Share AI-generated art and prompts
-- **AI Playgrounds**: Experiment with models and parameters
-- **Prompt Engineering**: Collaborative prompt development
-
-## Monorepo Structure
+## 🏗️ Monorepo Structure
 ```
 slug-store/
 ├── packages/
 │   ├── core/          # ✅ Core encoding/decoding library
 │   ├── react/         # ✅ React hooks with Zustand-like API
+│   ├── server/        # 🆕 Server-side persistence & caching
 │   ├── ui/            # ✅ Shared UI components
 │   ├── eslint-config/ # ✅ Shared ESLint configuration
 │   └── typescript-config/ # ✅ Shared TypeScript configuration
 ├── apps/
 │   └── web/           # ✅ Full-featured Next.js demo app
 ├── docs/              # ✅ Comprehensive documentation
-├── package.json       # Root package manager config
-└── turbo.json         # Turborepo build system config
+└── examples/          # 📚 Real-world usage examples
 ```
 
-## Package Status
+## 🌟 Advanced Features
 
-### ✅ Core Package ([@farajabien/slug-store-core](https://www.npmjs.com/package/@farajabien/slug-store-core))
-**Production Ready** - The foundation of Slug Store
-
-**Key Features:**
-- State ⇄ URL slug conversion
-- LZ-String compression for payload reduction
-- Web Crypto API for optional encryption
-- Framework-agnostic design
-- Comprehensive error handling
-- Full TypeScript support
-
-**Usage:**
-```javascript
-import { encodeState, decodeState } from '@farajabien/slug-store-core';
-
-// Convert state to shareable slug
-const state = { items: [...] };
-const slug = await encodeState(state, { compress: true });
-
-// Rebuild state from URL slug
-const restoredState = await decodeState(urlSlug);
-```
-
-### ✅ React Package ([@farajabien/slug-store-react](https://www.npmjs.com/package/@farajabien/slug-store-react)) 
-**Production Ready** - Zustand-like simplicity
-
-**Key Features:**
-- `useSlugStore()` - useState-like hook with URL persistence
-- `create()` - Zustand-like store creator with URL sync
-- Automatic URL synchronization
-- Debounced updates
-- Encryption support
-- TypeScript support
-
-**Usage:**
-```tsx
-// useState-like hook
-const { state, setState } = useSlugStore(initialState, { compress: true })
-
-// Zustand-like store
-const useWishlistStore = create((set) => ({
-  items: [],
-  addItem: (item) => set(state => ({ items: [...state.items, item] }))
-}), { compress: true })
-```
-
-### ✅ UI Package (`@workspace/ui`)
-**Production Ready** - Shared component library
-
-**Components:**
-- Button, Card, Badge, Alert
-- Tabs (Radix UI based)
-- Utility functions and styling
-
-### ✅ Web App (`apps/web`)
-**Production Ready** - Live documentation and demo
-
-**Features:**
-- Interactive wishlist demo
-- Real-time URL state persistence
-- Comprehensive documentation
-- API reference
-- Email sharing functionality
-- State compression and encryption examples
-
-## Advanced Features
-
-### 🗜️ Smart Compression
+### 🗜️ **Smart Compression**
 Automatic LZ-String compression reduces URL size by 30-70% for large state objects.
 
-### 🔐 Secure Encryption
+### 🔐 **Secure Encryption**
 Password-based encryption using Web Crypto API for sensitive data protection.
 
-### ⚡ Framework Agnostic
-Works with React, Vue, Angular, or vanilla JavaScript applications.
+### ⚡ **Framework Agnostic**
+Works with React, Vue, Angular, Next.js, Remix, Astro, or vanilla JavaScript.
 
-### 🔄 State Migration
+### 🔄 **State Migration**
 Handle schema changes gracefully with built-in migration support.
 
-### 📊 Analytics Integration
-Built-in hooks for tracking state changes and user interactions.
+### 📊 **Performance Monitoring**
+Built-in analytics for cache hit rates, performance metrics, and usage patterns.
 
-### 🗄️ Persistence Adapters
-Support for localStorage, sessionStorage, and custom storage backends.
+### 🗄️ **Multiple Persistence Layers**
+Choose from Memory, Redis, File, URL, or create custom adapters.
+
+### 🛡️ **Error Resilience**
+Graceful fallbacks, stale-while-revalidate, and automatic retry logic.
+
+## 🚀 Migration Guide
+
+### From v1 (Client-only) to v2 (Hybrid)
+
+**v1: Client-side only**
+```tsx
+import { useSlugStore } from '@farajabien/slug-store-react'
+const { state, setState } = useSlugStore({ items: [] })
+```
+
+**v2: Add server caching**
+```tsx
+// Keep client-side state for UI preferences
+import { useSlugStore } from '@farajabien/slug-store-react'
+const { state: uiState } = useSlugStore({ filters: {}, view: 'grid' })
+
+// Add server caching for data
+import { useServerSlugStore } from '@farajabien/slug-store-server'
+const { data } = await useServerSlugStore(fetchItems, params, searchParams)
+```
+
+**Benefits**: 
+- ✅ Zero breaking changes
+- ⚡ Instant performance improvement
+- 🔄 Backwards compatibility
+- 📈 Scalable architecture
 
 ## 🤝 Contributing
 
-We love contributions! Here's how to get started:
+We love contributions! See our [Contributing Guide](CONTRIBUTING.md) for details.
 
-### 1. Fork the Repository
+### Quick Start
 ```bash
-# Go to https://github.com/farajabien/slug-store
-# Click "Fork" button in the top right
-# This creates your own copy: https://github.com/YOUR_USERNAME/slug-store
-```
-
-### 2. Clone Your Fork
-```bash
-git clone https://github.com/YOUR_USERNAME/slug-store.git
+git clone https://github.com/farajabien/slug-store
 cd slug-store
-```
-
-### 3. Add Upstream Remote
-```bash
-git remote add upstream https://github.com/farajabien/slug-store.git
-```
-
-### 4. Install Dependencies
-```bash
 pnpm install
-```
-
-### 5. Create Feature Branch
-```bash
-git checkout -b feature/your-feature-name
-```
-
-### 6. Make Your Changes
-```bash
-# Make your changes to the code
-# Test everything works
 pnpm build
 pnpm test
 ```
 
-### 7. Commit and Push
-```bash
-git add .
-git commit -m "feat: add your feature description"
-git push origin feature/your-feature-name
-```
+## 🐛 Support
 
-### 8. Create Pull Request
-- Go to https://github.com/farajabien/slug-store
-- You'll see a prompt to create PR from your recently pushed branch
-- Or go to "Pull requests" tab and click "New pull request"
-
-### 9. Keep Your Fork Updated
-```bash
-git fetch upstream
-git checkout main
-git merge upstream/main
-git push origin main
-```
-
-## 📋 PR Guidelines
-
-When creating your PR, include:
-- **Clear title**: What the change does
-- **Description**: Why the change is needed
-- **Testing**: How you tested it
-- **Screenshots**: If UI changes
-- **Checklist**: Confirm all requirements met
-
-## 🐛 Reporting Issues
-
-Found a bug? Have a feature request?
-
-- **[GitHub Issues](https://github.com/farajabien/slug-store/issues)** - Report bugs and request features
-- **[GitHub Discussions](https://github.com/farajabien/slug-store/discussions)** - Ask questions and share ideas
+- **[GitHub Issues](https://github.com/farajabien/slug-store/issues)** - Bug reports & feature requests
+- **[GitHub Discussions](https://github.com/farajabien/slug-store/discussions)** - Questions & ideas
+- **[Documentation](https://slugstore.fbien.com)** - Complete guides & API reference
 
 ## 📄 License
 
