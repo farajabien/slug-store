@@ -55,7 +55,7 @@
       {
         "id": "quick-start",
         "question": "What's the fastest way to get started?",
-        "answer": "For React apps: `pnpm add @farajabien/slug-store-react` then replace `useState` with `useSlugStore`. For other frameworks: `pnpm add @farajabien/slug-store-core` and use `encodeState`/`decodeState`. Check our live demo at slugstore.fbien.com for examples.",
+        "answer": "For React apps: `pnpm add @farajabien/slug-store` then replace `useState` with `useSlugStore`. For other frameworks: `pnpm add @farajabien/slug-store-core` and use `encodeState`/`decodeState`. Check our live demo at slugstore.fbien.com for examples.",
         "category": "basics",
         "tags": ["installation", "quick-start"]
       }
@@ -251,7 +251,7 @@
       {
         "id": "from-zustand",
         "question": "How do I migrate from Zustand?",
-        "answer": "Easy! Replace `import { create } from 'zustand'` with `import { create } from '@farajabien/slug-store-react'`. Add options for URL sync: `create(storeFunction, { compress: true })`. Your existing store logic stays the same!",
+        "answer": "Easy! Replace `import { create } from 'zustand'` with `import { create } from '@farajabien/slug-store'`. Add options for URL sync: `create(storeFunction, { compress: true })`. Your existing store logic stays the same!",
         "category": "migration",
         "tags": ["zustand", "migration", "stores"]
       },

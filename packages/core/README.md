@@ -5,7 +5,7 @@
 [![Bundle size](https://img.shields.io/bundlephobia/minzip/@farajabien/slug-store-core)](https://bundlephobia.com/package/@farajabien/slug-store-core)
 
 > **Framework-agnostic core for URL state persistence**  
-> The foundation that powers `@farajabien/slug-store-react` and other framework adapters.
+> The foundation that powers `@farajabien/slug-store` and other framework adapters.
 
 ## Why Use This?
 
@@ -121,13 +121,13 @@ getSlugInfo(slug) // { version, compressed, encrypted, size }
 
 | Package | Description | NPM |
 |---------|-------------|-----|
-| [@farajabien/slug-store-react](https://www.npmjs.com/package/@farajabien/slug-store-react) | React hooks with Zustand-like API | [![npm](https://img.shields.io/npm/v/@farajabien/slug-store-react.svg)](https://www.npmjs.com/package/@farajabien/slug-store-react) |
+| [@farajabien/slug-store](https://www.npmjs.com/package/@farajabien/slug-store) | React hooks with Zustand-like API | [![npm](https://img.shields.io/npm/v/@farajabien/slug-store.svg)](https://www.npmjs.com/package/@farajabien/slug-store) |
 | [@farajabien/slug-store-ui](https://www.npmjs.com/package/@farajabien/slug-store-ui) | UI components and themes | [![npm](https://img.shields.io/npm/v/@farajabien/slug-store-ui.svg)](https://www.npmjs.com/package/@farajabien/slug-store-ui) |
 | [@farajabien/slug-store-eslint-config](https://www.npmjs.com/package/@farajabien/slug-store-eslint-config) | Shared ESLint configuration | [![npm](https://img.shields.io/npm/v/@farajabien/slug-store-eslint-config.svg)](https://www.npmjs.com/package/@farajabien/slug-store-eslint-config) |
 
 ## 🎨 Framework Adapters
 
-- **[React](https://www.npmjs.com/package/@farajabien/slug-store-react)** - Zustand-like hooks with URL persistence
+- **[React](https://www.npmjs.com/package/@farajabien/slug-store)** - Zustand-like hooks with URL persistence
 - **Vue** - Coming soon
 - **Angular** - Coming soon  
 - **Svelte** - Coming soon

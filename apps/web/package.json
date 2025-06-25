@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@farajabien/slug-store-core": "workspace:*",
-    "@farajabien/slug-store-react": "workspace:*",
+    "@farajabien/slug-store": "workspace:*",
     "@workspace/ui": "workspace:*",
     "lucide-react": "^0.475.0",
     "next": "^15.2.3",

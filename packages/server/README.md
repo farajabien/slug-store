@@ -299,7 +299,7 @@ describe('Server Cache', () => {
 
 ```typescript
 // v1: Client-side only
-import { useSlugStore } from '@farajabien/slug-store-react'
+import { useSlugStore } from '@farajabien/slug-store'
 const { state, setState } = useSlugStore({ items: [] })
 
 // v2: Server-side caching
@@ -338,7 +338,7 @@ const { data } = await useServerSlugStore(
 ## 🔗 Related Packages
 
 - [`@farajabien/slug-store-core`](../core) - Core encoding/decoding functionality
-- [`@farajabien/slug-store-react`](../react) - React hooks for client-side state
+- [`@farajabien/slug-store`](../react) - React hooks for client-side state
 
 ## 📄 License
 

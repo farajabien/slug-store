@@ -28,6 +28,13 @@
         "answer": "Absolutely! Store user authentication in a simple database (Supabase, Auth0), then put **all application state in encrypted URLs**. This gives you: enterprise security (encrypted URLs), audit trails (state history in URLs), team collaboration (share encrypted URLs), compliance (zero data lock-in), and infinite scaling (URLs are infinitely scalable). Fortune 500 complexity with startup simplicity.",
         "category": "paradigm",
         "tags": ["enterprise", "security", "compliance", "simplicity"]
+      },
+      {
+        "id": "three-package-ecosystem",
+        "question": "How do the three Slug Store packages work together?",
+        "answer": "**Core** (@farajabien/slug-store-core): Framework-agnostic encoding/compression/encryption. **React** (@farajabien/slug-store): Client-side URL state with React hooks. **Server** (@farajabien/slug-store-server): Server-side caching with Redis/memory/file backends. Use individually or combine them: client state in URLs + expensive data cached server-side = optimal performance with zero database complexity.",
+        "category": "paradigm", 
+        "tags": ["ecosystem", "packages", "architecture", "hybrid"]
       }
     ],
     "getting_started": [
@@ -55,7 +62,7 @@
       {
         "id": "quick-start",
         "question": "What's the fastest way to get started?",
-        "answer": "For React apps: `pnpm add @farajabien/slug-store-react` then replace `useState` with `useSlugStore`. For other frameworks: `pnpm add @farajabien/slug-store-core` and use `encodeState`/`decodeState`. Check our live demo at slugstore.fbien.com for examples.",
+        "answer": "For React apps: `pnpm add @farajabien/slug-store` then replace `useState` with `useSlugStore`. For server-side caching: `pnpm add @farajabien/slug-store-server`. For other frameworks: `pnpm add @farajabien/slug-store-core` and use `encodeState`/`decodeState`. Check our live demo at slugstore.fbien.com for examples.",
         "category": "basics",
         "tags": ["installation", "quick-start"]
       }
@@ -88,6 +95,13 @@
         "answer": "Use debouncing: `useSlugStore(state, { debounceMs: 300 })`. This batches URL updates and prevents excessive browser history entries. For high-frequency updates (like canvas drawing), consider `syncToUrl: false` and manual syncing.",
         "category": "react",
         "tags": ["performance", "debouncing", "optimization"]
+      },
+      {
+        "id": "server-side-caching",
+        "question": "How do I add server-side caching to my app?",
+        "answer": "Use the server package: ```tsx\nimport { useServerSlugStore } from '@farajabien/slug-store-server'\n\nexport default async function Page({ params, searchParams }) {\n  const { data, cached } = await useServerSlugStore(\n    async (params, searchParams) => {\n      return await fetchExpensiveData(searchParams)\n    },\n    params, searchParams,\n    { persist: 'redis', ttl: 300 }\n  )\n  return <MyComponent data={data} />\n}\n```",
+        "category": "react",
+        "tags": ["server", "caching", "performance", "nextjs"]
       }
     ],
     "use_cases": [
@@ -251,7 +265,7 @@
       {
         "id": "from-zustand",
         "question": "How do I migrate from Zustand?",
-        "answer": "Easy! Replace `import { create } from 'zustand'` with `import { create } from '@farajabien/slug-store-react'`. Add options for URL sync: `create(storeFunction, { compress: true })`. Your existing store logic stays the same!",
+        "answer": "Easy! Replace `import { create } from 'zustand'` with `import { create } from '@farajabien/slug-store'`. Add options for URL sync: `create(storeFunction, { compress: true })`. Your existing store logic stays the same!",
         "category": "migration",
         "tags": ["zustand", "migration", "stores"]
       },
@@ -279,9 +293,9 @@
     ]
   },
   "meta": {
-    "version": "1.1.0",
+    "version": "2.0.0",
     "lastUpdated": "2024-12-27",
-    "totalQuestions": 40,
+    "totalQuestions": 42,
     "categories": [
       "paradigm_shift",
       "getting_started",

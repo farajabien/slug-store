@@ -44,7 +44,7 @@ We've successfully evolved Slug Store from a simple client-side URL state manage
 
 ### Client-Side Packages
 ```bash
-npm install @farajabien/slug-store-react    # React hooks
+npm install @farajabien/slug-store    # React hooks
 npm install @farajabien/slug-store-core     # Framework-agnostic
 ```
 

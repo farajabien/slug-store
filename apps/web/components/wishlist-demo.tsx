@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useSlugStore } from '@farajabien/slug-store-react'
+import { useSlugStore } from '@farajabien/slug-store'
 import { 
   encodeState,
   decodeState,

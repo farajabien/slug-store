@@ -6,7 +6,7 @@ This guide covers advanced features across Slug Store's **three pillars of persi
 
 ### Client-Side Packages
 - **[@farajabien/slug-store-core](https://www.npmjs.com/package/@farajabien/slug-store-core)** - Framework-agnostic core library
-- **[@farajabien/slug-store-react](https://www.npmjs.com/package/@farajabien/slug-store-react)** - React hooks with Zustand-like API
+- **[@farajabien/slug-store](https://www.npmjs.com/package/@farajabien/slug-store)** - React hooks with Zustand-like API
 
 ### Server-Side Packages (NEW!)
 - **[@farajabien/slug-store-server](https://www.npmjs.com/package/@farajabien/slug-store-server)** - Multi-backend server caching
@@ -76,7 +76,7 @@ if (result.success) {
 #### React Hook with Validation
 
 ```typescript
-import { useSlugStore } from '@farajabien/slug-store-react'
+import { useSlugStore } from '@farajabien/slug-store'
 import { z } from 'zod'
 
 const TodoSchema = z.object({
@@ -236,7 +236,7 @@ Combine URL state, server caching, and traditional databases for maximum flexibi
 
 ```typescript
 // app/products/page.tsx - Next.js App Router
-import { useSlugStore } from '@farajabien/slug-store-react'
+import { useSlugStore } from '@farajabien/slug-store'
 import { useServerSlugStore } from '@farajabien/slug-store-server'
 
 export default async function ProductsPage({ params, searchParams }) {
@@ -422,7 +422,7 @@ async function decodeWithMigration(slug: string) {
 ### React Hook with Migration
 
 ```typescript
-import { useSlugStore } from '@farajabien/slug-store-react'
+import { useSlugStore } from '@farajabien/slug-store'
 
 function AppWithMigration() {
   const { state, setState } = useSlugStore(

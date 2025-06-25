@@ -27,7 +27,7 @@ export function InstallationTabs() {
             </CardHeader>
             <CardContent>
               <pre className="bg-muted p-4 rounded-lg overflow-x-auto">
-{`npm install @farajabien/slug-store-react
+{`npm install @farajabien/slug-store
 
 # Or with other frameworks
 npm install @farajabien/slug-store-core`}
@@ -72,7 +72,7 @@ npm install redis ioredis`}
             <CardContent>
               <pre className="bg-muted p-4 rounded-lg overflow-x-auto">
 {`# Client-side URL persistence
-npm install @farajabien/slug-store-react
+npm install @farajabien/slug-store
 
 # Server-side multi-backend caching  
 npm install @farajabien/slug-store-server

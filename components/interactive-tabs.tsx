@@ -7,7 +7,7 @@ import { Globe, Server, Layers, Code2, ArrowRight } from 'lucide-react'
 
 export function InteractiveTabs() {
   const openNpmPackage = () => {
-    window.open('https://www.npmjs.com/package/@farajabien/slug-store-react', '_blank')
+    window.open('https://www.npmjs.com/package/@farajabien/slug-store', '_blank')
   }
 
   const openServerPackage = () => {
@@ -75,7 +75,7 @@ export function InteractiveTabs() {
               </CardHeader>
               <CardContent>
                 <pre className="text-sm overflow-x-auto bg-slate-800 p-4 rounded-lg">
-{`import { useSlugStore } from '@farajabien/slug-store-react'
+{`import { useSlugStore } from '@farajabien/slug-store'
 
 function ChatApp() {
   const { state, setState } = useSlugStore({
@@ -91,7 +91,7 @@ function ChatApp() {
                 <div className="mt-4">
                   <Button onClick={openNpmPackage} variant="secondary" size="sm">
                     <ArrowRight className="h-4 w-4 mr-2" />
-                    Get @farajabien/slug-store-react
+                    Get @farajabien/slug-store
                   </Button>
                 </div>
               </CardContent>

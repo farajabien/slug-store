@@ -1,46 +1,32 @@
-'use client'
-
 import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
 import { WishlistDemo } from '@/components/wishlist-demo'
-// import { EnhancedDocumentation } from '@/components/enhanced-documentation'
-import { Button } from '@workspace/ui/components/button'
+import { HeroActions } from '@/components/hero-actions'
+import { InteractiveTabs } from '@/components/interactive-tabs'
+import { CTAActions } from '@/components/cta-actions'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@workspace/ui/components/card'
 import { Badge } from '@workspace/ui/components/badge'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@workspace/ui/components/tabs'
 import { 
   Zap, 
-  Database, 
   Share, 
   Lock, 
-  Code2,
-  Rocket,
-  Star,
-  ArrowRight,
   CheckCircle,
-  Sparkles,
-  Brain,
   Timer,
-  Link,
+  Server,
+  Smartphone,
+  ShoppingCart,
+  BarChart3,
+  FileText,
+  Gamepad2,
+  GitBranch,
+  Layers,
+  CloudCog,
+  Package,
   Users,
-  Globe
+  Brain
 } from 'lucide-react'
 
 export default function HomePage() {
-  const scrollToDemo = () => {
-    const demoSection = document.getElementById('demo-section')
-    if (demoSection) {
-      demoSection.scrollIntoView({ behavior: 'smooth' })
-    }
-  }
-
-  const openNpmPackage = () => {
-    window.open('https://www.npmjs.com/package/@farajabien/slug-store-react', '_blank')
-  }
-
-  const openGitHub = () => {
-    window.open('https://github.com/farajabien/slug-store', '_blank')
-  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -52,114 +38,108 @@ export default function HomePage() {
           <div className="text-center space-y-6 max-w-5xl mx-auto">
             <div className="flex items-center justify-center gap-2 mb-4">
               <Badge variant="default" className="px-4 py-2 text-sm">
-                <Brain className="h-4 w-4 mr-2" />
-                Perfect for AI Apps
+                <Layers className="h-4 w-4 mr-2" />
+                Complete Ecosystem
               </Badge>
               <Badge variant="outline" className="px-3 py-1 text-xs">
                 <Timer className="h-3 w-3 mr-1" />
-                2 min setup
+                Zero Setup
               </Badge>
             </div>
             
             <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent leading-tight">
-              Store for your<br />
-              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">AI apps</span>
+              State Management<br />
+              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Reimagined</span>
             </h1>
             
             <p className="text-xl md:text-2xl text-muted-foreground max-w-4xl mx-auto leading-relaxed">
-              Stop losing user conversations, AI outputs, and complex states. 
-              <strong className="text-foreground"> Slug Store gives your AI app instant persistence and sharing</strong> - 
-              no database setup, no backend complexity.
+              Persistent, shareable state for modern web applications. 
+              <strong className="text-foreground"> No databases, no backends, no complexity</strong> - 
+              just powerful state management that works everywhere.
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-6">
-              <Button size="lg" className="text-lg px-8 py-4" onClick={scrollToDemo}>
-                <Rocket className="mr-2 h-5 w-5" />
-                Try Live Demo
-              </Button>
-              <Button variant="outline" size="lg" className="text-lg px-8 py-4" onClick={openNpmPackage}>
-                <Code2 className="mr-2 h-5 w-5" />
-                Get Started
-              </Button>
-            </div>
+            <HeroActions />
             
             {/* Quick Stats */}
             <div className="flex flex-wrap justify-center gap-8 pt-8 text-sm text-muted-foreground">
               <div className="flex items-center gap-1">
                 <CheckCircle className="h-4 w-4 text-green-500" />
-                <span>No database required</span>
+                <span>URL-based persistence</span>
               </div>
               <div className="flex items-center gap-1">
                 <CheckCircle className="h-4 w-4 text-green-500" />
-                <span>Works with any AI model</span>
+                <span>Instant sharing</span>
               </div>
               <div className="flex items-center gap-1">
                 <CheckCircle className="h-4 w-4 text-green-500" />
-                <span>One line of code</span>
+                <span>Server-side caching</span>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* AI Use Cases */}
+      {/* Three Package Ecosystem */}
       <section className="py-12 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold mb-4">Perfect for AI Apps</h2>
+            <h2 className="text-3xl font-bold mb-4">Complete Ecosystem</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              From ChatGPT clones to creative AI tools - give users the persistence they expect
+              Three packages working together to handle every state management need
             </p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
-            <Card className="relative overflow-hidden">
+            <Card className="relative overflow-hidden border-blue-200 bg-blue-50/50">
               <CardHeader>
-                <Brain className="h-10 w-10 text-blue-500 mb-3" />
-                <CardTitle className="text-lg">AI Chat Apps</CardTitle>
+                <Package className="h-10 w-10 text-blue-600 mb-3" />
+                <CardTitle className="text-lg text-blue-700">@farajabien/slug-store-core</CardTitle>
                 <CardDescription>
-                  Every conversation becomes a shareable link. Users never lose their AI interactions.
+                  Foundation package with encoding, compression, and encryption
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-xs text-muted-foreground space-y-1">
-                  <div>✓ ChatGPT clones</div>
-                  <div>✓ AI assistants</div>
-                  <div>✓ Code generation tools</div>
+                <div className="text-xs text-blue-600 space-y-1">
+                  <div>✓ State encoding/decoding</div>
+                  <div>✓ LZ-String compression</div>
+                  <div>✓ AES encryption</div>
+                  <div>✓ Framework agnostic</div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="relative overflow-hidden">
+            <Card className="relative overflow-hidden border-purple-200 bg-purple-50/50">
               <CardHeader>
-                <Sparkles className="h-10 w-10 text-purple-500 mb-3" />
-                <CardTitle className="text-lg">Creative AI Tools</CardTitle>
+                <Smartphone className="h-10 w-10 text-purple-600 mb-3" />
+                <CardTitle className="text-lg text-purple-700">@farajabien/slug-store</CardTitle>
                 <CardDescription>
-                  Share AI-generated art, prompts, and creative workflows with a simple URL.
+                  React hooks for client-side state with URL persistence
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-xs text-muted-foreground space-y-1">
-                  <div>✓ Image generators</div>
-                  <div>✓ Writing assistants</div>
-                  <div>✓ Design tools</div>
+                <div className="text-xs text-purple-600 space-y-1">
+                  <div>✓ Zustand-like API</div>
+                  <div>✓ Automatic URL sync</div>
+                  <div>✓ Shareable state</div>
+                  <div>✓ TypeScript first</div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="relative overflow-hidden">
+            <Card className="relative overflow-hidden border-green-200 bg-green-50/50">
               <CardHeader>
-                <Globe className="h-10 w-10 text-green-500 mb-3" />
-                <CardTitle className="text-lg">AI Playgrounds</CardTitle>
+                <Server className="h-10 w-10 text-green-600 mb-3" />
+                <CardTitle className="text-lg text-green-700">@farajabien/slug-store-server</CardTitle>
                 <CardDescription>
-                  Let users experiment with models, parameters, and prompts - all state is preserved.
+                  Server-side caching with Redis, memory, and file adapters
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-xs text-muted-foreground space-y-1">
-                  <div>✓ Model comparisons</div>
-                  <div>✓ Prompt engineering</div>
-                  <div>✓ Parameter tuning</div>
+                <div className="text-xs text-green-600 space-y-1">
+                  <div>✓ Multiple backends</div>
+                  <div>✓ Stale-while-revalidate</div>
+                  <div>✓ Next.js integration</div>
+                  <div>✓ Production ready</div>
                 </div>
               </CardContent>
             </Card>
@@ -167,173 +147,189 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* The Problem */}
+      {/* Real-World Use Cases */}
       <section className="py-12">
         <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-3xl font-bold mb-6 text-red-600">The AI App Problem</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl font-bold mb-4">Built for Real Applications</h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              From simple filters to complex workflows - handle any state management challenge
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
+            <Card className="text-center hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <ShoppingCart className="h-8 w-8 mx-auto text-orange-500 mb-2" />
+                <CardTitle className="text-base">E-commerce</CardTitle>
+              </CardHeader>
+              <CardContent className="text-sm text-muted-foreground">
+                Shopping carts, product filters, user preferences, checkout flows
+              </CardContent>
+            </Card>
+
+            <Card className="text-center hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <BarChart3 className="h-8 w-8 mx-auto text-blue-500 mb-2" />
+                <CardTitle className="text-base">Dashboards</CardTitle>
+              </CardHeader>
+              <CardContent className="text-sm text-muted-foreground">
+                Chart configs, filter states, view modes, drill-down parameters
+              </CardContent>
+            </Card>
+
+            <Card className="text-center hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <FileText className="h-8 w-8 mx-auto text-green-500 mb-2" />
+                <CardTitle className="text-base">Content Tools</CardTitle>
+              </CardHeader>
+              <CardContent className="text-sm text-muted-foreground">
+                Draft states, editor configs, form data, template settings
+              </CardContent>
+            </Card>
+
+            <Card className="text-center hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <Users className="h-8 w-8 mx-auto text-purple-500 mb-2" />
+                <CardTitle className="text-base">Collaboration</CardTitle>
+              </CardHeader>
+              <CardContent className="text-sm text-muted-foreground">
+                Shared workspaces, team settings, real-time state sync
+              </CardContent>
+            </Card>
+
+            <Card className="text-center hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <Brain className="h-8 w-8 mx-auto text-pink-500 mb-2" />
+                <CardTitle className="text-base">AI Applications</CardTitle>
+              </CardHeader>
+              <CardContent className="text-sm text-muted-foreground">
+                Chat history, model parameters, prompt templates, outputs
+              </CardContent>
+            </Card>
+
+            <Card className="text-center hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <Gamepad2 className="h-8 w-8 mx-auto text-red-500 mb-2" />
+                <CardTitle className="text-base">Gaming</CardTitle>
+              </CardHeader>
+              <CardContent className="text-sm text-muted-foreground">
+                Save states, progress tracking, leaderboards, game configs
+              </CardContent>
+            </Card>
+
+            <Card className="text-center hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <GitBranch className="h-8 w-8 mx-auto text-indigo-500 mb-2" />
+                <CardTitle className="text-base">Workflows</CardTitle>
+              </CardHeader>
+              <CardContent className="text-sm text-muted-foreground">
+                Multi-step forms, approval processes, configuration wizards
+              </CardContent>
+            </Card>
+
+            <Card className="text-center hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <CloudCog className="h-8 w-8 mx-auto text-cyan-500 mb-2" />
+                <CardTitle className="text-base">Admin Tools</CardTitle>
+              </CardHeader>
+              <CardContent className="text-sm text-muted-foreground">
+                System configs, user management, monitoring dashboards
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* The Problem/Solution */}
+      <section className="py-12 bg-muted/50">
+        <div className="container mx-auto px-4">
+          <div className="max-w-5xl mx-auto">
+            <div className="text-center mb-10">
+              <h2 className="text-3xl font-bold mb-4">Why Slug Store?</h2>
+              <p className="text-lg text-muted-foreground">
+                Traditional state management comes with unnecessary complexity
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               <Card className="border-red-200 bg-red-50/50">
                 <CardHeader>
                   <CardTitle className="text-red-700 flex items-center gap-2">
-                    😤 Users Get Frustrated
+                    😤 Traditional Approach
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="text-sm text-red-600">
-                  <ul className="space-y-2 text-left">
-                    <li>• AI conversation lost on refresh</li>
-                    <li>• Can't share amazing AI outputs</li>
-                    <li>• Have to re-enter prompts constantly</li>
-                    <li>• No way to bookmark good results</li>
-                  </ul>
+                <CardContent className="text-sm text-red-600 space-y-3">
+                  <div>
+                    <strong>Database Setup:</strong> PostgreSQL, Redis, or other external storage for simple state
+                  </div>
+                  <div>
+                    <strong>Backend APIs:</strong> Express routes, authentication, session management
+                  </div>
+                  <div>
+                    <strong>Complex State Logic:</strong> Actions, reducers, middleware, store configuration
+                  </div>
+                  <div>
+                    <strong>Sharing Issues:</strong> User accounts, permissions, complex sharing mechanisms
+                  </div>
+                  <div>
+                    <strong>Performance Problems:</strong> Network requests, loading states, error handling
+                  </div>
                 </CardContent>
               </Card>
               
-              <Card className="border-orange-200 bg-orange-50/50">
+              <Card className="border-green-200 bg-green-50/50">
                 <CardHeader>
-                  <CardTitle className="text-orange-700 flex items-center gap-2">
-                    🔥 Developers Struggle
+                  <CardTitle className="text-green-700 flex items-center gap-2">
+                    ✨ Slug Store Way
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="text-sm text-orange-600">
-                  <ul className="space-y-2 text-left">
-                    <li>• Setting up databases for simple state</li>
-                    <li>• User authentication for sharing</li>
-                    <li>• Complex backend architecture</li>
-                    <li>• Expensive cloud storage costs</li>
-                  </ul>
+                <CardContent className="text-sm text-green-600 space-y-3">
+                  <div>
+                    <strong>URL-Based Storage:</strong> State lives in the URL - no database needed
+                  </div>
+                  <div>
+                    <strong>Instant Sharing:</strong> Copy URL = instant state sharing with anyone
+                  </div>
+                  <div>
+                    <strong>Simple API:</strong> Zustand-like hooks, minimal learning curve
+                  </div>
+                  <div>
+                    <strong>Server Caching:</strong> Optional Redis/memory caching for performance
+                  </div>
+                  <div>
+                    <strong>Zero Setup:</strong> Install package, use hook, done
+                  </div>
                 </CardContent>
               </Card>
-            </div>
-            
-            <div className="bg-gradient-to-r from-green-50 to-blue-50 p-6 rounded-lg border border-green-200">
-              <h3 className="text-xl font-bold text-green-700 mb-2">
-                ✨ Slug Store Solves This in 2 Minutes
-              </h3>
-              <p className="text-green-600">
-                Add one hook, get instant persistence and sharing. No backend, no database, no complexity.
-              </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Quick Start for AI Apps */}
-      <section className="py-12 bg-muted/50">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold mb-4">Add to Your AI App in 2 Minutes</h2>
-            <p className="text-lg text-muted-foreground">
-              From ChatGPT clone to production-ready app with shareable conversations
-            </p>
-          </div>
-
-          <div className="max-w-4xl mx-auto">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-red-600 flex items-center gap-2">
-                    ❌ Before: Ephemeral AI Chat
-                  </CardTitle>
-                  <CardDescription>50+ lines, lost on refresh</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <pre className="bg-muted p-4 rounded-lg text-xs overflow-x-auto">
-{`function ChatApp() {
-  const [messages, setMessages] = useState([])
-  const [isLoading, setIsLoading] = useState(false)
-  
-  // Lost on refresh 😢
-  const sendMessage = async (text) => {
-    setIsLoading(true)
-    try {
-      const response = await openai.chat.completions.create({
-        model: "gpt-4",
-        messages: [...messages, { role: "user", content: text }]
-      })
-      setMessages(prev => [...prev, 
-        { role: "user", content: text },
-        { role: "assistant", content: response.choices[0].message.content }
-      ])
-    } finally {
-      setIsLoading(false)
-    }
-  }
-  
-  // No sharing, no persistence
-  return <ChatInterface messages={messages} onSend={sendMessage} />
-}`}
-                  </pre>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-green-600 flex items-center gap-2">
-                    ✅ After: Persistent + Shareable
-                  </CardTitle>
-                  <CardDescription>5 lines, auto-saved, shareable</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <pre className="bg-muted p-4 rounded-lg text-xs overflow-x-auto">
-{`import { useSlugStore } from '@farajabien/slug-store-react'
-
-function ChatApp() {
-  const { state, setState } = useSlugStore({
-    messages: [],
-    model: "gpt-4"
-  }, { compress: true })
-  
-  const sendMessage = async (text) => {
-    const response = await openai.chat.completions.create({
-      model: state.model,
-      messages: [...state.messages, { role: "user", content: text }]
-    })
-    
-    setState({
-      ...state,
-      messages: [...state.messages, 
-        { role: "user", content: text },
-        { role: "assistant", content: response.choices[0].message.content }
-      ]
-    })
-  }
-  
-  // ✨ Auto-saved to URL, instantly shareable!
-  return <ChatInterface messages={state.messages} onSend={sendMessage} />
-}`}
-                  </pre>
-                </CardContent>
-              </Card>
-            </div>
-            
-            <div className="text-center mt-8">
-              <div className="flex flex-wrap justify-center gap-4 text-sm">
-                <Badge variant="secondary" className="px-3 py-1">
-                  <ArrowRight className="h-3 w-3 mr-1" />
-                  90% less code
-                </Badge>
-                <Badge variant="secondary" className="px-3 py-1">
-                  <Link className="h-3 w-3 mr-1" />
-                  Instant sharing
-                </Badge>
-                <Badge variant="secondary" className="px-3 py-1">
-                  <Users className="h-3 w-3 mr-1" />
-                  Better UX
-                </Badge>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Feature Grid */}
+      {/* Code Examples */}
       <section className="py-12">
         <div className="container mx-auto px-4">
           <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold mb-4">Why AI Apps Love Slug Store</h2>
+            <h2 className="text-3xl font-bold mb-4">See the Difference</h2>
+            <p className="text-lg text-muted-foreground">
+              Compare traditional state management with Slug Store
+            </p>
+          </div>
+
+          <div className="max-w-6xl mx-auto">
+            <InteractiveTabs />
+          </div>
+        </div>
+      </section>
+
+      {/* Features Grid */}
+      <section className="py-12 bg-muted/30">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl font-bold mb-4">Enterprise-Ready Features</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Built specifically for the needs of modern AI applications
+              Production-tested with the features you need for real applications
             </p>
           </div>
           
@@ -341,10 +337,10 @@ function ChatApp() {
             <Card className="text-center">
               <CardHeader>
                 <Zap className="h-12 w-12 mx-auto text-primary mb-4" />
-                <CardTitle>Instant Persistence</CardTitle>
+                <CardTitle>Zero Configuration</CardTitle>
                 <CardDescription>
-                  AI conversations and outputs are automatically saved to URLs. 
-                  No database setup, no backend complexity.
+                  Install and start using immediately. No setup, no configuration files, 
+                  no infrastructure decisions.
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -352,10 +348,10 @@ function ChatApp() {
             <Card className="text-center">
               <CardHeader>
                 <Share className="h-12 w-12 mx-auto text-primary mb-4" />
-                <CardTitle>One-Click Sharing</CardTitle>
+                <CardTitle>Instant Sharing</CardTitle>
                 <CardDescription>
-                  Every AI interaction creates a shareable URL. Perfect for 
-                  showcasing results or collaborative prompting.
+                  Every state change creates a shareable URL. Perfect for 
+                  bug reports, demos, and collaboration.
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -363,10 +359,10 @@ function ChatApp() {
             <Card className="text-center">
               <CardHeader>
                 <Lock className="h-12 w-12 mx-auto text-primary mb-4" />
-                <CardTitle>Enterprise Ready</CardTitle>
+                <CardTitle>Production Ready</CardTitle>
                 <CardDescription>
-                  Compression for large AI outputs, encryption for sensitive data, 
-                  and validation for production apps.
+                  Compression, encryption, TypeScript, testing utilities, 
+                  and enterprise-grade caching strategies.
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -375,12 +371,12 @@ function ChatApp() {
       </section>
 
       {/* Demo Section */}
-      <section id="demo-section" className="py-12 bg-muted/50">
+      <section id="demo-section" className="py-12">
         <div className="container mx-auto px-4">
           <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold mb-4">See It In Action</h2>
+            <h2 className="text-3xl font-bold mb-4">Interactive Demo</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Try our interactive demo - every change is automatically saved and shareable
+              Try our live demo - every change is automatically saved and shareable
             </p>
           </div>
 
@@ -390,39 +386,19 @@ function ChatApp() {
         </div>
       </section>
 
-      {/* Documentation Section - Temporarily commented out */}
-      {/* <section className="py-16">
-        <div className="container mx-auto px-4">
-          <EnhancedDocumentation />
-        </div>
-      </section> */}
-
       {/* CTA Section */}
       <section className="py-16 bg-gradient-to-r from-primary/10 to-primary/5">
         <div className="container mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto">
             <h2 className="text-4xl font-bold mb-6">
-              Ready to build the next great AI app?
+              Ready to simplify your state management?
             </h2>
             <p className="text-xl text-muted-foreground mb-8">
-              Join developers who've eliminated database complexity and given their users 
-              the persistence and sharing they expect.
+              Join thousands of developers who've eliminated database complexity 
+              and given their users the persistence and sharing they expect.
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Button size="lg" className="text-lg px-8 py-4" onClick={openNpmPackage}>
-                <Code2 className="mr-2 h-5 w-5" />
-                npm install @farajabien/slug-store-react
-              </Button>
-              <Button variant="outline" size="lg" className="text-lg px-8 py-4" onClick={openGitHub}>
-                <Star className="mr-2 h-5 w-5" />
-                View on GitHub
-              </Button>
-            </div>
-            
-            <p className="text-sm text-muted-foreground mt-4">
-              Free • Open Source • No vendor lock-in
-            </p>
+            <CTAActions />
           </div>
         </div>
       </section>

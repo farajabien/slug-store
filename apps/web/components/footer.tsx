@@ -27,7 +27,7 @@ export function Footer() {
             </p>
             <div className="flex gap-2">
               <Link 
-                href="https://www.npmjs.com/package/@farajabien/slug-store-react" 
+                href="https://www.npmjs.com/package/@farajabien/slug-store" 
                 className="text-xs bg-primary text-primary-foreground px-2 py-1 rounded hover:bg-primary/90 transition-colors"
                 target="_blank"
               >
@@ -119,9 +119,9 @@ export function Footer() {
             </h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link href="https://www.npmjs.com/package/@farajabien/slug-store-react" className="text-muted-foreground hover:text-foreground flex items-center gap-2" target="_blank">
+                <Link href="https://www.npmjs.com/package/@farajabien/slug-store" className="text-muted-foreground hover:text-foreground flex items-center gap-2" target="_blank">
                   <Package className="h-3 w-3" />
-                  @farajabien/slug-store-react
+                  @farajabien/slug-store
                 </Link>
               </li>
               <li>

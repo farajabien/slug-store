@@ -115,11 +115,11 @@ const { data } = await useServerSlugStore(fetchReports, params, searchParams)
 
 ### 🌐 **Client-Side State** (React)
 ```bash
-npm install @farajabien/slug-store-react
+npm install @farajabien/slug-store
 ```
 
 ```tsx
-import { useSlugStore } from '@farajabien/slug-store-react'
+import { useSlugStore } from '@farajabien/slug-store'
 
 function ChatApp() {
   const { state, setState } = useSlugStore({
@@ -281,7 +281,7 @@ const { data: products } = await useServerSlugStore(
 
 ### ✅ **Production Ready**
 - **@farajabien/slug-store-core** - Framework-agnostic encoding/decoding
-- **@farajabien/slug-store-react** - React hooks with Zustand-like API
+- **@farajabien/slug-store** - React hooks with Zustand-like API
 - **@farajabien/slug-store-server** - Multi-backend server caching (**NEW!**)
 
 ### 🔧 **Development Tools**
@@ -337,14 +337,14 @@ Graceful fallbacks, stale-while-revalidate, and automatic retry logic.
 
 **v1: Client-side only**
 ```tsx
-import { useSlugStore } from '@farajabien/slug-store-react'
+import { useSlugStore } from '@farajabien/slug-store'
 const { state, setState } = useSlugStore({ items: [] })
 ```
 
 **v2: Add server caching**
 ```tsx
 // Keep client-side state for UI preferences
-import { useSlugStore } from '@farajabien/slug-store-react'
+import { useSlugStore } from '@farajabien/slug-store'
 const { state: uiState } = useSlugStore({ filters: {}, view: 'grid' })
 
 // Add server caching for data

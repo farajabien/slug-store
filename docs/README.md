@@ -74,11 +74,11 @@ Slug Store is **more than state management, not quite a database, but with true 
 
 ### 🌐 **Client-Side State Management**
 
-#### `@farajabien/slug-store-react` ✅ Production Ready
+#### `@farajabien/slug-store` ✅ Production Ready
 React hooks with Zustand-like simplicity
 
 ```bash
-npm install @farajabien/slug-store-react
+npm install @farajabien/slug-store
 ```
 
 **Features:**
@@ -150,7 +150,7 @@ Optimized TypeScript settings for different use cases
 Perfect for demos, prototypes, and simple applications
 
 ```tsx
-import { useSlugStore } from '@farajabien/slug-store-react'
+import { useSlugStore } from '@farajabien/slug-store'
 
 function SimpleApp() {
   const { state, setState } = useSlugStore({
