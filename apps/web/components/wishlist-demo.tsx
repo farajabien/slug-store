@@ -55,7 +55,7 @@ const defaultState: WishlistState = {
       price: 2499,
       category: 'electronics',
       priority: 'high',
-      addedAt: new Date().toISOString()
+      addedAt: '2024-01-15T10:30:00.000Z'
     },
     {
       id: '2',
@@ -63,7 +63,7 @@ const defaultState: WishlistState = {
       price: 299,
       category: 'electronics',
       priority: 'medium',
-      addedAt: new Date().toISOString()
+      addedAt: '2024-01-14T14:20:00.000Z'
     },
     {
       id: '3',
@@ -71,7 +71,7 @@ const defaultState: WishlistState = {
       price: 89,
       category: 'home',
       priority: 'low',
-      addedAt: new Date().toISOString()
+      addedAt: '2024-01-13T09:15:00.000Z'
     }
   ],
   filters: {

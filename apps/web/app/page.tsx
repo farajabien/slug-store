@@ -1,11 +1,12 @@
 import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
-import { WishlistDemo } from '@/components/wishlist-demo'
 import { HeroActions } from '@/components/hero-actions'
 import { InteractiveTabs } from '@/components/interactive-tabs'
 import { CTAActions } from '@/components/cta-actions'
+import { DemoButton } from '@/components/demo-button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@workspace/ui/components/card'
 import { Badge } from '@workspace/ui/components/badge'
+import { Button } from '@workspace/ui/components/button'
 import { 
   Zap, 
   Share, 
@@ -25,9 +26,11 @@ import {
   Users,
   Brain,
   Code,
+  Code2,
   Database,
   Globe,
-  Settings
+  Settings,
+  Rocket
 } from 'lucide-react'
 
 export default function HomePage() {
@@ -389,17 +392,30 @@ const state = await loadUserState(slug)`}
       </section>
 
       {/* Demo Section */}
-      <section id="demo-section" className="py-12">
+      <section className="py-16 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/30 dark:to-purple-950/30">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold mb-4">Live Demo</h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Try the interactive demo - every change is automatically saved and shareable
+          <div className="text-center max-w-4xl mx-auto">
+            <h2 className="text-4xl font-bold mb-6">See It In Action</h2>
+            <p className="text-xl text-muted-foreground mb-8">
+              Experience Slug Store with our interactive wishlist demo. Every change is automatically saved to the URL - perfect for sharing and bookmarking.
             </p>
-          </div>
+            
+                         <DemoButton />
 
-          <div className="max-w-7xl mx-auto">
-            <WishlistDemo />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
+              <div className="flex items-center gap-2 justify-center">
+                <CheckCircle className="h-4 w-4 text-green-500" />
+                <span>Real-time URL updates</span>
+              </div>
+              <div className="flex items-center gap-2 justify-center">
+                <CheckCircle className="h-4 w-4 text-green-500" />
+                <span>Automatic compression</span>
+              </div>
+              <div className="flex items-center gap-2 justify-center">
+                <CheckCircle className="h-4 w-4 text-green-500" />
+                <span>Shareable links</span>
+              </div>
+            </div>
           </div>
         </div>
       </section>

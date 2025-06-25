@@ -33,7 +33,7 @@ export {
   createSlugForDatabase
 } from './server.js'
 
-export type {
+export type { 
   ShareableOptions,
   UserStateOptions,
   DatabaseStateResult,

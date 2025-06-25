@@ -28,6 +28,15 @@ interface WishlistItemsProps {
   onRemove: (id: string) => void
 }
 
+// Consistent date formatting function that works the same on server and client
+function formatDate(dateString: string): string {
+  const date = new Date(dateString)
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${month}/${day}/${year}`
+}
+
 export function WishlistItems({ items, filters, view, onRemove }: WishlistItemsProps) {
   // Filter items
   const filteredItems = items.filter(item => {
@@ -134,7 +143,7 @@ export function WishlistItems({ items, filters, view, onRemove }: WishlistItemsP
               </div>
               
               <div className="text-xs text-muted-foreground">
-                Added {new Date(item.addedAt).toLocaleDateString()}
+                Added {formatDate(item.addedAt)}
               </div>
             </CardContent>
           </Card>
@@ -153,7 +162,7 @@ export function WishlistItems({ items, filters, view, onRemove }: WishlistItemsP
                 <div className="flex-1">
                   <h3 className="font-semibold">{item.name}</h3>
                   <div className="text-sm text-muted-foreground">
-                    {item.category} • Added {new Date(item.addedAt).toLocaleDateString()}
+                    {item.category} • Added {formatDate(item.addedAt)}
                   </div>
                 </div>
                 <div className="text-right">
