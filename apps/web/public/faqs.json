@@ -2,11 +2,11 @@
   "faqs": {
     "paradigm_shift": [
       {
-        "id": "no-database-revolution",
-        "question": "How does Slug Store eliminate the need for databases?",
-        "answer": "Slug Store represents a paradigm shift - **building persistent apps with no database has never been easier**. It bridges the gap between ephemeral state (lost on refresh) and complex databases (overkill for many apps). Your application state lives in URLs, giving you **more than state, not quite a database, but with true persistence and infinite scalability**. Perfect for everything from startup MVPs to enterprise applications.",
+        "id": "universal-state-persistence",
+        "question": "How does Slug Store provide universal state persistence?",
+        "answer": "Slug Store gives you **two powerful options in one package**: 1) **Share via URLs** - state lives in shareable URLs (perfect for dashboards, filters, configurations), 2) **Store in database** - compressed state stored in any database (perfect for user preferences, private data). This eliminates the traditional choice between ephemeral state and database complexity. **One package, two use cases, zero obstruction** - from startup MVPs to enterprise applications.",
         "category": "paradigm",
-        "tags": ["revolution", "persistence", "no-database", "paradigm-shift"]
+        "tags": ["universal", "persistence", "dual-purpose", "paradigm-shift"]
       },
       {
         "id": "scaling-architecture",
@@ -30,25 +30,25 @@
         "tags": ["enterprise", "security", "compliance", "simplicity"]
       },
       {
-        "id": "three-package-ecosystem",
-        "question": "How do the three Slug Store packages work together?",
-        "answer": "**Core** (@farajabien/slug-store-core): Framework-agnostic encoding/compression/encryption. **React** (@farajabien/slug-store): Client-side URL state with React hooks. **Server** (@farajabien/slug-store-server): Server-side caching with Redis/memory/file backends. Use individually or combine them: client state in URLs + expensive data cached server-side = optimal performance with zero database complexity.",
+        "id": "unified-package-approach",
+        "question": "How does the unified Slug Store package work?",
+        "answer": "**One Package, Everything Included**: `@farajabien/slug-store` contains client hooks, server functions, and core encoding - all in one install. **Two Clear Use Cases**: 1) Share state via URLs (dashboards, filters, configurations), 2) Store state in database (user preferences, private data). **Zero Obstruction**: Works with React, Next.js, Supabase, Firebase, PostgreSQL, MongoDB - no configuration needed. Import what you need: everything, client-only, or server-only.",
         "category": "paradigm", 
-        "tags": ["ecosystem", "packages", "architecture", "hybrid"]
+        "tags": ["unified", "single-package", "architecture", "simplicity"]
       }
     ],
     "getting_started": [
       {
         "id": "what-is-slug-store",
         "question": "What is Slug Store?",
-        "answer": "Slug Store is a lightweight library that lets you persist complex application state in URL slugs. Think of it as a way to make any app state shareable via URLs - like how Excalidraw lets you share drawings or how Google Docs shares documents, but for any web application.",
+        "answer": "Slug Store is a universal state persistence library with two core use cases: **1) Share state via URLs** - like Excalidraw drawings or Google Docs links, perfect for dashboards and configurations, **2) Store state in database** - compressed user preferences that work with any database (Supabase, Firebase, PostgreSQL, etc.). One package handles both seamlessly.",
         "category": "basics",
         "tags": ["overview", "introduction"]
       },
       {
         "id": "why-use-slug-store",
         "question": "Why should I use Slug Store instead of localStorage or other state management?",
-        "answer": "Slug Store offers unique benefits: 1) **Shareable URLs** - Users can bookmark and share exact app states, 2) **SEO-friendly** - State is visible to search engines, 3) **No server required** - Everything works client-side, 4) **Framework agnostic** - Works with React, Vue, Angular, vanilla JS, 5) **Compressed & encrypted** - Efficient and secure.",
+        "answer": "Slug Store offers unique benefits: 1) **Universal persistence** - Share via URLs OR store in database, 2) **Zero configuration** - Works with any database out of the box, 3) **Cross-device sync** - Database storage syncs everywhere, 4) **Instant sharing** - URL state is immediately shareable, 5) **Framework agnostic** - React, Next.js, any backend, 6) **Built-in optimization** - Compression, encryption, TypeScript included.",
         "category": "basics",
         "tags": ["benefits", "comparison"]
       },
@@ -62,7 +62,7 @@
       {
         "id": "quick-start",
         "question": "What's the fastest way to get started?",
-        "answer": "For React apps: `pnpm add @farajabien/slug-store` then replace `useState` with `useSlugStore`. For server-side caching: `pnpm add @farajabien/slug-store-server`. For other frameworks: `pnpm add @farajabien/slug-store-core` and use `encodeState`/`decodeState`. Check our live demo at slugstore.fbien.com for examples.",
+        "answer": "Install once: `npm install @farajabien/slug-store`. **For React**: Replace `useState` with `useSlugStore` for automatic URL sync. **For Database Storage**: Use `saveUserState()` and `loadUserState()` with any database. **For Sharing**: Use `createShareableUrl()` and `loadFromShareableUrl()`. Everything works out of the box - no configuration needed! Check our live demo at slugstore.fbien.com for examples.",
         "category": "basics",
         "tags": ["installation", "quick-start"]
       }
@@ -97,11 +97,11 @@
         "tags": ["performance", "debouncing", "optimization"]
       },
       {
-        "id": "server-side-caching",
-        "question": "How do I add server-side caching to my app?",
-        "answer": "Use the server package: ```tsx\nimport { useServerSlugStore } from '@farajabien/slug-store-server'\n\nexport default async function Page({ params, searchParams }) {\n  const { data, cached } = await useServerSlugStore(\n    async (params, searchParams) => {\n      return await fetchExpensiveData(searchParams)\n    },\n    params, searchParams,\n    { persist: 'redis', ttl: 300 }\n  )\n  return <MyComponent data={data} />\n}\n```",
+        "id": "database-storage",
+        "question": "How do I store user state in my database?",
+        "answer": "Use the built-in database functions: ```tsx\nimport { saveUserState, loadUserState } from '@farajabien/slug-store'\n\n// Save to any database\nconst { slug } = await saveUserState(userPreferences)\nawait supabase.from('profiles').update({ app_state: slug }).eq('id', userId)\n// or Firebase: await db.collection('users').doc(userId).update({ appState: slug })\n// or SQL: await db.query('UPDATE users SET app_state = ? WHERE id = ?', [slug, userId])\n\n// Load from database\nconst { data } = await supabase.from('profiles').select('app_state').eq('id', userId).single()\nconst userPrefs = await loadUserState(data.app_state)\n```",
         "category": "react",
-        "tags": ["server", "caching", "performance", "nextjs"]
+        "tags": ["database", "storage", "supabase", "firebase"]
       }
     ],
     "use_cases": [
@@ -265,7 +265,7 @@
       {
         "id": "from-zustand",
         "question": "How do I migrate from Zustand?",
-        "answer": "Easy! Replace `import { create } from 'zustand'` with `import { create } from '@farajabien/slug-store'`. Add options for URL sync: `create(storeFunction, { compress: true })`. Your existing store logic stays the same!",
+        "answer": "Easy! Replace `import { create } from 'zustand'` with `import { create } from '@farajabien/slug-store'`. Add options for persistence: `create(storeFunction, { compress: true })` for URL sharing or use `saveUserState()` for database storage. Your existing store logic stays the same - just add powerful persistence!",
         "category": "migration",
         "tags": ["zustand", "migration", "stores"]
       },

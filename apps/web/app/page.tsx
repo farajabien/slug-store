@@ -48,14 +48,14 @@ export default function HomePage() {
             </div>
             
             <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent leading-tight">
-              State Management<br />
-              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Reimagined</span>
+              One Package<br />
+              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Two Use Cases</span>
             </h1>
             
             <p className="text-xl md:text-2xl text-muted-foreground max-w-4xl mx-auto leading-relaxed">
-              Persistent, shareable state for modern web applications. 
-              <strong className="text-foreground"> No databases, no backends, no complexity</strong> - 
-              just powerful state management that works everywhere.
+              Universal state persistence for modern web apps. 
+              <strong className="text-foreground">Share via URLs or store in any database</strong> - 
+              zero obstruction, maximum DevEx.
             </p>
             
             <HeroActions />
@@ -64,85 +64,84 @@ export default function HomePage() {
             <div className="flex flex-wrap justify-center gap-8 pt-8 text-sm text-muted-foreground">
               <div className="flex items-center gap-1">
                 <CheckCircle className="h-4 w-4 text-green-500" />
-                <span>URL-based persistence</span>
+                <span>One package install</span>
               </div>
               <div className="flex items-center gap-1">
                 <CheckCircle className="h-4 w-4 text-green-500" />
-                <span>Instant sharing</span>
+                <span>Works with any database</span>
               </div>
               <div className="flex items-center gap-1">
                 <CheckCircle className="h-4 w-4 text-green-500" />
-                <span>Server-side caching</span>
+                <span>Zero configuration</span>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Three Package Ecosystem */}
+      {/* The Two Use Cases */}
       <section className="py-12 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold mb-4">Complete Ecosystem</h2>
+            <h2 className="text-3xl font-bold mb-4">Two Use Cases. Everything Included.</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Three packages working together to handle every state management need
+              One simple install gives you everything you need for modern state persistence
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto mb-8">
             <Card className="relative overflow-hidden border-blue-200 bg-blue-50/50">
               <CardHeader>
-                <Package className="h-10 w-10 text-blue-600 mb-3" />
-                <CardTitle className="text-lg text-blue-700">@farajabien/slug-store-core</CardTitle>
-                <CardDescription>
-                  Foundation package with encoding, compression, and encryption
+                <Share className="h-12 w-12 text-blue-600 mb-4" />
+                <CardTitle className="text-xl text-blue-700">1. Share State via URLs</CardTitle>
+                <CardDescription className="text-base">
+                  Perfect for dashboards, filters, configurations that need external sharing
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-xs text-blue-600 space-y-1">
-                  <div>✓ State encoding/decoding</div>
-                  <div>✓ LZ-String compression</div>
-                  <div>✓ AES encryption</div>
-                  <div>✓ Framework agnostic</div>
+                <div className="text-sm text-blue-600 space-y-2 mb-4">
+                  <div>✓ Instant URL generation</div>
+                  <div>✓ Team collaboration</div>
+                  <div>✓ Bookmarkable configurations</div>
+                  <div>✓ SEO-friendly sharing</div>
                 </div>
+                <code className="text-xs bg-blue-100 p-2 rounded block">
+                  const url = await createShareableUrl(dashboardState)
+                </code>
               </CardContent>
             </Card>
 
             <Card className="relative overflow-hidden border-purple-200 bg-purple-50/50">
               <CardHeader>
-                <Smartphone className="h-10 w-10 text-purple-600 mb-3" />
-                <CardTitle className="text-lg text-purple-700">@farajabien/slug-store</CardTitle>
-                <CardDescription>
-                  React hooks for client-side state with URL persistence
+                <Lock className="h-12 w-12 text-purple-600 mb-4" />
+                <CardTitle className="text-xl text-purple-700">2. Store State in Database</CardTitle>
+                <CardDescription className="text-base">
+                  For user preferences, private data that doesn't need sharing
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-xs text-purple-600 space-y-1">
-                  <div>✓ Zustand-like API</div>
-                  <div>✓ Automatic URL sync</div>
-                  <div>✓ Shareable state</div>
-                  <div>✓ TypeScript first</div>
+                <div className="text-sm text-purple-600 space-y-2 mb-4">
+                  <div>✓ Works with ANY database</div>
+                  <div>✓ Automatic compression & encryption</div>
+                  <div>✓ Cross-device sync</div>
+                  <div>✓ No URL pollution</div>
                 </div>
+                <code className="text-xs bg-purple-100 p-2 rounded block">
+                  const {`{slug}`} = await saveUserState(preferences)
+                </code>
               </CardContent>
             </Card>
+          </div>
 
-            <Card className="relative overflow-hidden border-green-200 bg-green-50/50">
-              <CardHeader>
-                <Server className="h-10 w-10 text-green-600 mb-3" />
-                <CardTitle className="text-lg text-green-700">@farajabien/slug-store-server</CardTitle>
-                <CardDescription>
-                  Server-side caching with Redis, memory, and file adapters
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="text-xs text-green-600 space-y-1">
-                  <div>✓ Multiple backends</div>
-                  <div>✓ Stale-while-revalidate</div>
-                  <div>✓ Next.js integration</div>
-                  <div>✓ Production ready</div>
-                </div>
-              </CardContent>
-            </Card>
+          {/* One Package Badge */}
+          <div className="text-center">
+            <div className="inline-flex items-center gap-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-full">
+              <Package className="h-5 w-5" />
+              <span className="font-semibold">npm install @farajabien/slug-store</span>
+              <Badge variant="secondary" className="bg-white/20 text-white">
+                Everything included
+              </Badge>
+            </div>
           </div>
         </div>
       </section>
@@ -286,19 +285,19 @@ export default function HomePage() {
                 </CardHeader>
                 <CardContent className="text-sm text-green-600 space-y-3">
                   <div>
-                    <strong>URL-Based Storage:</strong> State lives in the URL - no database needed
+                    <strong>One Package:</strong> Everything included - client hooks, server functions, core encoding
                   </div>
                   <div>
-                    <strong>Instant Sharing:</strong> Copy URL = instant state sharing with anyone
+                    <strong>Two Use Cases:</strong> Share via URLs OR store in any database
                   </div>
                   <div>
-                    <strong>Simple API:</strong> Zustand-like hooks, minimal learning curve
+                    <strong>Zero Obstruction:</strong> Install once, works everywhere, no configuration
                   </div>
                   <div>
-                    <strong>Server Caching:</strong> Optional Redis/memory caching for performance
+                    <strong>Universal Compatibility:</strong> React, Next.js, Supabase, Firebase, PostgreSQL, MongoDB
                   </div>
                   <div>
-                    <strong>Zero Setup:</strong> Install package, use hook, done
+                    <strong>Maximum DevEx:</strong> TypeScript, compression, encryption - all built-in
                   </div>
                 </CardContent>
               </Card>
@@ -394,8 +393,8 @@ export default function HomePage() {
               Ready to simplify your state management?
             </h2>
             <p className="text-xl text-muted-foreground mb-8">
-              Join thousands of developers who've eliminated database complexity 
-              and given their users the persistence and sharing they expect.
+              Join thousands of developers building modern apps with universal state persistence.
+              One package. Two use cases. Zero obstruction.
             </p>
             
             <CTAActions />

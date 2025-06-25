@@ -1,6 +1,6 @@
 {
   "name": "@farajabien/slug-store-core",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Lightweight solution for persisting application state in URL slugs with compression and encryption",
   "type": "module",
   "main": "./dist/index.js",

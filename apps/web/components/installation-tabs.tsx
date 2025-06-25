@@ -7,30 +7,56 @@ import { Globe, Server, Layers } from 'lucide-react'
 export function InstallationTabs() {
   return (
     <div className="max-w-4xl mx-auto">
-      <Tabs defaultValue="client" className="w-full">
+      <Tabs defaultValue="unified" className="w-full">
         <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="client">Client-Side</TabsTrigger>
-          <TabsTrigger value="server">Server-Side</TabsTrigger>
-          <TabsTrigger value="both">Full-Stack</TabsTrigger>
+          <TabsTrigger value="unified">One Package</TabsTrigger>
+          <TabsTrigger value="client">Client Only</TabsTrigger>
+          <TabsTrigger value="server">Server Only</TabsTrigger>
         </TabsList>
         
-        <TabsContent value="client" className="space-y-4">
+        <TabsContent value="unified" className="space-y-4">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Globe className="h-5 w-5" />
-                URL Persistence for React
+                <Layers className="h-5 w-5" />
+                Everything You Need
               </CardTitle>
               <CardDescription>
-                Perfect for AI apps, design tools, and demo applications
+                One install, two use cases: URL sharing + database storage
               </CardDescription>
             </CardHeader>
             <CardContent>
               <pre className="bg-muted p-4 rounded-lg overflow-x-auto">
 {`npm install @farajabien/slug-store
 
-# Or with other frameworks
-npm install @farajabien/slug-store-core`}
+# That's it! 🎉
+# ✅ React hooks for client-side
+# ✅ Server functions for database storage 
+# ✅ Universal functions for both
+# ✅ Core encoding/compression/encryption
+# ✅ TypeScript support built-in`}
+              </pre>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="client" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Globe className="h-5 w-5" />
+                Client-Side Only Bundle
+              </CardTitle>
+              <CardDescription>
+                Smaller bundle for client-only applications
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <pre className="bg-muted p-4 rounded-lg overflow-x-auto">
+{`npm install @farajabien/slug-store
+
+# Import client-only functions
+import { useSlugStore } from '@farajabien/slug-store/client'`}
               </pre>
             </CardContent>
           </Card>
@@ -41,44 +67,18 @@ npm install @farajabien/slug-store-core`}
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Server className="h-5 w-5" />
-                Server-Side Caching
+                Server-Side Only
               </CardTitle>
               <CardDescription>
-                Multi-backend caching for Next.js, Remix, Astro, and more
+                For API routes, server components, and backend services
               </CardDescription>
             </CardHeader>
             <CardContent>
               <pre className="bg-muted p-4 rounded-lg overflow-x-auto">
-{`npm install @farajabien/slug-store-server
+{`npm install @farajabien/slug-store
 
-# Optional Redis support
-npm install redis ioredis`}
-              </pre>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="both" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Layers className="h-5 w-5" />
-                Complete Full-Stack Setup
-              </CardTitle>
-              <CardDescription>
-                Get both client and server capabilities for maximum flexibility
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <pre className="bg-muted p-4 rounded-lg overflow-x-auto">
-{`# Client-side URL persistence
-npm install @farajabien/slug-store
-
-# Server-side multi-backend caching  
-npm install @farajabien/slug-store-server
-
-# Optional backends
-npm install redis ioredis`}
+# Import server-only functions
+import { saveUserState, loadUserState } from '@farajabien/slug-store/server'`}
               </pre>
             </CardContent>
           </Card>

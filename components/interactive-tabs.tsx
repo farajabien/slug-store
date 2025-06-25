@@ -3,15 +3,11 @@
 import { Button } from '@workspace/ui/components/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@workspace/ui/components/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@workspace/ui/components/tabs'
-import { Globe, Server, Layers, Code2, ArrowRight } from 'lucide-react'
+import { Globe, Database, Layers, Code2, ArrowRight } from 'lucide-react'
 
 export function InteractiveTabs() {
   const openNpmPackage = () => {
     window.open('https://www.npmjs.com/package/@farajabien/slug-store', '_blank')
-  }
-
-  const openServerPackage = () => {
-    window.open('https://www.npmjs.com/package/@farajabien/slug-store-server', '_blank')
   }
 
   return (
@@ -20,11 +16,11 @@ export function InteractiveTabs() {
         <TabsList className="grid w-full grid-cols-3 mb-8">
           <TabsTrigger value="url" className="text-lg py-3">
             <Globe className="h-5 w-5 mr-2" />
-            URL Persistence
+            URL Sharing
           </TabsTrigger>
-          <TabsTrigger value="server" className="text-lg py-3">
-            <Server className="h-5 w-5 mr-2" />
-            Server Caching
+          <TabsTrigger value="database" className="text-lg py-3">
+            <Database className="h-5 w-5 mr-2" />
+            Database Storage
           </TabsTrigger>
           <TabsTrigger value="hybrid" className="text-lg py-3">
             <Layers className="h-5 w-5 mr-2" />
@@ -38,7 +34,7 @@ export function InteractiveTabs() {
               <CardHeader>
                 <CardTitle className="text-blue-900 flex items-center gap-2">
                   <Globe className="h-6 w-6" />
-                  Client-Side URL Persistence
+                  Share State via URLs
                 </CardTitle>
                 <CardDescription className="text-blue-700">
                   State encoded directly into URLs with compression and encryption
@@ -99,35 +95,35 @@ function ChatApp() {
           </div>
         </TabsContent>
         
-        <TabsContent value="server" className="space-y-6">
+        <TabsContent value="database" className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <Card className="border-purple-200 bg-purple-50/50">
               <CardHeader>
                 <CardTitle className="text-purple-900 flex items-center gap-2">
-                  <Server className="h-6 w-6" />
-                  Server-Side Multi-Backend Caching
+                  <Database className="h-6 w-6" />
+                  Store State in Database
                 </CardTitle>
                 <CardDescription className="text-purple-700">
-                  Intelligent caching with Redis, Memory, File, and URL backends
+                  Works with any database - Supabase, Firebase, PostgreSQL, MongoDB
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <h4 className="font-semibold text-purple-900">Perfect for:</h4>
                   <ul className="text-sm text-purple-800 space-y-1">
-                    <li>• Analytics dashboards with expensive queries</li>
-                    <li>• E-commerce platforms with product catalogs</li>
-                    <li>• API responses needing optimization</li>
-                    <li>• Any application with performance requirements</li>
+                    <li>• User preferences and settings</li>
+                    <li>• Private app state that doesn't need sharing</li>
+                    <li>• Cross-device synchronization</li>
+                    <li>• User-specific data and configurations</li>
                   </ul>
                 </div>
                 <div className="space-y-2">
                   <h4 className="font-semibold text-purple-900">Features:</h4>
                   <ul className="text-sm text-purple-800 space-y-1">
-                    <li>⚡ Stale-while-revalidate patterns</li>
-                    <li>🛡️ Automatic fallback chains</li>
-                    <li>📊 Built-in performance monitoring</li>
-                    <li>🔧 Framework-agnostic (Next.js, Remix, Astro)</li>
+                    <li>🔐 Automatic encryption for privacy</li>
+                    <li>🗜️ Built-in compression</li>
+                    <li>🔄 Cross-device sync</li>
+                    <li>🔧 Works with ANY database</li>
                   </ul>
                 </div>
               </CardContent>
@@ -137,35 +133,32 @@ function ChatApp() {
               <CardHeader>
                 <CardTitle className="text-purple-300 flex items-center gap-2">
                   <Code2 className="h-5 w-5" />
-                  Server Hook Example
+                  Database Example
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <pre className="text-sm overflow-x-auto bg-slate-800 p-4 rounded-lg">
-{`import { useServerSlugStore } from '@farajabien/slug-store-server'
+{`import { saveUserState, loadUserState } from '@farajabien/slug-store'
 
-// Next.js App Router
-export default async function Dashboard({ params, searchParams }) {
-  const { data, cached, stale } = await useServerSlugStore(
-    async (params, searchParams) => {
-      return await db.analytics.query(searchParams)
-    },
-    params,
-    searchParams,
-    { 
-      persist: 'redis',           // Redis backend
-      ttl: 1800,                 // 30 min cache
-      staleWhileRevalidate: true // Background updates
-    }
-  )
+// Save user preferences
+const { slug } = await saveUserState({
+  theme: 'dark',
+  preferences: { notifications: true }
+})
 
-  return <Analytics data={data} cached={cached} />
-}`}
+// Works with any database
+await supabase.from('profiles').insert({
+  user_id: user.id,
+  app_state: slug
+})
+
+// Load from database
+const userPrefs = await loadUserState(profile.app_state)`}
                 </pre>
                 <div className="mt-4">
-                  <Button onClick={openServerPackage} variant="secondary" size="sm">
+                  <Button onClick={openNpmPackage} variant="secondary" size="sm">
                     <ArrowRight className="h-4 w-4 mr-2" />
-                    Get @farajabien/slug-store-server
+                    Get @farajabien/slug-store
                   </Button>
                 </div>
               </CardContent>
@@ -182,7 +175,7 @@ export default async function Dashboard({ params, searchParams }) {
                   Hybrid Full-Stack Architecture
                 </CardTitle>
                 <CardDescription className="text-green-700">
-                  Combine URL state + server caching + traditional databases
+                  Combine URL sharing + database storage + traditional databases
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -223,22 +216,26 @@ const { state: filters } = useSlugStore({
   sortBy: 'popularity'
 })
 
-// Server: Data caching for performance  
-const { data: products } = await useServerSlugStore(
-  async (params, searchParams) => {
-    return await db.products.findMany({
-      where: buildFilters(searchParams)
-    })
-  },
-  params, searchParams,
-  { persist: 'redis', ttl: 300 }
-)
-
 // Database: User accounts and orders
 const user = await db.users.findUnique({ 
   where: { id: userId },
   include: { orders: true }
-})`}
+})
+
+// User preferences in database
+import { saveUserState, loadUserState } from '@farajabien/slug-store'
+
+const { slug } = await saveUserState({
+  theme: 'dark',
+  preferences: { notifications: true }
+})
+
+await supabase.from('profiles').insert({ 
+  user_id: user.id, 
+  app_state: slug 
+})
+
+const userPrefs = await loadUserState(profile.app_state)`}
                 </pre>
               </CardContent>
             </Card>

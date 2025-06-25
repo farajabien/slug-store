@@ -4,13 +4,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@work
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@workspace/ui/components/tabs'
 import { Layers, Code2 } from 'lucide-react'
 import { useState, useEffect } from 'react'
+import { saveUserState, loadUserState } from '@farajabien/slug-store'
+import { useSlugStore } from '@farajabien/slug-store'
 
 export function InteractiveTabs() {
   return (
     <Tabs defaultValue="client" className="w-full">
       <TabsList className="grid w-full grid-cols-3">
-        <TabsTrigger value="client">Client-Side</TabsTrigger>
-        <TabsTrigger value="server">Server-Side</TabsTrigger>
+        <TabsTrigger value="client">URL Sharing</TabsTrigger>
+        <TabsTrigger value="database">Database Storage</TabsTrigger>
         <TabsTrigger value="hybrid">Hybrid</TabsTrigger>
       </TabsList>
 
@@ -97,41 +99,43 @@ function Dashboard() {
         </div>
       </TabsContent>
 
-      <TabsContent value="server" className="space-y-6">
+      <TabsContent value="database" className="space-y-6">
         <Card>
           <CardHeader>
-            <CardTitle className="text-green-600">Server-Side Caching</CardTitle>
-            <CardDescription>Cache expensive operations with multiple backends</CardDescription>
+            <CardTitle className="text-green-600">Database Storage</CardTitle>
+            <CardDescription>Store user state in any database with zero configuration</CardDescription>
           </CardHeader>
           <CardContent>
             <pre className="bg-muted p-4 rounded-lg text-xs overflow-x-auto">
-{`import { useServerSlugStore } from '@farajabien/slug-store-server'
+{`import { saveUserState, loadUserState } from '@farajabien/slug-store'
 
-// Next.js App Router
-export default async function DashboardPage({ params, searchParams }) {
-  const { data, cached, stale } = await useServerSlugStore(
-    async (params, searchParams) => {
-      // Expensive database query or API call
-      return await fetchDashboardData(params.userId, searchParams)
-    },
-    params,
-    searchParams,
-    {
-      persist: 'redis',              // Redis in production
-      ttl: 300,                     // 5 minutes
-      staleWhileRevalidate: true,   // Background updates
-      compress: true                // Compress large data
-    }
-  )
+// Save user preferences
+const { slug } = await saveUserState({
+  theme: 'dark',
+  preferences: { notifications: true },
+  dashboardLayout: 'grid'
+})
 
-  return (
-    <div>
-      {cached && <p>✨ Served from cache</p>}
-      {stale && <p>🔄 Updating in background</p>}
-      <Dashboard data={data} />
-    </div>
-  )
-}`}
+// Works with ANY database
+// Supabase
+await supabase.from('profiles').insert({ 
+  user_id: user.id, 
+  app_state: slug 
+})
+
+// Firebase
+await db.collection('users').doc(userId).set({ 
+  appState: slug 
+})
+
+// PostgreSQL + Prisma
+await prisma.user.update({ 
+  where: { id: userId }, 
+  data: { appState: slug } 
+})
+
+// Load from database
+const userPrefs = await loadUserState(profile.app_state)`}
             </pre>
           </CardContent>
         </Card>
@@ -141,33 +145,42 @@ export default async function DashboardPage({ params, searchParams }) {
         <Card>
           <CardHeader>
             <CardTitle className="text-purple-600">Best of Both Worlds</CardTitle>
-            <CardDescription>Server-side data caching + client-side UI state</CardDescription>
+            <CardDescription>URL sharing + database storage + traditional databases</CardDescription>
           </CardHeader>
           <CardContent>
             <pre className="bg-muted p-4 rounded-lg text-xs overflow-x-auto">
-{`// Server: Cache expensive data fetching
-const { data: projectsData } = await useServerSlugStore(
-  fetchProjectsFromAPI,
-  params,
-  searchParams,
-  { persist: 'redis', ttl: 600 }
-)
+{`// Client: UI state in URLs (shareable)
+const { state, setState } = useSlugStore({
+  filters: { search: '', category: 'all' },
+  view: 'grid',
+  selectedItems: []
+}, {
+  compress: true,
+  syncToUrl: true  // Share filters via URL
+})
 
-// Client: Manage UI state with URL persistence
-function ProjectApp({ initialProjects }) {
-  const { state, setState } = useSlugStore({
-    projects: initialProjects,     // Server data
-    filters: { search: '', type: 'all' },
-    selectedProject: null,
-    sidebarOpen: true             // UI-only state
-  }, {
-    compress: true,
-    syncToUrl: true              // Share filters via URL
-  })
+// Database: User preferences (private)
+const { slug } = await saveUserState({
+  theme: 'dark',
+  notifications: true,
+  layout: 'sidebar'
+})
 
-  // Server handles data, client handles UI
-  // Both are optimized and shareable
-}`}
+await supabase.from('profiles').insert({
+  user_id: user.id,
+  app_state: slug
+})
+
+// Traditional: User accounts, orders, etc.
+const user = await db.users.findUnique({
+  where: { id: userId },
+  include: { orders: true }
+})
+
+// One package handles everything!
+// ✅ URL sharing for collaboration
+// ✅ Database storage for privacy  
+// ✅ Traditional DB for business data`}
             </pre>
           </CardContent>
         </Card>

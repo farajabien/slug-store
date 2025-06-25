@@ -2,6 +2,24 @@
   "useCases": {
     "paradigm_examples": [
       {
+        "id": "supabase-user-state",
+        "title": "Database User State (No URL Required)",
+        "description": "Store user app state directly in database profiles. Perfect for Supabase, Firebase, or any user table. Zero URL pollution.",
+        "stateExample": {
+          "userPreferences": {"theme": "dark", "language": "en", "notifications": true},
+          "appData": {"dashboardLayout": "grid", "favoriteProjects": ["proj-1", "proj-2"]},
+          "workspaceSettings": {"activeTab": "analytics", "filters": {"status": "active"}},
+          "personalData": {"onboardingComplete": true, "lastVisited": "2024-01-15"}
+        },
+        "implementation": {
+          "supabase": "// Single package install: npm install @farajabien/slug-store\nimport { saveUserState, loadUserState } from '@farajabien/slug-store'\n\n// 1. Store in user profile (one-time setup)\nconst userState = { theme: 'dark', preferences: {...} }\nconst { slug } = await saveUserState(userState)\n\nawait supabase.from('profiles').insert({\n  user_id: user.id,\n  app_state: slug  // Compressed, encrypted state\n})\n\n// 2. Load user state (every page load)\nconst { data: profile } = await supabase\n  .from('profiles')\n  .select('app_state')\n  .eq('user_id', user.id)\n  .single()\n\nconst appData = await loadUserState(profile.app_state)",
+          "benefits": ["No URL pollution", "Private user data", "Cross-device sync", "Works with ANY database", "Single package install"]
+        },
+        "tags": ["database", "supabase", "user-state", "private"],
+        "difficulty": "beginner",
+        "realWorldExamples": ["User preferences", "Dashboard layouts", "Personal settings", "App state"]
+      },
+      {
         "id": "zero-database-startup",
         "title": "Zero-Database Startup MVP",
         "description": "Launch a complete SaaS MVP with zero backend infrastructure - all state persists in URLs.",
@@ -12,8 +30,8 @@
           "settings": {"plan": "free", "limits": {"projects": 1, "users": 10}}
         },
         "implementation": {
-          "react": "// Complete SaaS app with ZERO database\nconst useSaaSStore = create((set, get) => ({\n  // User state\n  user: { name: '', email: '', plan: 'free' },\n  onboarding: { step: 1, completed: false },\n  \n  // App state\n  projects: [],\n  currentProject: null,\n  workflows: [],\n  \n  // Business logic\n  createProject: (name) => set(state => ({\n    projects: [...state.projects, {\n      id: Date.now(),\n      name,\n      createdAt: new Date().toISOString()\n    }]\n  })),\n  \n  upgradeToProPlan: () => set({ \n    user: { ...get().user, plan: 'pro' } \n  })\n}), { compress: true, key: 'saas' })",
-          "benefits": ["Zero hosting costs", "Instant deployment", "Global CDN delivery", "Infinite scaling", "No vendor lock-in"]
+          "react": "// Complete SaaS app with ONE package install\nimport { create } from '@farajabien/slug-store'\n\nconst useSaaSStore = create((set, get) => ({\n  // User state\n  user: { name: '', email: '', plan: 'free' },\n  onboarding: { step: 1, completed: false },\n  \n  // App state\n  projects: [],\n  currentProject: null,\n  workflows: [],\n  \n  // Business logic\n  createProject: (name) => set(state => ({\n    projects: [...state.projects, {\n      id: Date.now(),\n      name,\n      createdAt: new Date().toISOString()\n    }]\n  })),\n  \n  upgradeToProPlan: () => set({ \n    user: { ...get().user, plan: 'pro' } \n  })\n}), { compress: true, key: 'saas' })",
+          "benefits": ["Single package install", "Zero hosting costs", "Instant deployment", "Global CDN delivery", "No vendor lock-in"]
         },
         "tags": ["startup", "mvp", "zero-backend", "saas"],
         "difficulty": "beginner",
@@ -30,8 +48,8 @@
           "collaboration": {"activeUsers": ["john", "jane"], "comments": []}
         },
         "implementation": {
-          "react": "// Hybrid approach: Database for users, URLs for everything else\nconst useWorkspaceStore = create((set) => ({\n  // This state lives in URLs - infinitely scalable\n  workspace: { name: '', settings: {} },\n  dashboard: { widgets: [], layout: 'grid' },\n  filters: { dateRange: 'last-7-days' },\n  \n  // User data comes from your auth provider (Supabase, Auth0, etc.)\n  // App state automatically syncs to URLs\n  \n  updateDashboard: (widgets) => set({ dashboard: { widgets } }),\n  applyFilters: (filters) => set({ filters }),\n  \n  // Collaboration via URL sharing\n  shareWorkspace: async () => {\n    const url = await get().getShareableUrl()\n    return url // Share this with team members\n  }\n}), { \n  compress: true, \n  encrypt: true, \n  password: userSessionToken, // From your auth provider\n  key: 'workspace' \n})",
-          "benefits": ["Minimal database usage", "Instant state sharing", "Team collaboration", "Reduced server costs", "Automatic backups via URLs"]
+          "react": "// Hybrid approach: Simple auth + powerful state persistence\nimport { create, createShareableUrl } from '@farajabien/slug-store'\n\nconst useWorkspaceStore = create((set, get) => ({\n  // This state lives in URLs - infinitely scalable\n  workspace: { name: '', settings: {} },\n  dashboard: { widgets: [], layout: 'grid' },\n  filters: { dateRange: 'last-7-days' },\n  \n  // User data comes from your auth provider (Supabase, Auth0, etc.)\n  // App state automatically syncs to URLs\n  \n  updateDashboard: (widgets) => set({ dashboard: { widgets } }),\n  applyFilters: (filters) => set({ filters }),\n  \n  // Collaboration via URL sharing\n  shareWorkspace: async () => {\n    const url = await createShareableUrl(get())\n    return url // Share this with team members\n  }\n}), { \n  compress: true, \n  encrypt: true, \n  password: userSessionToken, // From your auth provider\n  key: 'workspace' \n})",
+          "benefits": ["Single package simplicity", "Minimal database usage", "Instant state sharing", "Team collaboration", "Automatic backups via URLs"]
         },
         "tags": ["hybrid", "scale", "team", "enterprise"],
         "difficulty": "intermediate",
@@ -76,8 +94,8 @@
           "theme": "light"
         },
         "implementation": {
-          "react": "const useCanvasStore = create((set) => ({\n  elements: [],\n  viewport: { zoom: 1, pan: { x: 0, y: 0 } },\n  selectedTool: 'select',\n  addElement: (element) => set(state => ({ \n    elements: [...state.elements, element] \n  })),\n  updateViewport: (viewport) => set({ viewport })\n}), { compress: true, debounceMs: 300 })",
-          "benefits": ["Instant sharing of drawings", "Bookmark complex diagrams", "Collaborative whiteboarding", "Version history via URLs"]
+          "react": "import { create } from '@farajabien/slug-store'\n\nconst useCanvasStore = create((set) => ({\n  elements: [],\n  viewport: { zoom: 1, pan: { x: 0, y: 0 } },\n  selectedTool: 'select',\n  addElement: (element) => set(state => ({ \n    elements: [...state.elements, element] \n  })),\n  updateViewport: (viewport) => set({ viewport })\n}), { compress: true, debounceMs: 300 })",
+          "benefits": ["Single package install", "Instant sharing of drawings", "Bookmark complex diagrams", "Collaborative whiteboarding"]
         },
         "tags": ["design", "collaboration", "canvas", "drawing"],
         "difficulty": "intermediate",
@@ -120,8 +138,8 @@
           "viewMode": "grid"
         },
         "implementation": {
-          "react": "const useProductFilters = create((set) => ({\n  category: 'all',\n  brands: [],\n  priceRange: [0, 5000],\n  inStock: false,\n  sortBy: 'relevance',\n  setCategory: (category) => set({ category }),\n  toggleBrand: (brand) => set(state => ({\n    brands: state.brands.includes(brand)\n      ? state.brands.filter(b => b !== brand)\n      : [...state.brands, brand]\n  }))\n}), { compress: true, key: 'filters' })",
-          "benefits": ["Shareable product searches", "Bookmark favorite filters", "Email filtered results", "SEO-friendly URLs"]
+          "react": "import { create } from '@farajabien/slug-store'\n\nconst useProductFilters = create((set) => ({\n  category: 'all',\n  brands: [],\n  priceRange: [0, 5000],\n  inStock: false,\n  sortBy: 'relevance',\n  setCategory: (category) => set({ category }),\n  toggleBrand: (brand) => set(state => ({\n    brands: state.brands.includes(brand)\n      ? state.brands.filter(b => b !== brand)\n      : [...state.brands, brand]\n  }))\n}), { compress: true, key: 'filters' })",
+          "benefits": ["Single package install", "Shareable product searches", "Bookmark favorite filters", "SEO-friendly URLs"]
         },
         "tags": ["ecommerce", "filters", "shopping", "search"],
         "difficulty": "beginner",
@@ -214,8 +232,8 @@
           "conversationTitle": "React Discussion"
         },
         "implementation": {
-          "react": "const useChatStore = create((set, get) => ({\n  messages: [],\n  model: 'gpt-3.5-turbo',\n  temperature: 0.7,\n  systemPrompt: 'You are a helpful assistant',\n  addMessage: (message) => set(state => ({\n    messages: [...state.messages, { ...message, id: Date.now() }]\n  })),\n  updateSettings: (settings) => set(settings),\n  clearChat: () => set({ messages: [] })\n}), { \n  compress: true, \n  encrypt: true, \n  password: userSessionKey,\n  key: 'chat'\n})",
-          "benefits": ["Share AI conversations", "Save chat templates", "Collaborate on prompts", "Resume conversations"]
+          "react": "import { create } from '@farajabien/slug-store'\n\nconst useChatStore = create((set, get) => ({\n  messages: [],\n  model: 'gpt-3.5-turbo',\n  temperature: 0.7,\n  systemPrompt: 'You are a helpful assistant',\n  addMessage: (message) => set(state => ({\n    messages: [...state.messages, { ...message, id: Date.now() }]\n  })),\n  updateSettings: (settings) => set(settings),\n  clearChat: () => set({ messages: [] })\n}), { \n  compress: true, \n  encrypt: true, \n  password: userSessionKey,\n  key: 'chat'\n})",
+          "benefits": ["Single package install", "Share AI conversations", "Save chat templates", "Collaborate on prompts"]
         },
         "tags": ["ai", "chat", "gpt", "conversations"],
         "difficulty": "intermediate",
