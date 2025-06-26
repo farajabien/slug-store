@@ -1,24 +1,25 @@
 # Slug Store Usage Guide
 
-> **One package. Two use cases. Zero obstruction.**
+> **Universal state persistence for modern web apps. Zero obstruction, maximum DevEx.**
 
-Complete guide to using Slug Store - from simple React apps to complex full-stack systems.
+Complete guide to using Slug Store - from simple React apps to complex offline-first applications.
 
-## 🎯 The Revolution: One Package for Everything
+## 🎯 The Revolution: Universal State Management
 
 ```bash
 npm install @farajabien/slug-store
 ```
 
 **What you get:**
-- ✅ **Client-side React hooks** - URL state persistence
+- ✅ **Client-side React hooks** - URL state persistence + offline-sync
 - ✅ **Server-side functions** - Database integration with any database
 - ✅ **Universal functions** - Auto-optimized for purpose
+- ✅ **Offline-sync engine** - Any webapp works offline without PWA complexity
 - ✅ **Core functionality** - Compression, encryption, validation (auto-included)
 - ✅ **TypeScript support** - Full type safety
 - ✅ **Zero additional dependencies** - Everything built-in
 
-## 🎯 The Two Use Cases
+## 🎯 The Three Use Cases
 
 ### 1. **Share State via URLs**
 *For dashboards, filters, configurations that need external sharing*
@@ -59,7 +60,170 @@ await prisma.user.update({ where: { id: userId }, data: { appState: slug } })
 const userPrefs = await loadUserState(profile.app_state)
 ```
 
+### 3. **🔥 NEW: Offline-First Webapps**
+*Any webapp can work offline without PWA complexity*
+
+```typescript
+import { useSlugStore } from '@farajabien/slug-store'
+
+// Simple offline-sync - just add one option!
+const { state, setState, syncStatus } = useSlugStore({
+  todos: [],
+  cart: [],
+  preferences: {}
+}, {
+  offlineSync: true  // That's it! Works offline now
+})
+
+// Advanced offline-sync with custom conflict resolution
+const { state, setState, sync } = useSlugStore(
+  initialData,
+  { 
+    offlineSync: {
+      conflictResolution: 'merge',  // Intelligent merging
+      syncInterval: 30,             // Auto-sync every 30s
+      onSync: (data, direction) => console.log(`Synced ${direction}`, data)
+    }
+  }
+)
+
+// Features:
+// 🔄 Background sync when online
+// 🔀 Smart conflict resolution  
+// 💾 IndexedDB storage
+// 🔐 Auto-encryption
+// 🌐 Universal endpoints
+```
+
 ## 🚀 Real-World Examples
+
+### Offline-First Todo App
+
+```typescript
+// src/hooks/useTodoStore.ts
+import { useSlugStore } from '@farajabien/slug-store'
+
+interface TodoState {
+  todos: Todo[]
+  filter: 'all' | 'active' | 'completed'
+  searchQuery: string
+}
+
+export function useTodoStore() {
+  const { state, setState, syncStatus, sync } = useSlugStore<TodoState>({
+    todos: [],
+    filter: 'all',
+    searchQuery: ''
+  }, {
+    offlineSync: {
+      conflictResolution: 'merge',  // Smart merging for todos
+      syncInterval: 30,             // Auto-sync every 30s
+      onSync: (data, direction) => {
+        console.log(`Synced ${direction}:`, data.todos.length, 'todos')
+      }
+    }
+  })
+
+  const addTodo = (text: string) => {
+    setState({
+      ...state,
+      todos: [...state.todos, { 
+        id: crypto.randomUUID(), 
+        text, 
+        completed: false,
+        createdAt: new Date().toISOString()
+      }]
+    })
+  }
+
+  const toggleTodo = (id: string) => {
+    setState({
+      ...state,
+      todos: state.todos.map(todo => 
+        todo.id === id ? { ...todo, completed: !todo.completed } : todo
+      )
+    })
+  }
+
+  return { 
+    state, 
+    addTodo, 
+    toggleTodo, 
+    syncStatus, 
+    sync,
+    isOnline: syncStatus?.online ?? true,
+    pendingChanges: syncStatus?.pendingChanges ?? 0
+  }
+}
+
+// Usage in component
+function TodoApp() {
+  const { state, addTodo, toggleTodo, syncStatus, sync, isOnline, pendingChanges } = useTodoStore()
+
+  return (
+    <div>
+      {/* Sync Status Indicator */}
+      <div className={`sync-status ${isOnline ? 'online' : 'offline'}`}>
+        {isOnline ? '🟢 Online' : '🔴 Offline'}
+        {pendingChanges > 0 && ` (${pendingChanges} pending changes)`}
+      </div>
+
+      {/* Todo Input */}
+      <input 
+        placeholder="Add a todo..."
+        onKeyPress={(e) => {
+          if (e.key === 'Enter' && e.currentTarget.value.trim()) {
+            addTodo(e.currentTarget.value.trim())
+            e.currentTarget.value = ''
+          }
+        }}
+      />
+
+      {/* Filter Buttons */}
+      <div className="filters">
+        {(['all', 'active', 'completed'] as const).map(filter => (
+          <button
+            key={filter}
+            className={state.filter === filter ? 'active' : ''}
+            onClick={() => setState({ ...state, filter })}
+          >
+            {filter}
+          </button>
+        ))}
+      </div>
+
+      {/* Todo List */}
+      <ul>
+        {state.todos
+          .filter(todo => {
+            if (state.filter === 'active') return !todo.completed
+            if (state.filter === 'completed') return todo.completed
+            return true
+          })
+          .map(todo => (
+            <li key={todo.id}>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={todo.completed}
+                  onChange={() => toggleTodo(todo.id)}
+                />
+                <span className={todo.completed ? 'completed' : ''}>
+                  {todo.text}
+                </span>
+              </label>
+            </li>
+          ))}
+      </ul>
+
+      {/* Manual Sync Button */}
+      <button onClick={sync} disabled={syncStatus?.syncing}>
+        Force Sync
+      </button>
+    </div>
+  )
+}
+```
 
 ### Project Management App (Clarity Style)
 
@@ -126,6 +290,101 @@ function ProjectDashboard() {
 }
 ```
 
+### Offline-Sync Shopping Cart
+
+```typescript
+// Shopping cart that works offline and syncs when online
+import { useSlugStore } from '@farajabien/slug-store'
+
+interface CartState {
+  items: CartItem[]
+  total: number
+  promoCode?: string
+}
+
+export function useCartStore() {
+  const { state, setState, syncStatus } = useSlugStore<CartState>({
+    items: [],
+    total: 0
+  }, {
+    offlineSync: {
+      conflictResolution: 'merge',
+      syncInterval: 60, // Sync every minute
+      onSync: (data, direction) => {
+        console.log(`Cart synced ${direction}:`, data.items.length, 'items')
+      }
+    }
+  })
+
+  const addItem = (item: Omit<CartItem, 'id'>) => {
+    const existingItem = state.items.find(i => i.productId === item.productId)
+    
+    if (existingItem) {
+      setState({
+        ...state,
+        items: state.items.map(i => 
+          i.productId === item.productId 
+            ? { ...i, quantity: i.quantity + item.quantity }
+            : i
+        ),
+        total: state.total + (item.price * item.quantity)
+      })
+    } else {
+      setState({
+        ...state,
+        items: [...state.items, { ...item, id: crypto.randomUUID() }],
+        total: state.total + (item.price * item.quantity)
+      })
+    }
+  }
+
+  const removeItem = (itemId: string) => {
+    const item = state.items.find(i => i.id === itemId)
+    if (item) {
+      setState({
+        ...state,
+        items: state.items.filter(i => i.id !== itemId),
+        total: state.total - (item.price * item.quantity)
+      })
+    }
+  }
+
+  return { 
+    state, 
+    addItem, 
+    removeItem, 
+    syncStatus,
+    isOnline: syncStatus?.online ?? true,
+    pendingChanges: syncStatus?.pendingChanges ?? 0
+  }
+}
+
+// Usage in component
+function ShoppingCart() {
+  const { state, addItem, removeItem, isOnline, pendingChanges } = useCartStore()
+
+  return (
+    <div>
+      {/* Online/Offline Status */}
+      <div className={`status ${isOnline ? 'online' : 'offline'}`}>
+        {isOnline ? '🟢 Online' : '🔴 Offline'}
+        {pendingChanges > 0 && ` - ${pendingChanges} pending changes`}
+      </div>
+
+      {/* Cart Items */}
+      {state.items.map(item => (
+        <div key={item.id}>
+          {item.name} - ${item.price} x {item.quantity}
+          <button onClick={() => removeItem(item.id)}>Remove</button>
+        </div>
+      ))}
+
+      <div>Total: ${state.total}</div>
+    </div>
+  )
+}
+```
+
 ### User Preferences with Database Storage
 
 ```typescript
@@ -187,7 +446,7 @@ async function saveToSQL(userId: string, preferences: UserPrefs) {
 }
 ```
 
-### Next.js Full-Stack App
+### Next.js Full-Stack App with Offline-Sync
 
 ```typescript
 // app/dashboard/page.tsx (Server Component)
@@ -221,7 +480,13 @@ export default async function DashboardPage({ searchParams, user }) {
 import { useSlugStore, saveUserState, createShareableUrl } from '@farajabien/slug-store'
 
 export function DashboardComponent({ initialState, user }) {
-  const { state, setState } = useSlugStore(initialState, { compress: true })
+  const { state, setState, syncStatus } = useSlugStore(initialState, { 
+    compress: true,
+    offlineSync: {
+      conflictResolution: 'merge',
+      syncInterval: 60
+    }
+  })
 
   // Save to user's profile
   const savePersonal = async () => {
@@ -242,6 +507,12 @@ export function DashboardComponent({ initialState, user }) {
 
   return (
     <div>
+      {/* Sync Status */}
+      <div className={`sync-status ${syncStatus?.online ? 'online' : 'offline'}`}>
+        {syncStatus?.online ? '🟢 Online' : '🔴 Offline'}
+        {syncStatus?.pendingChanges > 0 && ` (${syncStatus.pendingChanges} pending)`}
+      </div>
+
       <div className="flex gap-2 mb-4">
         <button onClick={savePersonal}>Save to My Profile</button>
         <button onClick={shareWithTeam}>Share with Team</button>
@@ -254,10 +525,10 @@ export function DashboardComponent({ initialState, user }) {
 }
 ```
 
-### E-commerce Shopping Cart
+### E-commerce Shopping Cart with Offline-Sync
 
 ```typescript
-// Shopping cart that works everywhere
+// Shopping cart that works everywhere and syncs offline
 import { saveUserState, loadUserState } from '@farajabien/slug-store'
 
 interface CartState {
@@ -313,6 +584,26 @@ function SimpleApp() {
   // State automatically syncs to URL - instantly shareable!
   return <TodoApp state={state} setState={setState} />
 }
+
+// With offline-sync
+function OfflineApp() {
+  const { state, setState, syncStatus } = useSlugStore({
+    todos: [],
+    filter: 'all',
+    theme: 'light'
+  }, {
+    offlineSync: true  // Works offline automatically
+  })
+
+  return (
+    <div>
+      <div className={`status ${syncStatus?.online ? 'online' : 'offline'}`}>
+        {syncStatus?.online ? '🟢 Online' : '🔴 Offline'}
+      </div>
+      <TodoApp state={state} setState={setState} />
+    </div>
+  )
+}
 ```
 
 ### Next.js (Full-Stack)
@@ -327,16 +618,28 @@ export default async function Page({ searchParams, user }) {
   return <App initialState={state} />
 }
 
-// Client: Save to database, share via URL
+// Client: Save to database, share via URL, work offline
 function App({ initialState }) {
-  const { state } = useSlugStore(initialState)
+  const { state, syncStatus } = useSlugStore(initialState, {
+    offlineSync: {
+      conflictResolution: 'merge',
+      syncInterval: 60
+    }
+  })
   
   const savePersonal = async () => {
     const { slug } = await saveUserState(state)
     await saveToDatabase(slug)
   }
   
-  return <div>...</div>
+  return (
+    <div>
+      <div className={`sync-status ${syncStatus?.online ? 'online' : 'offline'}`}>
+        {syncStatus?.online ? '🟢 Online' : '🔴 Offline'}
+      </div>
+      <button onClick={savePersonal}>Save</button>
+    </div>
+  )
 }
 ```
 
@@ -365,12 +668,31 @@ export async function action({ request }) {
   
   return redirect('/dashboard')
 }
+
+// Component with offline-sync
+function RemixApp({ state }) {
+  const { state: localState, syncStatus } = useSlugStore(state, {
+    offlineSync: true
+  })
+
+  return (
+    <div>
+      <div className={`status ${syncStatus?.online ? 'online' : 'offline'}`}>
+        {syncStatus?.online ? '🟢 Online' : '🔴 Offline'}
+      </div>
+      <Form method="post">
+        <input type="hidden" name="state" value={JSON.stringify(localState)} />
+        <button type="submit">Save</button>
+      </Form>
+    </div>
+  )
+}
 ```
 
 ### Node.js (Any Server)
 
 ```typescript
-import { persistState, restoreState } from '@farajabien/slug-store'
+import { persistState, restoreState, handleSyncRequest } from '@farajabien/slug-store'
 
 // Express.js
 app.post('/api/save-state', async (req, res) => {
@@ -390,6 +712,82 @@ app.post('/api/save-state', async (req, res) => {
 app.get('/api/load-state/:slug', async (req, res) => {
   const state = await restoreState(req.params.slug) // Auto-detects format
   res.json({ state })
+})
+
+// Universal offline-sync endpoint
+app.all('/api/sync/:storeId', async (req, res) => {
+  const result = await handleSyncRequest(req, {
+    loadState: async (storeId) => {
+      const record = await db.collection('app_state').doc(storeId).get()
+      return record.exists ? record.data().state : null
+    },
+    saveState: async (storeId, state) => {
+      await db.collection('app_state').doc(storeId).set({
+        state,
+        updatedAt: new Date()
+      })
+    }
+  })
+  
+  res.json(result)
+})
+```
+
+### Offline-Sync Server Integration
+
+```typescript
+// Universal sync endpoint for any database
+// app/api/sync/[storeId]/route.ts (Next.js)
+import { handleSyncRequest } from '@farajabien/slug-store'
+
+export async function GET(request: Request, { params }: { params: { storeId: string } }) {
+  return handleSyncRequest(request, {
+    loadState: async (storeId) => {
+      // Load from your database
+      const record = await db.collection('app_state').doc(storeId).get()
+      return record.exists ? record.data().state : null
+    },
+    saveState: async (storeId, state) => {
+      // Save to your database
+      await db.collection('app_state').doc(storeId).set({
+        state,
+        updatedAt: new Date()
+      })
+    }
+  })
+}
+
+export async function POST(request: Request, { params }: { params: { storeId: string } }) {
+  return handleSyncRequest(request, {
+    loadState: async (storeId) => {
+      const record = await db.collection('app_state').doc(storeId).get()
+      return record.exists ? record.data().state : null
+    },
+    saveState: async (storeId, state) => {
+      await db.collection('app_state').doc(storeId).set({
+        state,
+        updatedAt: new Date()
+      })
+    }
+  })
+}
+
+// Express.js version
+app.all('/api/sync/:storeId', async (req, res) => {
+  const result = await handleSyncRequest(req, {
+    loadState: async (storeId) => {
+      const record = await db.collection('app_state').doc(storeId).get()
+      return record.exists ? record.data().state : null
+    },
+    saveState: async (storeId, state) => {
+      await db.collection('app_state').doc(storeId).set({
+        state,
+        updatedAt: new Date()
+      })
+    }
+  })
+  
+  res.json(result)
 })
 ```
 
@@ -452,16 +850,19 @@ CREATE TABLE user_preferences (
 
 ```typescript
 // Everything (recommended - zero config)
-import { useSlugStore, saveUserState, createShareableUrl } from '@farajabien/slug-store'
+import { useSlugStore, saveUserState, createShareableUrl, handleSyncRequest } from '@farajabien/slug-store'
 
 // Client-only (smaller bundle for client-side apps)
 import { useSlugStore, create } from '@farajabien/slug-store/client'
 
 // Server-only (for API routes, server components)  
-import { saveUserState, createShareableUrl, persistState } from '@farajabien/slug-store/server'
+import { saveUserState, createShareableUrl, persistState, handleSyncRequest } from '@farajabien/slug-store/server'
 
 // Core only (if you need just encoding/decoding)
 import { encodeState, decodeState } from '@farajabien/slug-store'
+
+// Offline-sync utilities
+import { createOfflineSync, resolveConflict } from '@farajabien/slug-store'
 ```
 
 ## 🚀 Production Tips
@@ -480,6 +881,14 @@ const shareUrl = await createShareableUrl(dashboardConfig, baseUrl, {
   compress: true,  // Smaller URLs
   encrypt: false   // Shareable by default
 })
+
+// Offline-sync: Auto-encrypted by default
+const { state } = useSlugStore(initialData, {
+  offlineSync: {
+    encrypt: true,  // Automatic encryption
+    password: userKey // Optional custom key
+  }
+})
 ```
 
 ### Performance Optimization
@@ -490,12 +899,67 @@ const { state } = useSlugStore(largeProjectData, {
   compress: true,    // 30-70% size reduction
   debounceMs: 500   // Less aggressive URL updates
 })
+
+// Offline-sync: Optimize for your use case
+const { state } = useSlugStore(data, {
+  offlineSync: {
+    syncInterval: 60,  // Sync every minute (not too aggressive)
+    conflictResolution: 'merge',  // Smart merging
+    compress: true,  // Compress offline data
+    encrypt: true    // Encrypt sensitive data
+  }
+})
+```
+
+### Offline-Sync Best Practices
+
+```typescript
+// 1. Choose the right conflict resolution
+const { state } = useSlugStore(data, {
+  offlineSync: {
+    conflictResolution: 'merge',  // For collaborative data
+    // conflictResolution: 'client-wins',  // For user preferences
+    // conflictResolution: 'server-wins',  // For authoritative data
+    // conflictResolution: 'timestamp',    // For time-based conflicts
+    // conflictResolution: (client, server) => customMerge(client, server)  // Custom logic
+  }
+})
+
+// 2. Handle sync status in UI
+function App() {
+  const { state, syncStatus } = useSlugStore(data, { offlineSync: true })
+  
+  return (
+    <div>
+      <div className={`sync-indicator ${syncStatus?.online ? 'online' : 'offline'}`}>
+        {syncStatus?.online ? '🟢 Online' : '🔴 Offline'}
+        {syncStatus?.syncing && ' 🔄 Syncing...'}
+        {syncStatus?.pendingChanges > 0 && ` (${syncStatus.pendingChanges} pending)`}
+      </div>
+      
+      {syncStatus?.conflicts && (
+        <div className="conflict-warning">
+          ⚠️ Sync conflicts detected. Resolving automatically...
+        </div>
+      )}
+    </div>
+  )
+}
+
+// 3. Optimize sync intervals
+const { state } = useSlugStore(data, {
+  offlineSync: {
+    syncInterval: 30,  // Frequent for real-time apps
+    // syncInterval: 300,  // Less frequent for productivity apps
+    // syncInterval: 0,    // Manual sync only
+  }
+})
 ```
 
 ## 🧪 Testing
 
 ```typescript
-import { saveUserState, loadUserState, createShareableUrl } from '@farajabien/slug-store'
+import { saveUserState, loadUserState, createShareableUrl, createOfflineSync } from '@farajabien/slug-store'
 
 describe('User Preferences', () => {
   it('should save and load user state', async () => {
@@ -516,6 +980,63 @@ describe('User Preferences', () => {
     
     const loaded = await loadFromShareableUrl(shareUrl)
     expect(loaded).toEqual(dashboardConfig)
+  })
+})
+
+describe('Offline-Sync', () => {
+  it('should create offline-sync engine', async () => {
+    const engine = await createOfflineSync({
+      storeId: 'test-store',
+      conflictResolution: 'merge'
+    })
+    
+    expect(engine).toBeDefined()
+    expect(engine.sync).toBeDefined()
+  })
+
+  it('should handle offline state changes', async () => {
+    const engine = await createOfflineSync({
+      storeId: 'test-store',
+      conflictResolution: 'merge'
+    })
+    
+    // Simulate offline state changes
+    await engine.saveState({ todos: [{ id: '1', text: 'Test', completed: false }] })
+    
+    const state = await engine.loadState()
+    expect(state.todos).toHaveLength(1)
+    expect(state.todos[0].text).toBe('Test')
+  })
+
+  it('should resolve conflicts intelligently', async () => {
+    const engine = await createOfflineSync({
+      storeId: 'test-store',
+      conflictResolution: 'merge'
+    })
+    
+    // Client state
+    const clientState = { 
+      todos: [
+        { id: '1', text: 'Client todo', completed: false },
+        { id: '2', text: 'Client todo 2', completed: true }
+      ]
+    }
+    
+    // Server state
+    const serverState = {
+      todos: [
+        { id: '1', text: 'Server todo', completed: true },
+        { id: '3', text: 'Server todo 3', completed: false }
+      ]
+    }
+    
+    const merged = await engine.resolveConflict(clientState, serverState)
+    
+    // Should merge both states intelligently
+    expect(merged.todos).toHaveLength(3)
+    expect(merged.todos.find(t => t.id === '1')?.completed).toBe(true) // Server wins for existing
+    expect(merged.todos.find(t => t.id === '2')).toBeDefined() // Client todo preserved
+    expect(merged.todos.find(t => t.id === '3')).toBeDefined() // Server todo preserved
   })
 })
 ```
@@ -547,6 +1068,22 @@ const { slug } = await saveUserState(preferences) // Store in database
 const prefs = await loadUserState(slug) // Load anywhere
 ```
 
+### From PWA/Service Workers
+
+```typescript
+// Before (PWA - complex setup)
+// - Service worker registration
+// - Background sync API
+// - IndexedDB setup
+// - Conflict resolution logic
+// - Network detection
+
+// After (Slug Store - one line)
+const { state, setState, syncStatus } = useSlugStore(data, {
+  offlineSync: true  // That's it! Works offline now
+})
+```
+
 ## 📈 Performance Comparison
 
 | Operation | Traditional | Slug Store |
@@ -558,6 +1095,8 @@ const prefs = await loadUserState(slug) // Load anywhere
 | **Compression** | Manual gzip | Built-in |
 | **Encryption** | Custom crypto | Built-in |
 | **Type Safety** | Manual types | Auto-inferred |
+| **Offline-Sync** | PWA complexity | `offlineSync: true` |
+| **Conflict Resolution** | Custom logic | Built-in strategies |
 
 ## 🎯 Use Case Matrix
 
@@ -569,6 +1108,26 @@ const prefs = await loadUserState(slug) // Load anywhere
 | **Form State** | Form libraries | `useSlugStore()` |
 | **Filters/Search** | URL params manually | `useSlugStore()` |
 | **Collaboration** | Complex real-time sync | URL sharing |
+| **Offline Apps** | PWA + Service Workers | `offlineSync: true` |
+| **Mobile Web Apps** | Native apps | Offline-sync web apps |
+
+## 🌟 The Three Pillars
+
+### 1. **🌐 URL Persistence**
+- Instant shareability across devices
+- Zero infrastructure required
+- Perfect for dashboards, filters, configurations
+
+### 2. **💾 Database Storage**  
+- Universal database compatibility
+- Automatic compression and encryption
+- Perfect for user preferences, private data
+
+### 3. **🔥 Offline-Sync**
+- Any webapp works offline without PWA complexity
+- Smart conflict resolution
+- Background sync when online
+- Perfect for productivity apps, shopping carts, todo apps
 
 ---
 
@@ -578,4 +1137,4 @@ const prefs = await loadUserState(slug) // Load anywhere
 npm install @farajabien/slug-store
 ```
 
-**One package. Infinite possibilities. Zero obstruction.** 
+**Universal state persistence for modern web apps. Zero obstruction, maximum DevEx.** 
