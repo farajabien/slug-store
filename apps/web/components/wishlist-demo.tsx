@@ -3,11 +3,8 @@
 import { useState, useEffect } from 'react'
 import { useSlugStore } from '@farajabien/slug-store'
 import { 
-  encodeState,
-  decodeState,
-  getSlugInfo,
-  SlugStoreError 
-} from '@farajabien/slug-store-core'
+  getSlugInfo
+} from '@farajabien/slug-store'
 import { WishlistItems } from '@/components/wishlist-items'
 import { WishlistFilters } from '@/components/wishlist-filters'
 import { StateInfo } from '@/components/state-info'

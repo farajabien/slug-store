@@ -30,7 +30,8 @@ import {
   Database,
   Globe,
   Settings,
-  Rocket
+  Rocket,
+  Wifi
 } from 'lucide-react'
 
 export default function HomePage() {
@@ -59,8 +60,8 @@ export default function HomePage() {
             </h1>
             
             <p className="text-xl md:text-2xl text-muted-foreground max-w-4xl mx-auto leading-relaxed">
-              A practical solution for persisting application state in URLs and databases. 
-              <strong className="text-foreground">Two clear use cases, one simple package.</strong>
+              Universal state persistence for modern web apps. Zero obstruction, maximum DevEx.
+              <strong className="text-foreground block mt-2">One package. Three use cases. Everything you need.</strong>
             </p>
             
             <HeroActions />
@@ -79,6 +80,10 @@ export default function HomePage() {
                 <CheckCircle className="h-4 w-4 text-green-500" />
                 <span>MIT licensed</span>
               </div>
+              <div className="flex items-center gap-1">
+                <CheckCircle className="h-4 w-4 text-green-500" />
+                <span>Offline-sync ready</span>
+              </div>
             </div>
           </div>
         </div>
@@ -90,11 +95,11 @@ export default function HomePage() {
           <div className="text-center mb-10">
             <h2 className="text-3xl font-bold mb-4">What is Slug Store?</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              A library that solves two common state persistence problems in web applications
+              Universal state persistence that solves three common problems in web applications
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto mb-8">
             <Card className="relative overflow-hidden border-blue-200 bg-blue-50/50">
               <CardHeader>
                 <Share className="h-12 w-12 text-blue-600 mb-4" />
@@ -133,6 +138,27 @@ export default function HomePage() {
                 </div>
                 <code className="text-xs bg-purple-100 p-2 rounded block">
                   const {`{slug}`} = await saveUserState(preferences)
+                </code>
+              </CardContent>
+            </Card>
+
+            <Card className="relative overflow-hidden border-green-200 bg-green-50/50">
+              <CardHeader>
+                <Wifi className="h-12 w-12 text-green-600 mb-4" />
+                <CardTitle className="text-xl text-green-700">🔥 NEW: Offline-Sync</CardTitle>
+                <CardDescription className="text-base">
+                  Any webapp works offline without PWA complexity
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-sm text-green-600 space-y-2 mb-4">
+                  <div>• Works offline automatically</div>
+                  <div>• Smart conflict resolution</div>
+                  <div>• Background sync when online</div>
+                  <div>• IndexedDB storage + encryption</div>
+                </div>
+                <code className="text-xs bg-green-100 p-2 rounded block">
+                  offlineSync: true // That's it!
                 </code>
               </CardContent>
             </Card>

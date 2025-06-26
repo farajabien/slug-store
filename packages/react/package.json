@@ -1,6 +1,6 @@
 {
   "name": "@farajabien/slug-store",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "Universal state persistence for client and server - URLs, databases, cache, and more",
   "keywords": [
     "react",
@@ -29,7 +29,7 @@
       "import": "./dist/index.js"
     },
     "./client": {
-      "types": "./dist/client.d.ts", 
+      "types": "./dist/client.d.ts",
       "import": "./dist/client.js"
     },
     "./server": {
@@ -67,17 +67,20 @@
     }
   },
   "devDependencies": {
-    "@workspace/eslint-config": "workspace:*",
-    "@workspace/typescript-config": "workspace:*",
+    "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^14.1.2",
     "@testing-library/react-hooks": "^8.0.1",
     "@types/react": "^18.2.45",
+    "@vitest/ui": "^3.2.4",
+    "@workspace/eslint-config": "workspace:*",
+    "@workspace/typescript-config": "workspace:*",
     "eslint": "^8.56.0",
     "jsdom": "^23.0.1",
     "react": "^18.2.0",
+    "react-dom": "^18.0.0",
     "tsup": "^8.0.1",
     "typescript": "^5.3.3",
-    "vitest": "^1.1.0"
+    "vitest": "^3.2.4"
   },
   "publishConfig": {
     "access": "public"

@@ -8,7 +8,7 @@ Object.defineProperty(window, 'location', {
     origin: 'http://localhost:3000',
     search: '',
   },
-  writable: true,
+  writable: true, 
 });
 
 // Mock history API
@@ -21,5 +21,56 @@ Object.defineProperty(window, 'history', {
   writable: true,
 });
 
+// Mock IndexedDB for offline-sync tests
+class MockIDBKeyRange {
+  static bound(lower: any, upper: any) {
+    return { lower, upper };
+  }
+  static only(value: any) {
+    return { value };
+  }
+}
+
+const mockIndexedDB = {
+  open: vi.fn(() => ({
+    onsuccess: null,
+    onerror: null,
+    onupgradeneeded: null,
+    result: {
+      transaction: vi.fn(() => ({
+        objectStore: vi.fn(() => ({
+          get: vi.fn(() => ({ onsuccess: null, result: null })),
+          put: vi.fn(() => ({ onsuccess: null })),
+          delete: vi.fn(() => ({ onsuccess: null })),
+          index: vi.fn(() => ({
+            getAll: vi.fn(() => ({ onsuccess: null, result: [] }))
+          })),
+          createIndex: vi.fn(),
+        })),
+      })),
+      createObjectStore: vi.fn(() => ({
+        createIndex: vi.fn(),
+      })),
+    },
+  })),
+  deleteDatabase: vi.fn(),
+};
+
+(globalThis as any).indexedDB = mockIndexedDB;
+(globalThis as any).IDBKeyRange = MockIDBKeyRange;
+
 // Mock URLSearchParams if needed
-(globalThis as any).URLSearchParams = URLSearchParams; 
+(globalThis as any).URLSearchParams = URLSearchParams;
+
+// Mock navigator.onLine
+Object.defineProperty(navigator, 'onLine', {
+  writable: true,
+  value: true,
+});
+
+// Mock service worker registration
+(globalThis as any).ServiceWorkerRegistration = class MockServiceWorkerRegistration {
+  sync = {
+    register: vi.fn(),
+  };
+}; 

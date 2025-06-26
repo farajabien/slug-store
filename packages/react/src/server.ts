@@ -32,6 +32,22 @@ export interface SlugStoreServerReturn<T> {
   getSlug: () => Promise<string>
 }
 
+// ===== SYNC ENDPOINT TYPES =====
+export interface SyncRequest {
+  slug: string
+  timestamp: number
+  version: number
+  clientId: string
+}
+
+export interface SyncResponse {
+  slug?: string
+  timestamp: number
+  version: number
+  conflict?: boolean
+  serverWins?: boolean
+}
+
 // ===== MAIN FUNCTIONS =====
 
 
@@ -162,6 +178,207 @@ export async function saveUserState<T>(
   return { data: state, slug }
 }
 
+// ===== OFFLINE SYNC SERVER HELPERS =====
+/**
+ * Create sync endpoint handler for any backend
+ * Zero configuration - works with any database, any framework
+ * 
+ * @example
+ * ```typescript
+ * // Next.js API route: /api/sync/[storeId]/route.ts
+ * export async function GET(request: Request, { params }: { params: { storeId: string } }) {
+ *   return handleSyncRequest(params.storeId, request, {
+ *     loadState: async (storeId) => {
+ *       const result = await db.query('SELECT app_state FROM stores WHERE id = ?', [storeId])
+ *       return result.rows[0]?.app_state
+ *     }
+ *   })
+ * }
+ * 
+ * export async function POST(request: Request, { params }: { params: { storeId: string } }) {
+ *   return handleSyncRequest(params.storeId, request, {
+ *     saveState: async (storeId, slug, metadata) => {
+ *       await db.query(
+ *         'INSERT INTO stores (id, app_state, updated_at) VALUES (?, ?, ?) ON CONFLICT (id) DO UPDATE SET app_state = ?, updated_at = ?',
+ *         [storeId, slug, metadata.timestamp, slug, metadata.timestamp]
+ *       )
+ *     }
+ *   })
+ * }
+ * ```
+ */
+export interface SyncHandlerOptions {
+  /** Load state from your database */
+  loadState?: (storeId: string) => Promise<string | null>
+  /** Save state to your database */
+  saveState?: (storeId: string, slug: string, metadata: { timestamp: number, version: number, clientId: string }) => Promise<void>
+  /** Custom conflict resolution */
+  resolveConflict?: (client: any, server: any) => any
+  /** Encryption password */
+  password?: string
+}
+
+/**
+ * Universal sync endpoint handler - works with any framework, any database
+ */
+export async function handleSyncRequest(
+  storeId: string,
+  request: Request,
+  options: SyncHandlerOptions = {}
+): Promise<Response> {
+  const { loadState, saveState, resolveConflict, password } = options
+
+  try {
+    if (request.method === 'GET') {
+      // Client requesting latest state from server
+      if (!loadState) {
+        return new Response('Load function not provided', { status: 500 })
+      }
+
+      const serverSlug = await loadState(storeId)
+      
+      if (!serverSlug) {
+        return new Response('', { status: 204 }) // No content
+      }
+
+      return new Response(serverSlug, {
+        headers: { 'Content-Type': 'text/plain' }
+      })
+    }
+
+    if (request.method === 'POST') {
+      // Client pushing state to server
+      if (!saveState) {
+        return new Response('Save function not provided', { status: 500 })
+      }
+
+      const syncRequest: SyncRequest = await request.json()
+      const { slug, timestamp, version, clientId } = syncRequest
+
+      // Load existing state for conflict detection
+      let conflict = false
+      if (loadState) {
+        const existingSlug = await loadState(storeId)
+        
+        if (existingSlug && existingSlug !== slug) {
+          conflict = true
+          
+          if (resolveConflict) {
+            // Custom conflict resolution
+            const clientData = await decodeState(slug, { password })
+            const serverData = await decodeState(existingSlug, { password })
+            const resolved = resolveConflict(clientData, serverData)
+            
+            // Re-encode resolved state
+            const resolvedSlug = await encodeState(resolved, { 
+              compress: true, 
+              encrypt: !!password, 
+              password 
+            })
+            
+            await saveState(storeId, resolvedSlug, { timestamp: Date.now(), version: version + 1, clientId })
+            
+            return Response.json({
+              slug: resolvedSlug,
+              timestamp: Date.now(),
+              version: version + 1,
+              conflict: true
+            } as SyncResponse)
+          }
+        }
+      }
+
+      // Save state
+      await saveState(storeId, slug, { timestamp, version, clientId })
+
+      return Response.json({
+        timestamp,
+        version,
+        conflict: false
+      } as SyncResponse)
+    }
+
+    return new Response('Method not allowed', { status: 405 })
+  } catch (error) {
+    console.error('Sync error:', error)
+    return new Response('Sync failed', { status: 500 })
+  }
+}
+
+/**
+ * Create sync endpoints for popular frameworks
+ */
+export const syncEndpoints = {
+  /**
+   * Next.js App Router sync endpoints
+   */
+  nextjs: {
+    /**
+     * GET handler for /api/sync/[storeId]/route.ts
+     */
+    GET: (params: { storeId: string }, options: SyncHandlerOptions) => 
+      (request: Request) => handleSyncRequest(params.storeId, request, options),
+
+    /**
+     * POST handler for /api/sync/[storeId]/route.ts
+     */
+    POST: (params: { storeId: string }, options: SyncHandlerOptions) => 
+      (request: Request) => handleSyncRequest(params.storeId, request, options)
+  },
+
+  /**
+   * Remix action/loader helpers
+   */
+  remix: {
+    /**
+     * Loader for sync routes
+     */
+    loader: (params: { storeId: string }, options: SyncHandlerOptions) =>
+      async ({ request }: { request: Request }) => {
+        const response = await handleSyncRequest(params.storeId, request, options)
+        return response
+      },
+
+    /**
+     * Action for sync routes
+     */
+    action: (params: { storeId: string }, options: SyncHandlerOptions) =>
+      async ({ request }: { request: Request }) => {
+        const response = await handleSyncRequest(params.storeId, request, options)
+        return response
+      }
+  }
+}
+
+// ===== OFFLINE SYNC SERVER HELPERS =====
+/**
+ * Create sync endpoint handler for any backend
+ * Zero configuration - works with any database, any framework
+ * 
+ * @example
+ * ```typescript
+ * // Next.js API route: /api/sync/[storeId]/route.ts
+ * export async function GET(request: Request, { params }: { params: { storeId: string } }) {
+ *   return handleSyncRequest(params.storeId, request, {
+ *     loadState: async (storeId) => {
+ *       const result = await db.query('SELECT app_state FROM stores WHERE id = ?', [storeId])
+ *       return result.rows[0]?.app_state
+ *     }
+ *   })
+ * }
+ * 
+ * export async function POST(request: Request, { params }: { params: { storeId: string } }) {
+ *   return handleSyncRequest(params.storeId, request, {
+ *     saveState: async (storeId, slug, metadata) => {
+ *       await db.query(
+ *         'INSERT INTO stores (id, app_state, updated_at) VALUES (?, ?, ?) ON CONFLICT (id) DO UPDATE SET app_state = ?, updated_at = ?',
+ *         [storeId, slug, metadata.timestamp, slug, metadata.timestamp]
+ *       )
+ *     }
+ *   })
+ * }
+ * ```
+ */
 // ===== UNIFIED INTERFACE =====
 /**
  * Universal state persistence - automatically chooses best strategy

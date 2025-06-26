@@ -38,6 +38,7 @@ const DemoPage = () => {
               <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
                 Experience real-time URL state persistence with this wishlist application. 
                 Every change is automatically saved to the URL - try adding items, changing filters, or sharing the link!
+                <strong className="text-foreground block mt-2">Plus: Works offline with automatic sync when back online!</strong>
               </p>
               
               <div className="flex flex-wrap justify-center gap-4 text-sm">
@@ -53,6 +54,12 @@ const DemoPage = () => {
                   <Share2 className="h-4 w-4 text-purple-500" />
                   <span>Instantly shareable</span>
                 </div>
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline" className="px-2 py-0.5 text-xs">
+                    🔥 NEW
+                  </Badge>
+                  <span>Offline-sync capable</span>
+                </div>
               </div>
             </div>
           </div>
@@ -62,8 +69,8 @@ const DemoPage = () => {
       {/* Demo Content */}
       <section className="py-8">
         <div className="container mx-auto px-4">
-          <div className="max-w-7xl mx-auto">
-            <WishlistDemo />
+    <div className="max-w-7xl mx-auto">
+    <WishlistDemo />
           </div>
         </div>
       </section>
@@ -131,6 +138,9 @@ const [state, setState] = useSlugStore({
                   <div>
                     <strong>Sharing:</strong> Copy URL to share exact state with others
                   </div>
+                  <div>
+                    <strong>🔥 Offline-Sync:</strong> Works offline with automatic sync when reconnected
+                  </div>
                 </CardContent>
               </Card>
             </div>
@@ -155,7 +165,7 @@ const [state, setState] = useSlugStore({
       </section>
 
       <Footer />
-    </div>
+  </div>    
   )
 }
 

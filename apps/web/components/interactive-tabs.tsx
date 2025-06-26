@@ -92,7 +92,8 @@ function Dashboard() {
     const url = await getShareableUrl()
     navigator.clipboard.writeText(url)
     // Instant sharing!
-  }`}
+  }
+}`}
               </pre>
             </CardContent>
           </Card>
@@ -142,13 +143,14 @@ const userPrefs = await loadUserState(profile.app_state)`}
       </TabsContent>
 
       <TabsContent value="hybrid" className="space-y-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-purple-600">Best of Both Worlds</CardTitle>
-            <CardDescription>URL sharing + database storage + traditional databases</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <pre className="bg-muted p-4 rounded-lg text-xs overflow-x-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-purple-600">Hybrid Architecture</CardTitle>
+              <CardDescription>URL sharing + database storage + traditional databases</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <pre className="bg-muted p-4 rounded-lg text-xs overflow-x-auto">
 {`// Client: UI state in URLs (shareable)
 const { state, setState } = useSlugStore({
   filters: { search: '', category: 'all' },
@@ -181,9 +183,50 @@ const user = await db.users.findUnique({
 // ✅ URL sharing for collaboration
 // ✅ Database storage for privacy  
 // ✅ Traditional DB for business data`}
-            </pre>
-          </CardContent>
-        </Card>
+              </pre>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-orange-600">🔥 NEW: Offline-Sync</CardTitle>
+              <CardDescription>Any webapp works offline without PWA complexity</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <pre className="bg-muted p-4 rounded-lg text-xs overflow-x-auto">
+{`// Offline-first shopping cart
+const { state, setState, syncStatus } = useSlugStore({
+  cart: [],
+  wishlist: [],
+  preferences: {}
+}, {
+  offlineSync: true  // That's it! Works offline now
+})
+
+// Advanced offline-sync with conflict resolution
+const { state, setState, sync } = useSlugStore(
+  initialData,
+  { 
+    offlineSync: {
+      conflictResolution: 'merge',  // Smart merging
+      syncInterval: 30,             // Auto-sync every 30s
+      onSync: (data, direction) => {
+        console.log(\`Synced \${direction}\`, data)
+      }
+    }
+  }
+)
+
+// Features:
+// 🔄 Background sync when online
+// 🔀 Smart conflict resolution  
+// 💾 IndexedDB storage
+// 🔐 Auto-encryption
+// 🌐 Universal endpoints`}
+              </pre>
+            </CardContent>
+          </Card>
+        </div>
       </TabsContent>
     </Tabs>
   )

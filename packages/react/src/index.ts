@@ -8,8 +8,17 @@ export type {
   UseSlugStoreOptions,
   UseSlugStoreReturn, 
   SlugStoreCreator, 
-  SlugStore 
+  SlugStore,
+  // Offline-sync types
+  OfflineSyncOptions,
+  SyncStatus,
+  AppStateSnapshot
 } from './types.js'
+
+// ===== OFFLINE-SYNC EXPORTS =====
+// Universal offline-sync for any webapp
+export { createOfflineSync, resolveConflict } from './offline-sync.js'
+export type { OfflineSyncEngine } from './offline-sync.js'
 
 // ===== SERVER-SIDE EXPORTS =====
 // Zero-obstruction state persistence
@@ -27,6 +36,9 @@ export {
   persistState,
   restoreState,
   
+  // Offline-sync server helpers
+  handleSyncRequest,
+  
   // Legacy server hook
   useSlugStore as useServerSlugStore,
   fromDatabase,
@@ -39,7 +51,9 @@ export type {
   DatabaseStateResult,
   UniversalOptions,
   SlugStoreServerOptions,
-  SlugStoreServerReturn
+  SlugStoreServerReturn,
+  // Sync server types
+  SyncHandlerOptions
 } from './server.js'
 
 // ===== CORE EXPORTS =====
