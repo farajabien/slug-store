@@ -102,10 +102,10 @@ import { encodeState, decodeState } from '@farajabien/slug-store-core'
 export default async function handler(request: Request) {
   const url = new URL(request.url)
   const data = { user: 'john', preferences: { theme: 'dark' } }
-  
+
   // Encode state for URL sharing
   const encoded = await encodeState(data, { compress: true })
-  
+
   // Generate shareable URL
   url.searchParams.set('state', encoded)
   
