@@ -31,7 +31,8 @@ import {
   Globe,
   Settings,
   Rocket,
-  Wifi
+  Wifi,
+  Sparkles
 } from 'lucide-react'
 
 export default function HomePage() {
@@ -46,12 +47,12 @@ export default function HomePage() {
           <div className="text-center space-y-6 max-w-5xl mx-auto">
             <div className="flex items-center justify-center gap-2 mb-4">
               <Badge variant="default" className="px-4 py-2 text-sm">
-                <Package className="h-4 w-4 mr-2" />
-                Universal State Persistence
+                <Sparkles className="h-4 w-4 mr-2" />
+                v3.0 - Unified API
               </Badge>
               <Badge variant="outline" className="px-3 py-1 text-xs">
                 <Code className="h-3 w-3 mr-1" />
-                TypeScript Ready
+                Zero Configuration
               </Badge>
             </div>
             
@@ -61,7 +62,7 @@ export default function HomePage() {
             
             <p className="text-xl md:text-2xl text-muted-foreground max-w-4xl mx-auto leading-relaxed">
               Universal state persistence for modern web apps. Zero obstruction, maximum DevEx.
-              <strong className="text-foreground block mt-2">One package. Three use cases. Everything you need.</strong>
+              <strong className="text-foreground block mt-2">One hook. Three use cases. Everything you need.</strong>
             </p>
             
             <HeroActions />
@@ -70,26 +71,26 @@ export default function HomePage() {
             <div className="flex flex-wrap justify-center gap-8 pt-8 text-sm text-muted-foreground">
               <div className="flex items-center gap-1">
                 <CheckCircle className="h-4 w-4 text-green-500" />
-                <span>15KB bundle size</span>
+                <span>5.5KB gzipped</span>
               </div>
               <div className="flex items-center gap-1">
                 <CheckCircle className="h-4 w-4 text-green-500" />
-                <span>Zero dependencies</span>
+                <span>Zero configuration</span>
               </div>
               <div className="flex items-center gap-1">
                 <CheckCircle className="h-4 w-4 text-green-500" />
-                <span>MIT licensed</span>
+                <span>Offline-first ready</span>
               </div>
               <div className="flex items-center gap-1">
                 <CheckCircle className="h-4 w-4 text-green-500" />
-                <span>Offline-sync ready</span>
+                <span>TypeScript native</span>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* What is Slug Store */}
+      {/* What is Slug Store - FIXED API EXAMPLES */}
       <section className="py-12 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="text-center mb-10">
@@ -116,7 +117,7 @@ export default function HomePage() {
                   <div>• Application settings and preferences</div>
                 </div>
                 <code className="text-xs bg-blue-100 p-2 rounded block">
-                  const url = await createShareableUrl(dashboardState)
+                  {`const [state, setState, { isLoading }] = useSlugStore('filters', initialState, { url: true })`}
                 </code>
               </CardContent>
             </Card>
@@ -137,7 +138,7 @@ export default function HomePage() {
                   <div>• Private data and configurations</div>
                 </div>
                 <code className="text-xs bg-purple-100 p-2 rounded block">
-                  const {`{slug}`} = await saveUserState(preferences)
+                  {`const [state, setState, { isLoading }] = useSlugStore('prefs', initialState, { db: { endpoint: '/api/sync' } })`}
                 </code>
               </CardContent>
             </Card>
@@ -145,7 +146,7 @@ export default function HomePage() {
             <Card className="relative overflow-hidden border-green-200 bg-green-50/50">
               <CardHeader>
                 <Wifi className="h-12 w-12 text-green-600 mb-4" />
-                <CardTitle className="text-xl text-green-700">🔥 NEW: Offline-Sync</CardTitle>
+                <CardTitle className="text-xl text-green-700">🔥 NEW: Offline-First</CardTitle>
                 <CardDescription className="text-base">
                   Any webapp works offline without PWA complexity
                 </CardDescription>
@@ -158,7 +159,7 @@ export default function HomePage() {
                   <div>• IndexedDB storage + encryption</div>
                 </div>
                 <code className="text-xs bg-green-100 p-2 rounded block">
-                  offlineSync: true // That's it!
+                  {`const [state, setState, { isLoading }] = useSlugStore('todos', initialState, { offline: true })`}
                 </code>
               </CardContent>
             </Card>
@@ -174,13 +175,13 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* How It Works */}
+      {/* How It Works - FIXED API EXAMPLES */}
       <section className="py-12">
         <div className="container mx-auto px-4">
           <div className="text-center mb-10">
             <h2 className="text-3xl font-bold mb-4">How It Works</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Simple, practical functions for common state persistence needs
+              Simple, useState-like hook with automatic persistence
             </p>
           </div>
           
@@ -195,7 +196,7 @@ export default function HomePage() {
               </CardHeader>
               <CardContent>
                 <code className="text-xs bg-muted p-2 rounded block">
-                  {`const state = {
+                  {`const initialState = {
   filters: { category: 'electronics' },
   view: 'grid',
   sortBy: 'price'
@@ -209,16 +210,17 @@ export default function HomePage() {
                 <Settings className="h-12 w-12 mx-auto text-primary mb-4" />
                 <CardTitle>2. Choose Persistence</CardTitle>
                 <CardDescription>
-                  Use URL sharing or database storage based on your needs
+                  Use URL sharing, offline storage, or database sync
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <code className="text-xs bg-muted p-2 rounded block">
-                  {`// For sharing
-const url = await createShareableUrl(state)
-
-// For database
-const { slug } = await saveUserState(state)`}
+                  {`const [state, setState, { isLoading, error }] = 
+  useSlugStore('dashboard', initialState, {
+    url: true,        // Share via URL
+    offline: true,    // Store offline
+    db: { endpoint: '/api/sync' } // Database sync
+  })`}
                 </code>
               </CardContent>
             </Card>
@@ -226,18 +228,20 @@ const { slug } = await saveUserState(state)`}
             <Card className="text-center">
               <CardHeader>
                 <Globe className="h-12 w-12 mx-auto text-primary mb-4" />
-                <CardTitle>3. Use Anywhere</CardTitle>
+                <CardTitle>3. Use Like useState</CardTitle>
                 <CardDescription>
-                  Load state in React components, server functions, or any JavaScript
+                  Update state normally - persistence happens automatically
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <code className="text-xs bg-muted p-2 rounded block">
-                  {`// From URL
-const state = await loadFromShareableUrl(url)
+                  {`// Handle loading states
+if (isLoading) return <div>Loading...</div>
+if (error) return <div>Error: {error.message}</div>
 
-// From database
-const state = await loadUserState(slug)`}
+// Update state like useState!
+setState({ ...state, filters: { category: 'books' } })
+// URL updates automatically ✨`}
                 </code>
               </CardContent>
             </Card>
@@ -245,8 +249,22 @@ const state = await loadUserState(slug)`}
         </div>
       </section>
 
-      {/* Common Use Cases */}
+      {/* Interactive Demo */}
       <section className="py-12 bg-muted/50">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl font-bold mb-4">See It In Action</h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Interactive examples showing the three use cases
+            </p>
+          </div>
+          
+          <InteractiveTabs />
+        </div>
+      </section>
+
+      {/* Common Use Cases */}
+      <section className="py-12">
         <div className="container mx-auto px-4">
           <div className="text-center mb-10">
             <h2 className="text-3xl font-bold mb-4">Common Use Cases</h2>
@@ -340,7 +358,7 @@ const state = await loadUserState(slug)`}
       </section>
 
       {/* Technical Details */}
-      <section className="py-12">
+      <section className="py-12 bg-muted/50">
         <div className="container mx-auto px-4">
           <div className="max-w-5xl mx-auto">
             <div className="text-center mb-10">
@@ -366,10 +384,13 @@ const state = await loadUserState(slug)`}
                     <strong>Encryption:</strong> Optional Web Crypto API encryption for sensitive data
                   </div>
                   <div>
-                    <strong>Debouncing:</strong> Automatic URL update batching for performance
+                    <strong>Offline Storage:</strong> IndexedDB with localStorage fallback
                   </div>
                   <div>
                     <strong>Tree Shaking:</strong> Only import what you use to minimize bundle size
+                  </div>
+                  <div>
+                    <strong>Bundle Size:</strong> 5.5KB gzipped total (Core: 5.1KB + React: 397B)
                   </div>
                 </CardContent>
               </Card>
@@ -401,67 +422,9 @@ const state = await loadUserState(slug)`}
         </div>
       </section>
 
-      {/* Code Examples */}
-      <section className="py-12 bg-muted/30">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold mb-4">Code Examples</h2>
-            <p className="text-lg text-muted-foreground">
-              See how Slug Store compares to traditional approaches
-            </p>
-          </div>
-
-          <div className="max-w-6xl mx-auto">
-            <InteractiveTabs />
-          </div>
-        </div>
-      </section>
-
-      {/* Demo Section */}
-      <section className="py-16 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/30 dark:to-purple-950/30">
-        <div className="container mx-auto px-4">
-          <div className="text-center max-w-4xl mx-auto">
-            <h2 className="text-4xl font-bold mb-6">See It In Action</h2>
-            <p className="text-xl text-muted-foreground mb-8">
-              Experience Slug Store with our interactive wishlist demo. Every change is automatically saved to the URL - perfect for sharing and bookmarking.
-            </p>
-            
-                         <DemoButton />
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
-              <div className="flex items-center gap-2 justify-center">
-                <CheckCircle className="h-4 w-4 text-green-500" />
-                <span>Real-time URL updates</span>
-              </div>
-              <div className="flex items-center gap-2 justify-center">
-                <CheckCircle className="h-4 w-4 text-green-500" />
-                <span>Automatic compression</span>
-              </div>
-              <div className="flex items-center gap-2 justify-center">
-                <CheckCircle className="h-4 w-4 text-green-500" />
-                <span>Shareable links</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Get Started */}
-      <section className="py-16 bg-gradient-to-r from-primary/10 to-primary/5">
-        <div className="container mx-auto px-4">
-          <div className="text-center max-w-3xl mx-auto">
-            <h2 className="text-4xl font-bold mb-6">
-              Ready to get started?
-            </h2>
-            <p className="text-xl text-muted-foreground mb-8">
-              Install Slug Store and start persisting state in your applications today.
-            </p>
-            
-            <CTAActions />
-          </div>
-        </div>
-      </section>
-
+      {/* CTA Section */}
+      <CTAActions />
+      
       <Footer />
     </div>
   )

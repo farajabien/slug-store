@@ -9,10 +9,10 @@
           "userPreferences": {"theme": "dark", "language": "en", "notifications": true},
           "appData": {"dashboardLayout": "grid", "favoriteProjects": ["proj-1", "proj-2"]},
           "workspaceSettings": {"activeTab": "analytics", "filters": {"status": "active"}},
-          "personalData": {"onboardingComplete": true, "lastVisited": "2024-01-15"}
+          "personalData": {"onboardingComplete": true, "lastVisited": "2025-01-15"}
         },
         "implementation": {
-          "supabase": "// Single package install: npm install @farajabien/slug-store\nimport { saveUserState, loadUserState } from '@farajabien/slug-store'\n\n// 1. Store in user profile (one-time setup)\nconst userState = { theme: 'dark', preferences: {...} }\nconst { slug } = await saveUserState(userState)\n\nawait supabase.from('profiles').insert({\n  user_id: user.id,\n  app_state: slug  // Compressed, encrypted state\n})\n\n// 2. Load user state (every page load)\nconst { data: profile } = await supabase\n  .from('profiles')\n  .select('app_state')\n  .eq('user_id', user.id)\n  .single()\n\nconst appData = await loadUserState(profile.app_state)",
+          "supabase": "// Single package install: npm install @farajabien/slug-store\nimport { useSlugStore } from '@farajabien/slug-store'\n\n// 1. Store in user profile (React component)\nfunction UserProfile() {\n  const [userState, setUserState, { isLoading, error }] = useSlugStore('user-profile', {\n    theme: 'dark', \n    preferences: { notifications: true },\n    dashboardLayout: 'grid'\n  }, {\n    db: { \n      endpoint: '/api/user/profile',\n      method: 'PUT'\n    }\n  })\n  \n  if (isLoading) return <div>Loading profile...</div>\n  if (error) return <div>Error: {error.message}</div>\n  \n  return (\n    <div>\n      <button onClick={() => setUserState({ ...userState, theme: 'light' })}>\n        Toggle Theme\n      </button>\n    </div>\n  )\n}",
           "benefits": ["No URL pollution", "Private user data", "Cross-device sync", "Works with ANY database", "Single package install"]
         },
         "tags": ["database", "supabase", "user-state", "private"],
@@ -30,7 +30,7 @@
           "settings": {"plan": "free", "limits": {"projects": 1, "users": 10}}
         },
         "implementation": {
-          "react": "// Complete SaaS app with ONE package install\nimport { create } from '@farajabien/slug-store'\n\nconst useSaaSStore = create((set, get) => ({\n  // User state\n  user: { name: '', email: '', plan: 'free' },\n  onboarding: { step: 1, completed: false },\n  \n  // App state\n  projects: [],\n  currentProject: null,\n  workflows: [],\n  \n  // Business logic\n  createProject: (name) => set(state => ({\n    projects: [...state.projects, {\n      id: Date.now(),\n      name,\n      createdAt: new Date().toISOString()\n    }]\n  })),\n  \n  upgradeToProPlan: () => set({ \n    user: { ...get().user, plan: 'pro' } \n  })\n}), { compress: true, key: 'saas' })",
+          "react": "// Complete SaaS app with ONE package install\nimport { useSlugStore } from '@farajabien/slug-store'\n\nfunction SaaSApp() {\n  const [state, setState, { isLoading, error }] = useSlugStore('saas-app', {\n    user: { name: '', email: '', plan: 'free' },\n    onboarding: { step: 1, completed: false },\n    projects: [],\n    currentProject: null,\n    workflows: []\n  }, {\n    url: true,        // All state in URLs\n    compress: true    // Compress for smaller URLs\n  })\n  \n  if (isLoading) return <div>Loading...</div>\n  if (error) return <div>Error: {error.message}</div>\n  \n  const createProject = (name) => {\n    setState({\n      ...state,\n      projects: [...state.projects, {\n        id: Date.now(),\n        name,\n        createdAt: new Date().toISOString()\n      }]\n    })\n  }\n  \n  const upgradeToProPlan = () => {\n    setState({ \n      ...state,\n      user: { ...state.user, plan: 'pro' } \n    })\n  }\n  \n  return <div>{/* Your SaaS UI */}</div>\n}",
           "benefits": ["Single package install", "Zero hosting costs", "Instant deployment", "Global CDN delivery", "No vendor lock-in"]
         },
         "tags": ["startup", "mvp", "zero-backend", "saas"],
@@ -48,7 +48,7 @@
           "collaboration": {"activeUsers": ["john", "jane"], "comments": []}
         },
         "implementation": {
-          "react": "// Hybrid approach: Simple auth + powerful state persistence\nimport { create, createShareableUrl } from '@farajabien/slug-store'\n\nconst useWorkspaceStore = create((set, get) => ({\n  // This state lives in URLs - infinitely scalable\n  workspace: { name: '', settings: {} },\n  dashboard: { widgets: [], layout: 'grid' },\n  filters: { dateRange: 'last-7-days' },\n  \n  // User data comes from your auth provider (Supabase, Auth0, etc.)\n  // App state automatically syncs to URLs\n  \n  updateDashboard: (widgets) => set({ dashboard: { widgets } }),\n  applyFilters: (filters) => set({ filters }),\n  \n  // Collaboration via URL sharing\n  shareWorkspace: async () => {\n    const url = await createShareableUrl(get())\n    return url // Share this with team members\n  }\n}), { \n  compress: true, \n  encrypt: true, \n  password: userSessionToken, // From your auth provider\n  key: 'workspace' \n})",
+          "react": "// Hybrid approach: Simple auth + powerful state persistence\nimport { useSlugStore } from '@farajabien/slug-store'\n\nfunction WorkspaceApp() {\n  const [workspace, setWorkspace, { isLoading, error }] = useSlugStore('workspace', {\n    name: '',\n    settings: {},\n    dashboard: { widgets: [], layout: 'grid' },\n    filters: { dateRange: 'last-7-days' }\n  }, {\n    url: true,        // Infinitely scalable URLs\n    compress: true,   // Compress complex state\n    // User auth handled separately by your auth provider\n  })\n  \n  if (isLoading) return <div>Loading workspace...</div>\n  if (error) return <div>Error: {error.message}</div>\n  \n  const updateDashboard = (widgets) => {\n    setWorkspace({\n      ...workspace,\n      dashboard: { ...workspace.dashboard, widgets }\n    })\n  }\n  \n  const shareWorkspace = () => {\n    // URL is already shareable!\n    navigator.clipboard.writeText(window.location.href)\n  }\n  \n  return <div>{/* Your workspace UI */}</div>\n}",
           "benefits": ["Single package simplicity", "Minimal database usage", "Instant state sharing", "Team collaboration", "Automatic backups via URLs"]
         },
         "tags": ["hybrid", "scale", "team", "enterprise"],
@@ -66,11 +66,11 @@
             "workflow": {"stage": "review", "assignees": ["john.doe", "jane.smith"]},
             "documents": [{"id": "doc-1", "version": "2.1", "status": "pending"}]
           },
-          "compliance": {"regulations": ["SOX", "GDPR"], "audits": ["2024-Q1", "2024-Q2"]},
+          "compliance": {"regulations": ["SOX", "GDPR"], "audits": ["2025-Q1", "2025-Q2"]},
           "reporting": {"metrics": ["revenue", "costs"], "timeframe": "quarterly"}
         },
         "implementation": {
-          "react": "// Enterprise-grade state management\nconst useEnterpriseStore = create((set, get) => ({\n  // Complex business state in URLs\n  organization: { departments: [], policies: [] },\n  processes: { approvals: [], workflows: [] },\n  compliance: { regulations: [], audits: [] },\n  \n  // Advanced business logic\n  initiateApproval: (request) => set(state => ({\n    processes: {\n      ...state.processes,\n      approvals: [...state.processes.approvals, {\n        id: generateId(),\n        request,\n        status: 'pending',\n        chain: state.organization.approvalChain,\n        createdAt: new Date().toISOString()\n      }]\n    }\n  })),\n  \n  // Compliance tracking\n  addAuditEvent: (event) => set(state => ({\n    compliance: {\n      ...state.compliance,\n      audits: [...state.compliance.audits, event]\n    }\n  })),\n  \n  // Enterprise sharing with encryption\n  shareSecureState: async () => {\n    const url = await get().getShareableUrl()\n    // URLs are encrypted with enterprise-grade security\n    return url\n  }\n}), { \n  compress: true, \n  encrypt: true, \n  password: enterpriseSecurityKey,\n  key: 'enterprise',\n  debounceMs: 500 // Handle high-frequency updates\n})",
+          "react": "// Enterprise-grade state management\nimport { useSlugStore } from '@farajabien/slug-store'\n\nfunction EnterpriseApp() {\n  const [enterprise, setEnterprise, { isLoading, error }] = useSlugStore('enterprise', {\n    organization: { departments: [], policies: [] },\n    processes: { approvals: [], workflows: [] },\n    compliance: { regulations: [], audits: [] }\n  }, {\n    url: true,\n    compress: true,\n    debounceMs: 500   // Handle high-frequency updates\n  })\n  \n  if (isLoading) return <div>Loading enterprise data...</div>\n  if (error) return <div>Error: {error.message}</div>\n  \n  const initiateApproval = (request) => {\n    setEnterprise({\n      ...enterprise,\n      processes: {\n        ...enterprise.processes,\n        approvals: [...enterprise.processes.approvals, {\n          id: Date.now(),\n          request,\n          status: 'pending',\n          createdAt: new Date().toISOString()\n        }]\n      }\n    })\n  }\n  \n  const shareSecureState = () => {\n    // URLs are automatically shareable with enterprise security\n    navigator.clipboard.writeText(window.location.href)\n  }\n  \n  return <div>{/* Your enterprise UI */}</div>\n}",
           "benefits": ["Enterprise security", "Audit trails in URLs", "Zero data lock-in", "Infinite scalability", "Compliance-ready"]
         },
         "tags": ["enterprise", "compliance", "security", "audit"],
@@ -94,7 +94,7 @@
           "theme": "light"
         },
         "implementation": {
-          "react": "import { create } from '@farajabien/slug-store'\n\nconst useCanvasStore = create((set) => ({\n  elements: [],\n  viewport: { zoom: 1, pan: { x: 0, y: 0 } },\n  selectedTool: 'select',\n  addElement: (element) => set(state => ({ \n    elements: [...state.elements, element] \n  })),\n  updateViewport: (viewport) => set({ viewport })\n}), { compress: true, debounceMs: 300 })",
+          "react": "import { useSlugStore } from '@farajabien/slug-store'\n\nfunction CanvasApp() {\n  const [canvas, setCanvas, { isLoading }] = useSlugStore('canvas', {\n    elements: [],\n    viewport: { zoom: 1, pan: { x: 0, y: 0 } },\n    selectedTool: 'select'\n  }, {\n    url: true,\n    compress: true,\n    debounceMs: 300   // Smooth updates for drawing\n  })\n  \n  if (isLoading) return <div>Loading canvas...</div>\n  \n  const addElement = (element) => {\n    setCanvas({\n      ...canvas,\n      elements: [...canvas.elements, element]\n    })\n  }\n  \n  const updateViewport = (viewport) => {\n    setCanvas({ ...canvas, viewport })\n  }\n  \n  return <div>{/* Your canvas UI */}</div>\n}",
           "benefits": ["Single package install", "Instant sharing of drawings", "Bookmark complex diagrams", "Collaborative whiteboarding"]
         },
         "tags": ["design", "collaboration", "canvas", "drawing"],
@@ -115,7 +115,7 @@
           "theme": "dark"
         },
         "implementation": {
-          "react": "const useDiagramStore = create((set) => ({\n  nodes: [],\n  edges: [],\n  layout: 'manual',\n  addNode: (node) => set(state => ({ nodes: [...state.nodes, node] })),\n  connectNodes: (from, to, label) => set(state => ({\n    edges: [...state.edges, { from, to, label }]\n  }))\n}), { compress: true })",
+          "react": "import { useSlugStore } from '@farajabien/slug-store'\n\nfunction DiagramApp() {\n  const [diagram, setDiagram] = useSlugStore('diagram', {\n    nodes: [],\n    edges: [],\n    layout: 'manual'\n  }, {\n    url: true,\n    compress: true\n  })\n  \n  const addNode = (node) => {\n    setDiagram({\n      ...diagram,\n      nodes: [...diagram.nodes, node]\n    })\n  }\n  \n  const connectNodes = (from, to, label) => {\n    setDiagram({\n      ...diagram,\n      edges: [...diagram.edges, { from, to, label }]\n    })\n  }\n  \n  return <div>{/* Your diagram UI */}</div>\n}",
           "benefits": ["Share architecture diagrams", "Document system designs", "Review and iterate", "Embed in documentation"]
         },
         "tags": ["architecture", "diagrams", "documentation", "systems"],
@@ -138,7 +138,7 @@
           "viewMode": "grid"
         },
         "implementation": {
-          "react": "import { create } from '@farajabien/slug-store'\n\nconst useProductFilters = create((set) => ({\n  category: 'all',\n  brands: [],\n  priceRange: [0, 5000],\n  inStock: false,\n  sortBy: 'relevance',\n  setCategory: (category) => set({ category }),\n  toggleBrand: (brand) => set(state => ({\n    brands: state.brands.includes(brand)\n      ? state.brands.filter(b => b !== brand)\n      : [...state.brands, brand]\n  }))\n}), { compress: true, key: 'filters' })",
+          "react": "import { useSlugStore } from '@farajabien/slug-store'\n\nfunction ProductFilters() {\n  const [filters, setFilters, { isLoading }] = useSlugStore('product-filters', {\n    category: 'all',\n    brands: [],\n    priceRange: [0, 5000],\n    inStock: false,\n    sortBy: 'relevance'\n  }, {\n    url: true,\n    compress: true\n  })\n  \n  if (isLoading) return <div>Loading filters...</div>\n  \n  const setCategory = (category) => {\n    setFilters({ ...filters, category })\n  }\n  \n  const toggleBrand = (brand) => {\n    setFilters({\n      ...filters,\n      brands: filters.brands.includes(brand)\n        ? filters.brands.filter(b => b !== brand)\n        : [...filters.brands, brand]\n    })\n  }\n  \n  return <div>{/* Your filter UI */}</div>\n}",
           "benefits": ["Single package install", "Shareable product searches", "Bookmark favorite filters", "SEO-friendly URLs"]
         },
         "tags": ["ecommerce", "filters", "shopping", "search"],
@@ -159,7 +159,7 @@
           "promoCode": "SAVE10"
         },
         "implementation": {
-          "react": "const useCartStore = create((set, get) => ({\n  items: [],\n  promoCode: null,\n  addItem: (item) => set(state => ({\n    items: [...state.items, { ...item, quantity: 1 }]\n  })),\n  removeItem: (id) => set(state => ({\n    items: state.items.filter(item => item.id !== id)\n  })),\n  getTotal: () => get().items.reduce((sum, item) => sum + item.price * item.quantity, 0)\n}), { compress: true, key: 'cart' })",
+          "react": "import { useSlugStore } from '@farajabien/slug-store'\n\nfunction ShoppingCart() {\n  const [cart, setCart] = useSlugStore('cart', {\n    items: [],\n    promoCode: null\n  }, {\n    url: true,\n    compress: true\n  })\n  \n  const addItem = (item) => {\n    setCart({\n      ...cart,\n      items: [...cart.items, { ...item, quantity: 1 }]\n    })\n  }\n  \n  const removeItem = (id) => {\n    setCart({\n      ...cart,\n      items: cart.items.filter(item => item.id !== id)\n    })\n  }\n  \n  const getTotal = () => {\n    return cart.items.reduce((sum, item) => sum + item.price * item.quantity, 0)\n  }\n  \n  return <div>{/* Your cart UI */}</div>\n}",
           "benefits": ["Cross-device cart sync", "Share cart with family", "Recover abandoned carts", "Guest checkout persistence"]
         },
         "tags": ["ecommerce", "cart", "persistence", "sharing"],
@@ -183,7 +183,7 @@
           "sortBy": "priority"
         },
         "implementation": {
-          "react": "const useTodoStore = create((set) => ({\n  todos: [],\n  filter: 'all', // 'all', 'active', 'completed'\n  selectedProject: null,\n  addTodo: (text, project = 'inbox') => set(state => ({\n    todos: [...state.todos, {\n      id: Date.now().toString(),\n      text,\n      project,\n      done: false,\n      priority: 'medium',\n      createdAt: new Date().toISOString()\n    }]\n  })),\n  toggleTodo: (id) => set(state => ({\n    todos: state.todos.map(todo => \n      todo.id === id ? { ...todo, done: !todo.done } : todo\n    )\n  }))\n}), { compress: true })",
+          "react": "import { useSlugStore } from '@farajabien/slug-store'\n\nfunction TodoApp() {\n  const [todos, setTodos] = useSlugStore('todos', {\n    items: [],\n    filter: 'all', // 'all', 'active', 'completed'\n    selectedProject: null\n  }, {\n    url: true,\n    compress: true\n  })\n  \n  const addTodo = (text, project = 'inbox') => {\n    setTodos({\n      ...todos,\n      items: [...todos.items, {\n        id: Date.now().toString(),\n        text,\n        project,\n        done: false,\n        priority: 'medium',\n        createdAt: new Date().toISOString()\n      }]\n    })\n  }\n  \n  const toggleTodo = (id) => {\n    setTodos({\n      ...todos,\n      items: todos.items.map(todo => \n        todo.id === id ? { ...todo, done: !todo.done } : todo\n      )\n    })\n  }\n  \n  return <div>{/* Your todo UI */}</div>\n}",
           "benefits": ["Share project lists", "Collaborate on tasks", "Bookmark filtered views", "Cross-device sync"]
         },
         "tags": ["productivity", "tasks", "collaboration", "organization"],
@@ -208,7 +208,7 @@
           "teamMembers": ["john", "jane", "bob"]
         },
         "implementation": {
-          "react": "const useKanbanStore = create((set) => ({\n  columns: [\n    { id: 'todo', title: 'To Do', cards: [] },\n    { id: 'doing', title: 'In Progress', cards: [] },\n    { id: 'done', title: 'Done', cards: [] }\n  ],\n  cards: {},\n  addCard: (columnId, title) => set(state => {\n    const cardId = Date.now().toString()\n    return {\n      cards: { ...state.cards, [cardId]: { id: cardId, title } },\n      columns: state.columns.map(col => \n        col.id === columnId \n          ? { ...col, cards: [...col.cards, cardId] }\n          : col\n      )\n    }\n  })\n}), { compress: true, key: 'board' })",
+          "react": "import { useSlugStore } from '@farajabien/slug-store'\n\nfunction KanbanBoard() {\n  const [board, setBoard] = useSlugStore('kanban-board', {\n    columns: [\n      { id: 'todo', title: 'To Do', cards: [] },\n      { id: 'doing', title: 'In Progress', cards: [] },\n      { id: 'done', title: 'Done', cards: [] }\n    ],\n    cards: {}\n  }, {\n    url: true,\n    compress: true\n  })\n  \n  const addCard = (columnId, title) => {\n    const cardId = Date.now().toString()\n    setBoard({\n      ...board,\n      cards: { ...board.cards, [cardId]: { id: cardId, title } },\n      columns: board.columns.map(col => \n        col.id === columnId \n          ? { ...col, cards: [...col.cards, cardId] }\n          : col\n      )\n    })\n  }\n  \n  return <div>{/* Your kanban UI */}</div>\n}",
           "benefits": ["Share project boards", "Team collaboration", "Save board snapshots", "Project templates"]
         },
         "tags": ["productivity", "kanban", "project-management", "collaboration"],
@@ -232,7 +232,7 @@
           "conversationTitle": "React Discussion"
         },
         "implementation": {
-          "react": "import { create } from '@farajabien/slug-store'\n\nconst useChatStore = create((set, get) => ({\n  messages: [],\n  model: 'gpt-3.5-turbo',\n  temperature: 0.7,\n  systemPrompt: 'You are a helpful assistant',\n  addMessage: (message) => set(state => ({\n    messages: [...state.messages, { ...message, id: Date.now() }]\n  })),\n  updateSettings: (settings) => set(settings),\n  clearChat: () => set({ messages: [] })\n}), { \n  compress: true, \n  encrypt: true, \n  password: userSessionKey,\n  key: 'chat'\n})",
+          "react": "import { useSlugStore } from '@farajabien/slug-store'\n\nfunction ChatApp() {\n  const [chat, setChat] = useSlugStore('ai-chat', {\n    messages: [],\n    model: 'gpt-3.5-turbo',\n    temperature: 0.7,\n    systemPrompt: 'You are a helpful assistant'\n  }, {\n    url: true,\n    compress: true\n    // Note: Consider encryption for sensitive conversations\n  })\n  \n  const addMessage = (message) => {\n    setChat({\n      ...chat,\n      messages: [...chat.messages, { ...message, id: Date.now() }]\n    })\n  }\n  \n  const updateSettings = (settings) => {\n    setChat({ ...chat, ...settings })\n  }\n  \n  const clearChat = () => {\n    setChat({ ...chat, messages: [] })\n  }\n  \n  return <div>{/* Your chat UI */}</div>\n}",
           "benefits": ["Single package install", "Share AI conversations", "Save chat templates", "Collaborate on prompts"]
         },
         "tags": ["ai", "chat", "gpt", "conversations"],
@@ -269,12 +269,12 @@
         "stateExample": {
           "widgets": ["sales", "traffic", "conversion", "revenue"],
           "layout": "grid",
-          "dateRange": {"start": "2024-01-01", "end": "2024-12-31"},
+          "dateRange": {"start": "2025-01-01", "end": "2025-12-31"},
           "filters": {"country": "US", "source": "organic"},
           "refreshInterval": 300
         },
         "implementation": {
-          "react": "const useDashboardStore = create((set) => ({\n  widgets: ['sales', 'users', 'revenue'],\n  layout: 'grid', // 'grid', 'list', 'masonry'\n  dateRange: { start: '2024-01-01', end: '2024-12-31' },\n  filters: {},\n  refreshInterval: 60,\n  addWidget: (widget) => set(state => ({\n    widgets: [...state.widgets, widget]\n  })),\n  removeWidget: (widget) => set(state => ({\n    widgets: state.widgets.filter(w => w !== widget)\n  })),\n  updateDateRange: (range) => set({ dateRange: range })\n}), { compress: true, key: 'dashboard' })",
+          "react": "const useDashboardStore = create((set) => ({\n  widgets: ['sales', 'users', 'revenue'],\n  layout: 'grid', // 'grid', 'list', 'masonry'\n  dateRange: { start: '2025-01-01', end: '2025-12-31' },\n  filters: {},\n  refreshInterval: 60,\n  addWidget: (widget) => set(state => ({\n    widgets: [...state.widgets, widget]\n  })),\n  removeWidget: (widget) => set(state => ({\n    widgets: state.widgets.filter(w => w !== widget)\n  })),\n  updateDateRange: (range) => set({ dateRange: range })\n}), { compress: true, key: 'dashboard' })",
           "benefits": ["Share dashboard configs", "Bookmark reports", "Template dashboards", "Collaborate on insights"]
         },
         "tags": ["analytics", "dashboard", "widgets", "reporting"],
@@ -309,11 +309,11 @@
         "description": "Track expenses, budgets, and financial goals with shareable reports.",
         "stateExample": {
           "transactions": [
-            {"id": "1", "amount": -45.99, "category": "food", "date": "2024-01-15"},
-            {"id": "2", "amount": 3000, "category": "salary", "date": "2024-01-01"}
+            {"id": "1", "amount": -45.99, "category": "food", "date": "2025-01-15"},
+            {"id": "2", "amount": 3000, "category": "salary", "date": "2025-01-01"}
           ],
           "budgets": {"food": 400, "entertainment": 200},
-          "dateRange": {"start": "2024-01-01", "end": "2024-01-31"},
+          "dateRange": {"start": "2025-01-01", "end": "2025-01-31"},
           "view": "monthly"
         },
         "implementation": {
@@ -334,8 +334,8 @@
             {"id": "2", "name": "Read", "streak": 3, "goal": "daily"}
           ],
           "completions": {
-            "2024-01-15": {"1": true, "2": true},
-            "2024-01-14": {"1": false, "2": true}
+            "2025-01-15": {"1": true, "2": true},
+            "2025-01-14": {"1": false, "2": true}
           },
           "view": "week"
         },
@@ -398,7 +398,7 @@
   },
   "meta": {
     "version": "1.1.0",
-    "lastUpdated": "2024-12-27",
+    "lastUpdated": "2025-12-27",
     "totalUseCases": 21,
     "categories": [
       "paradigm_examples",

@@ -62,7 +62,7 @@
       {
         "id": "quick-start",
         "question": "What's the fastest way to get started?",
-        "answer": "Install once: `npm install @farajabien/slug-store`. **For React**: Replace `useState` with `useSlugStore` for automatic URL sync. **For Database Storage**: Use `saveUserState()` and `loadUserState()` with any database. **For Sharing**: Use `createShareableUrl()` and `loadFromShareableUrl()`. Everything works out of the box - no configuration needed! Check our live demo at slugstore.fbien.com for examples.",
+        "answer": "Install once: `npm install @farajabien/slug-store`. **For React**: Use `useSlugStore` hook for automatic persistence. **Simple example**: ```tsx\nconst [state, setState, { isLoading, error }] = useSlugStore('my-app', { count: 0 }, { url: true })\n\nif (isLoading) return <div>Loading...</div>\nif (error) return <div>Error: {error.message}</div>\n```\nEverything works out of the box - no configuration needed! Check our live demo at slugstore.fbien.com for examples.",
         "category": "basics",
         "tags": ["installation", "quick-start"]
       }
@@ -71,72 +71,72 @@
       {
         "id": "replace-usestate",
         "question": "How do I replace useState with useSlugStore?",
-        "answer": "It's a one-line change! Replace `const [state, setState] = useState(initial)` with `const { state, setState } = useSlugStore(initial, { compress: true })`. The API is identical, but now your state automatically syncs to the URL.",
+        "answer": "Simple change! Replace `const [state, setState] = useState(initial)` with `const [state, setState, { isLoading, error }] = useSlugStore('key', initial, { url: true })`. Handle loading states and you get automatic URL persistence!",
         "category": "react",
         "tags": ["migration", "hooks"]
       },
       {
-        "id": "zustand-like-stores",
-        "question": "How do I create Zustand-like stores with URL persistence?",
-        "answer": "Use the `create` function: ```tsx\nconst useStore = create((set) => ({\n  items: [],\n  addItem: (item) => set(state => ({ items: [...state.items, item] }))\n}), { compress: true })\n```\nIt works exactly like Zustand but automatically syncs to the URL.",
+        "id": "basic-usage",
+        "question": "What's the basic useSlugStore pattern?",
+        "answer": "The v3.0 API is simple and consistent: ```tsx\nconst [state, setState] = useSlugStore('store-key', initialState, {\n  url: true,        // Share via URL\n  offline: true,    // Store offline\n  db: { endpoint: '/api/sync' } // Database sync\n})\n\nif (isLoading) return <div>Loading...</div>\nif (error) return <div>Error: {error.message}</div>\n\n// Use like useState!\nsetState({ ...state, newProperty: 'value' })\n```",
         "category": "react",
-        "tags": ["zustand", "stores", "global-state"]
+        "tags": ["basic-usage", "api-pattern"]
       },
       {
         "id": "multiple-stores",
         "question": "Can I have multiple stores in the same app?",
-        "answer": "Yes! Each store can use a different URL parameter: ```tsx\nconst useCartStore = create(/* ... */, { key: 'cart' })\nconst useFiltersStore = create(/* ... */, { key: 'filters' })\n```\nThis creates URLs like `?cart=...&filters=...`",
+        "answer": "Yes! Each store uses a unique key: ```tsx\nconst [cart, setCart] = useSlugStore('cart', { items: [] }, { url: true })\nconst [filters, setFilters] = useSlugStore('filters', { category: 'all' }, { url: true })\n```\nThis creates URLs like `?cart=...&filters=...`",
         "category": "react",
         "tags": ["multiple-stores", "url-parameters"]
       },
       {
         "id": "performance-optimization",
         "question": "How do I optimize performance for frequent state updates?",
-        "answer": "Use debouncing: `useSlugStore(state, { debounceMs: 300 })`. This batches URL updates and prevents excessive browser history entries. For high-frequency updates (like canvas drawing), consider `syncToUrl: false` and manual syncing.",
+        "answer": "Use debouncing in options: ```tsx\nconst [state, setState] = useSlugStore('canvas', canvasState, {\n  url: true,\n  compress: true,\n  debounceMs: 300  // Batch URL updates\n})\n```\nFor very high-frequency updates (like drawing), consider `url: false` and manual sharing.",
         "category": "react",
         "tags": ["performance", "debouncing", "optimization"]
       },
       {
         "id": "database-storage",
         "question": "How do I store user state in my database?",
-        "answer": "Use the built-in database functions: ```tsx\nimport { saveUserState, loadUserState } from '@farajabien/slug-store'\n\n// Save to any database\nconst { slug } = await saveUserState(userPreferences)\nawait supabase.from('profiles').update({ app_state: slug }).eq('id', userId)\n// or Firebase: await db.collection('users').doc(userId).update({ appState: slug })\n// or SQL: await db.query('UPDATE users SET app_state = ? WHERE id = ?', [slug, userId])\n\n// Load from database\nconst { data } = await supabase.from('profiles').select('app_state').eq('id', userId).single()\nconst userPrefs = await loadUserState(data.app_state)\n```",
+        "answer": "Use the database sync option: ```tsx\nconst [preferences, setPreferences, { isLoading, error }] = useSlugStore('user-prefs', defaultPrefs, {\n  db: { \n    endpoint: '/api/user/preferences',\n    method: 'POST'\n  }\n})\n\nif (isLoading) return <div>Loading preferences...</div>\nif (error) return <div>Failed to load: {error.message}</div>\n\n// Updates automatically sync to database\nsetPreferences({ ...preferences, theme: 'dark' })\n```",
         "category": "react",
-        "tags": ["database", "storage", "supabase", "firebase"]
+        "tags": ["database", "storage", "sync"]
       }
     ],
     "use_cases": [
       {
         "id": "ecommerce-filters",
         "question": "How do I implement shareable e-commerce filters?",
-        "answer": "Perfect use case! Store filters, sorting, and pagination in state: ```tsx\nconst { state, setState } = useSlugStore({\n  category: 'all',\n  priceRange: [0, 1000],\n  sortBy: 'price',\n  page: 1\n}, { compress: true })\n```\nUsers can bookmark filtered results and share product discoveries.",
+        "answer": "Perfect use case! Store filters, sorting, and pagination: ```tsx\nconst [filters, setFilters, { isLoading }] = useSlugStore('product-filters', {\n  category: 'all',\n  priceRange: [0, 1000],\n  sortBy: 'price',\n  page: 1\n}, { url: true, compress: true })\n\nif (isLoading) return <div>Loading filters...</div>\n\n// Users can bookmark and share filtered results\n```",
         "category": "use-cases",
         "tags": ["ecommerce", "filters", "shopping"]
       },
       {
         "id": "dashboard-layouts",
         "question": "Can I save dashboard layouts and configurations?",
-        "answer": "Absolutely! Store widget positions, chart configurations, date ranges: ```tsx\nconst useDashboard = create((set) => ({\n  widgets: ['sales', 'users', 'revenue'],\n  layout: 'grid',\n  dateRange: { start: '2024-01-01', end: '2024-12-31' },\n  setLayout: (layout) => set({ layout })\n}), { key: 'dashboard' })\n```",
+        "answer": "Absolutely! Store widget positions, chart configurations, date ranges: ```tsx\nconst [dashboard, setDashboard] = useSlugStore('dashboard', {\n  widgets: ['sales', 'users', 'revenue'],\n  layout: 'grid',\n  dateRange: { start: '2025-01-01', end: '2025-12-31' }\n}, { url: true, compress: true })\n\nconst updateLayout = (newLayout) => {\n  setDashboard({ ...dashboard, layout: newLayout })\n}\n```",
         "category": "use-cases",
         "tags": ["dashboard", "layout", "configuration"]
       },
       {
         "id": "ai-chat-apps",
         "question": "How do I make AI chat conversations shareable?",
-        "answer": "Store conversation history and settings: ```tsx\nconst useChatStore = create((set) => ({\n  messages: [],\n  model: 'gpt-4',\n  temperature: 0.7,\n  systemPrompt: 'You are a helpful assistant'\n}), { encrypt: true, password: userSessionKey })\n```\nUse encryption for sensitive conversations.",
+        "answer": "Store conversation history and settings: ```tsx\nconst [chat, setChat] = useSlugStore('ai-chat', {\n  messages: [],\n  model: 'gpt-4',\n  temperature: 0.7,\n  systemPrompt: 'You are a helpful assistant'\n}, { \n  url: true, \n  compress: true,\n  // Note: Consider encryption for sensitive conversations\n})\n```",
         "category": "use-cases",
         "tags": ["ai", "chat", "conversations", "gpt"]
       },
       {
         "id": "design-tools",
         "question": "Can I build something like Excalidraw with shareable canvases?",
-        "answer": "Yes! Store canvas elements, zoom, pan, and tool settings: ```tsx\nconst useCanvasStore = create((set) => ({\n  elements: [],\n  zoom: 1,\n  pan: { x: 0, y: 0 },\n  selectedTool: 'rectangle',\n  addElement: (el) => set(state => ({ elements: [...state.elements, el] }))\n}), { compress: true, debounceMs: 500 })\n```",
+        "answer": "Yes! Store canvas elements, zoom, pan, and tool settings: ```tsx\nconst [canvas, setCanvas] = useSlugStore('canvas', {\n  elements: [],\n  zoom: 1,\n  pan: { x: 0, y: 0 },\n  selectedTool: 'rectangle'\n}, { url: true, compress: true, debounceMs: 500 })\n\nconst addElement = (element) => {\n  setCanvas({\n    ...canvas,\n    elements: [...canvas.elements, element]\n  })\n}\n```",
         "category": "use-cases",
         "tags": ["design", "canvas", "excalidraw", "drawing"]
       },
       {
         "id": "todo-apps",
         "question": "How do I make todo lists shareable and collaborative?",
-        "answer": "Store todos, filters, and views: ```tsx\nconst useTodoStore = create((set) => ({\n  todos: [],\n  filter: 'all', // 'all', 'active', 'completed'\n  view: 'list',\n  addTodo: (text) => set(state => ({ \n    todos: [...state.todos, { id: Date.now(), text, done: false }] \n  }))\n}), { compress: true })\n```\nUsers can share filtered views or specific todo lists.",
+        "answer": "Store todos, filters, and views: ```tsx\nconst [todos, setTodos] = useSlugStore('todos', {\n  items: [],\n  filter: 'all', // 'all', 'active', 'completed'\n  view: 'list'\n}, { url: true, compress: true })\n\nconst addTodo = (text) => {\n  setTodos({\n    ...todos,\n    items: [...todos.items, { id: Date.now(), text, done: false }]\n  })\n}\n```\nUsers can share filtered views or specific todo lists.",
         "category": "use-cases",
         "tags": ["todo", "tasks", "productivity"]
       }
@@ -189,7 +189,7 @@
       {
         "id": "bundle-size",
         "question": "How much does it add to my bundle?",
-        "answer": "Core package: ~15KB minified. React package: additional ~5KB. Only dependency is lz-string for compression. Tree-shakeable - only import what you use. Much smaller than most state management libraries.",
+        "answer": "Very lightweight! **Total: 5.5KB gzipped** (Core: 5.1KB + React: 397B). 72% smaller than v2.x! Only dependency is lz-string for compression. Tree-shakeable - only import what you use. Much smaller than most state management libraries.",
         "category": "technical",
         "tags": ["bundle-size", "performance", "dependencies"]
       },
@@ -294,7 +294,7 @@
   },
   "meta": {
     "version": "2.0.0",
-    "lastUpdated": "2024-12-27",
+    "lastUpdated": "2025-12-27",
     "totalQuestions": 42,
     "categories": [
       "paradigm_shift",

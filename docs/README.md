@@ -1,6 +1,21 @@
 # Slug Store Documentation 📚
 
+> **⚠️ Upcoming Breaking Changes: Slug Store v3.0 is coming!**
+> 
+> - Major API simplification, smaller bundles, and better DX
+> - See the [v3.0 Breaking Changes & Migration Guide](./V3_BREAKING_CHANGES.md)
+> - Track progress in the [v3.0 Implementation TODO](./V3_IMPLEMENTATION_TODO.md)
+
+---
+
 Welcome to the comprehensive documentation for **Slug Store** - the revolutionary state persistence library that bridges the gap between ephemeral client state and complex database architectures.
+
+## 🚦 v3.0 Roadmap & Migration
+
+- [Breaking Changes & Migration Guide](./V3_BREAKING_CHANGES.md)
+- [Implementation TODO & Progress](./V3_IMPLEMENTATION_TODO.md)
+
+---
 
 ## 🎯 **What is Slug Store?**
 
@@ -71,6 +86,14 @@ Slug Store is **more than state management, not quite a database, but with true 
 - 🔧 Custom adapters for existing infrastructure
 
 ## 📦 **Package Ecosystem**
+
+> **Note:**
+> Slug Store v3.0 will introduce a new, simplified package structure:
+> - `@farajabien/slug-store` (main React package, simplified)
+> - `@farajabien/slug-store-core` (core with offline support)
+> - `@farajabien/slug-store-offline` (advanced offline, optional)
+> - `@farajabien/slug-store-server` (server utilities, optional)
+> See [v3.0 Breaking Changes](./V3_BREAKING_CHANGES.md) for details.
 
 ### 🌐 **Client-Side State Management**
 

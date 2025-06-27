@@ -149,7 +149,7 @@ export function Footer() {
         <div className="border-t mt-8 pt-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
             <div className="text-sm text-muted-foreground">
-              <p>© 2024 Faraja Bien. MIT License.</p>
+              <p>© 2025 Faraja Bien. MIT License.</p>
               <p className="mt-1">Built with ❤️ for the developer community</p>
             </div>
             <div className="text-sm text-muted-foreground text-right">

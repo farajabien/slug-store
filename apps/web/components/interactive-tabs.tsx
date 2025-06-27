@@ -2,21 +2,20 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@workspace/ui/components/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@workspace/ui/components/tabs'
-import { Layers, Code2 } from 'lucide-react'
+import { Layers, Code2, Sparkles } from 'lucide-react'
 import { useState, useEffect } from 'react'
-import { saveUserState, loadUserState } from '@farajabien/slug-store'
 import { useSlugStore } from '@farajabien/slug-store'
 
 export function InteractiveTabs() {
   return (
-    <Tabs defaultValue="client" className="w-full">
+    <Tabs defaultValue="url" className="w-full">
       <TabsList className="grid w-full grid-cols-3">
-        <TabsTrigger value="client">URL Sharing</TabsTrigger>
-        <TabsTrigger value="database">Database Storage</TabsTrigger>
-        <TabsTrigger value="hybrid">Hybrid</TabsTrigger>
+        <TabsTrigger value="url">URL Sharing</TabsTrigger>
+        <TabsTrigger value="offline">Offline-First</TabsTrigger>
+        <TabsTrigger value="database">Database Sync</TabsTrigger>
       </TabsList>
 
-      <TabsContent value="client" className="space-y-6">
+      <TabsContent value="url" className="space-y-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Card>
             <CardHeader>
@@ -28,13 +27,11 @@ export function InteractiveTabs() {
             <CardContent>
               <pre className="bg-muted p-4 rounded-lg text-xs overflow-x-auto">
 {`import { useState, useEffect } from 'react'
-import { useLocalStorage } from './hooks'
 
 function Dashboard() {
-  const [filters, setFilters] = useLocalStorage('filters', {})
-  const [view, setView] = useLocalStorage('view', 'grid')
+  const [filters, setFilters] = useState({ status: 'all', category: 'all' })
+  const [view, setView] = useState('grid')
   const [data, setData] = useState([])
-  const [loading, setLoading] = useState(false)
   
   // Manual URL sync
   useEffect(() => {
@@ -62,7 +59,8 @@ function Dashboard() {
           <Card>
             <CardHeader>
               <CardTitle className="text-green-600 flex items-center gap-2">
-                ✅ Slug Store
+                <Sparkles className="h-4 w-4" />
+                ✅ Slug Store v3.0
               </CardTitle>
               <CardDescription>Simple, persistent, instantly shareable</CardDescription>
             </CardHeader>
@@ -71,14 +69,17 @@ function Dashboard() {
 {`import { useSlugStore } from '@farajabien/slug-store'
 
 function Dashboard() {
-  const { state, setState, getShareableUrl } = useSlugStore({
+  const [state, setState, { isLoading, error }] = useSlugStore('dashboard', {
     filters: { status: 'all', category: 'all' },
     view: 'grid',
     data: []
   }, {
-    compress: true,    // Automatic compression
-    syncToUrl: true    // Automatic URL sync
+    url: true,        // Automatic URL sync
+    compress: true    // Automatic compression
   })
+  
+  if (isLoading) return <div>Loading...</div>
+  if (error) return <div>Error: {error.message}</div>
   
   const updateFilters = (newFilters) => {
     setState({
@@ -88,10 +89,84 @@ function Dashboard() {
     // URL automatically updated!
   }
   
-  const shareState = async () => {
-    const url = await getShareableUrl()
-    navigator.clipboard.writeText(url)
-    // Instant sharing!
+  const shareState = () => {
+    // URL is already shareable!
+    navigator.clipboard.writeText(window.location.href)
+  }
+}`}
+              </pre>
+            </CardContent>
+          </Card>
+        </div>
+      </TabsContent>
+
+      <TabsContent value="offline" className="space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-red-600 flex items-center gap-2">
+                ❌ Traditional PWA Approach
+              </CardTitle>
+              <CardDescription>Complex service workers, manifest files, build tools</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <pre className="bg-muted p-4 rounded-lg text-xs overflow-x-auto">
+{`// Complex PWA setup
+// 1. Service worker
+// 2. Manifest file
+// 3. Build configuration
+// 4. Cache strategies
+// 5. Background sync
+// 6. Push notifications
+
+// Plus manual state management
+const [todos, setTodos] = useState([])
+const [isOnline, setIsOnline] = useState(navigator.onLine)
+
+useEffect(() => {
+  // Load from IndexedDB
+  // Handle offline/online
+  // Sync with server
+  // Handle conflicts
+}, [])
+
+// Complex offline logic needed`}
+              </pre>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-green-600 flex items-center gap-2">
+                <Sparkles className="h-4 w-4" />
+                ✅ Slug Store Offline-First
+              </CardTitle>
+              <CardDescription>Any webapp works offline without PWA complexity</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <pre className="bg-muted p-4 rounded-lg text-xs overflow-x-auto">
+{`import { useSlugStore } from '@farajabien/slug-store'
+
+function TodoApp() {
+  const [state, setState, { isLoading, error }] = useSlugStore('todos', {
+    todos: [],
+    filters: { status: 'all' },
+    settings: { theme: 'light' }
+  }, {
+    offline: true,    // That's it!
+    db: { endpoint: '/api/sync' } // Optional server sync
+  })
+  
+  if (isLoading) return <div>Loading...</div>
+  if (error) return <div>Error: {error.message}</div>
+  
+  const addTodo = (text) => {
+    setState({
+      ...state,
+      todos: [...state.todos, { id: Date.now(), text, done: false }]
+    })
+    // Works offline automatically!
+    // Syncs when online automatically!
   }
 }`}
               </pre>
@@ -101,128 +176,79 @@ function Dashboard() {
       </TabsContent>
 
       <TabsContent value="database" className="space-y-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-green-600">Database Storage</CardTitle>
-            <CardDescription>Store user state in any database with zero configuration</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <pre className="bg-muted p-4 rounded-lg text-xs overflow-x-auto">
-{`import { saveUserState, loadUserState } from '@farajabien/slug-store'
-
-// Save user preferences
-const { slug } = await saveUserState({
-  theme: 'dark',
-  preferences: { notifications: true },
-  dashboardLayout: 'grid'
-})
-
-// Works with ANY database
-// Supabase
-await supabase.from('profiles').insert({ 
-  user_id: user.id, 
-  app_state: slug 
-})
-
-// Firebase
-await db.collection('users').doc(userId).set({ 
-  appState: slug 
-})
-
-// PostgreSQL + Prisma
-await prisma.user.update({ 
-  where: { id: userId }, 
-  data: { appState: slug } 
-})
-
-// Load from database
-const userPrefs = await loadUserState(profile.app_state)`}
-            </pre>
-          </CardContent>
-        </Card>
-      </TabsContent>
-
-      <TabsContent value="hybrid" className="space-y-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Card>
             <CardHeader>
-              <CardTitle className="text-purple-600">Hybrid Architecture</CardTitle>
-              <CardDescription>URL sharing + database storage + traditional databases</CardDescription>
+              <CardTitle className="text-red-600 flex items-center gap-2">
+                ❌ Manual Database Sync
+              </CardTitle>
+              <CardDescription>Complex API calls, error handling, loading states</CardDescription>
             </CardHeader>
             <CardContent>
               <pre className="bg-muted p-4 rounded-lg text-xs overflow-x-auto">
-{`// Client: UI state in URLs (shareable)
-const { state, setState } = useSlugStore({
-  filters: { search: '', category: 'all' },
-  view: 'grid',
-  selectedItems: []
-}, {
-  compress: true,
-  syncToUrl: true  // Share filters via URL
-})
+{`import { useState, useEffect } from 'react'
 
-// Database: User preferences (private)
-const { slug } = await saveUserState({
-  theme: 'dark',
-  notifications: true,
-  layout: 'sidebar'
-})
-
-await supabase.from('profiles').insert({
-  user_id: user.id,
-  app_state: slug
-})
-
-// Traditional: User accounts, orders, etc.
-const user = await db.users.findUnique({
-  where: { id: userId },
-  include: { orders: true }
-})
-
-// One package handles everything!
-// ✅ URL sharing for collaboration
-// ✅ Database storage for privacy  
-// ✅ Traditional DB for business data`}
+function UserSettings() {
+  const [preferences, setPreferences] = useState({})
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  
+  // Load from database
+  useEffect(() => {
+    fetchUserPreferences()
+      .then(setPreferences)
+      .catch(setError)
+      .finally(() => setLoading(false))
+  }, [])
+  
+  const updatePreferences = async (newPrefs) => {
+    setLoading(true)
+    try {
+      await saveUserPreferences(newPrefs)
+      setPreferences(newPrefs)
+    } catch (err) {
+      setError(err)
+    } finally {
+      setLoading(false)
+    }
+  }
+}`}
               </pre>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-orange-600">🔥 NEW: Offline-Sync</CardTitle>
-              <CardDescription>Any webapp works offline without PWA complexity</CardDescription>
+              <CardTitle className="text-green-600 flex items-center gap-2">
+                <Sparkles className="h-4 w-4" />
+                ✅ Slug Store Database Sync
+              </CardTitle>
+              <CardDescription>Automatic database sync with zero configuration</CardDescription>
             </CardHeader>
             <CardContent>
               <pre className="bg-muted p-4 rounded-lg text-xs overflow-x-auto">
-{`// Offline-first shopping cart
-const { state, setState, syncStatus } = useSlugStore({
-  cart: [],
-  wishlist: [],
-  preferences: {}
-}, {
-  offlineSync: true  // That's it! Works offline now
-})
+{`import { useSlugStore } from '@farajabien/slug-store'
 
-// Advanced offline-sync with conflict resolution
-const { state, setState, sync } = useSlugStore(
-  initialData,
-  { 
-    offlineSync: {
-      conflictResolution: 'merge',  // Smart merging
-      syncInterval: 30,             // Auto-sync every 30s
-      onSync: (data, direction) => {
-        console.log(\`Synced \${direction}\`, data)
-      }
+function UserSettings() {
+  const [state, setState, { isLoading, error }] = useSlugStore('preferences', {
+    theme: 'light',
+    notifications: true,
+    layout: 'sidebar'
+  }, {
+    db: { 
+      endpoint: '/api/user/preferences',
+      method: 'POST'
     }
+  })
+  
+  if (isLoading) return <div>Loading...</div>
+  if (error) return <div>Error: {error.message}</div>
+  
+  const updatePreferences = (newPrefs) => {
+    setState({ ...state, ...newPrefs })
+    // Automatically syncs to database!
   }
-)
-
-// Features:
-// 🔄 Background sync when online
-// 🔀 Smart conflict resolution  
-// 💾 IndexedDB storage
-// 🔐 Auto-encryption
-// 🌐 Universal endpoints`}
+}`}
               </pre>
             </CardContent>
           </Card>

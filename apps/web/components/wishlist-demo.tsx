@@ -2,9 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import { useSlugStore } from '@farajabien/slug-store'
-import { 
-  getSlugInfo
-} from '@farajabien/slug-store'
 import { WishlistItems } from '@/components/wishlist-items'
 import { WishlistFilters } from '@/components/wishlist-filters'
 import { StateInfo } from '@/components/state-info'
@@ -52,7 +49,7 @@ const defaultState: WishlistState = {
       price: 2499,
       category: 'electronics',
       priority: 'high',
-      addedAt: '2024-01-15T10:30:00.000Z'
+      addedAt: '2025-01-15T10:30:00.000Z'
     },
     {
       id: '2',
@@ -60,7 +57,7 @@ const defaultState: WishlistState = {
       price: 299,
       category: 'electronics',
       priority: 'medium',
-      addedAt: '2024-01-14T14:20:00.000Z'
+      addedAt: '2025-01-14T14:20:00.000Z'
     },
     {
       id: '3',
@@ -68,7 +65,7 @@ const defaultState: WishlistState = {
       price: 89,
       category: 'home',
       priority: 'low',
-      addedAt: '2024-01-13T09:15:00.000Z'
+      addedAt: '2025-01-13T09:15:00.000Z'
     }
   ],
   filters: {
@@ -82,40 +79,21 @@ const defaultState: WishlistState = {
 }
 
 export function WishlistDemo() {
-  // Use the new React hook for state management
-  const { state, setState, resetState, getShareableUrl, hasUrlState } = useSlugStore(
-    defaultState,
-    { 
-      key: 'state',
-      compress: true,
-      debounceMs: 300,
-      syncToUrl: true,
-      fallback: true
-    }
-  )
+  const [isClient, setIsClient] = useState(false)
+  
+  // Use the new v3.0 React hook for state management
+  const [state, setState] = useSlugStore('wishlist', defaultState, {
+    url: true,        // Share via URL
+    compress: true,   // Compress URL data
+    offline: true     // Store offline
+  })
   
   const [error, setError] = useState<string | null>(null)
-  const [slugInfo, setSlugInfo] = useState<any>(null)
 
-  // Update slug info when state changes
+  // Ensure we're on the client side
   useEffect(() => {
-    const updateSlugInfo = async () => {
-      try {
-        const shareableUrl = await getShareableUrl()
-        if (shareableUrl) {
-          const url = new URL(shareableUrl)
-          const slug = url.searchParams.get('state')
-          if (slug) {
-            setSlugInfo(getSlugInfo(slug))
-          }
-        }
-      } catch (err) {
-        console.error('Failed to get slug info:', err)
-      }
-    }
-
-    updateSlugInfo()
-  }, [state, getShareableUrl])
+    setIsClient(true)
+  }, [])
 
   const addItem = (item: Omit<WishlistItem, 'id' | 'addedAt'>) => {
     const newItem: WishlistItem = {
@@ -144,18 +122,32 @@ export function WishlistDemo() {
   }
 
   const handleResetState = () => {
-    resetState()
+    setState(defaultState)
     setError(null)
   }
 
   const copyShareUrl = async () => {
+    if (!isClient) return
     try {
-      const shareableUrl = await getShareableUrl()
-      await navigator.clipboard.writeText(shareableUrl)
+      await navigator.clipboard.writeText(window.location.href)
       alert('URL copied to clipboard!')
     } catch (error) {
       console.error('Failed to copy URL:', error)
     }
+  }
+
+  // Don't render until client-side
+  if (!isClient) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-center py-12">
+          <div className="text-center">
+            <RefreshCw className="h-8 w-8 animate-spin mx-auto mb-4" />
+            <p className="text-muted-foreground">Loading demo...</p>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -169,9 +161,12 @@ export function WishlistDemo() {
       )}
 
       {/* State Info */}
-      {hasUrlState && slugInfo && (
+      {typeof window !== 'undefined' && window.location.search.includes('state') && (
         <StateInfo 
-          info={slugInfo}
+          info={{
+            compressed: true,
+            size: window.location.search.length
+          }}
         />
       )}
 
@@ -203,7 +198,7 @@ export function WishlistDemo() {
             className="flex items-center gap-2"
           >
             <Share2 className="h-4 w-4" />
-            Share
+            Share URL
           </Button>
         </div>
       </div>
@@ -223,121 +218,104 @@ export function WishlistDemo() {
       />
 
       {/* Add Item Form */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <ShoppingCart className="h-5 w-5" />
-            Add New Item
-          </CardTitle>
-          <CardDescription>
-            Add a new item to your wishlist. It will be automatically saved to the URL.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <AddItemForm onAdd={addItem} />
-        </CardContent>
-      </Card>
-
-      {/* Quick Features Demo */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-sm">
-              <Zap className="h-4 w-4" />
-              Compression Active
-            </CardTitle>
-            <CardDescription className="text-xs">
-              URL size reduced by ~30-70%
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-xs text-muted-foreground">
-              Your state is automatically compressed to keep URLs short and shareable.
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-sm">
-              <Lock className="h-4 w-4" />
-              Encryption Ready
-            </CardTitle>
-            <CardDescription className="text-xs">
-              Add password protection anytime
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-xs text-muted-foreground">
-              Enable encryption for sensitive data with a simple option.
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      <AddItemForm onAdd={addItem} />
     </div>
   )
 }
 
-// Helper components
 function AddItemForm({ onAdd }: { onAdd: (item: any) => void }) {
-  const [formData, setFormData] = useState({
-    name: '',
-    price: '',
-    category: 'electronics',
-    priority: 'medium' as const
-  })
+  const [name, setName] = useState('')
+  const [price, setPrice] = useState('')
+  const [category, setCategory] = useState('electronics')
+  const [priority, setPriority] = useState<'low' | 'medium' | 'high'>('medium')
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+    if (!name || !price) return
+
     onAdd({
-      name: formData.name,
-      price: parseFloat(formData.price),
-      category: formData.category,
-      priority: formData.priority
+      name,
+      price: parseFloat(price),
+      category,
+      priority
     })
-    setFormData({ name: '', price: '', category: 'electronics', priority: 'medium' })
+
+    // Reset form
+    setName('')
+    setPrice('')
+    setCategory('electronics')
+    setPriority('medium')
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-3">
-      <input
-        type="text"
-        placeholder="Item name"
-        value={formData.name}
-        onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-        className="w-full px-3 py-2 border rounded-md"
-        required
-      />
-      <input
-        type="number"
-        placeholder="Price"
-        value={formData.price}
-        onChange={(e) => setFormData(prev => ({ ...prev, price: e.target.value }))}
-        className="w-full px-3 py-2 border rounded-md"
-        required
-      />
-      <select
-        value={formData.category}
-        onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
-        className="w-full px-3 py-2 border rounded-md"
-      >
-        <option value="electronics">Electronics</option>
-        <option value="home">Home</option>
-        <option value="clothing">Clothing</option>
-        <option value="books">Books</option>
-      </select>
-      <select
-        value={formData.priority}
-        onChange={(e) => setFormData(prev => ({ ...prev, priority: e.target.value as any }))}
-        className="w-full px-3 py-2 border rounded-md"
-      >
-        <option value="low">Low Priority</option>
-        <option value="medium">Medium Priority</option>
-        <option value="high">High Priority</option>
-      </select>
-      <Button type="submit" className="w-full">
-        Add Item
-      </Button>
-    </form>
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-lg">Add New Item</CardTitle>
+        <CardDescription>Add items to your wishlist</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium mb-1">Name</label>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full px-3 py-2 border rounded-md"
+                placeholder="Item name"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Price</label>
+              <input
+                type="number"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                className="w-full px-3 py-2 border rounded-md"
+                placeholder="0.00"
+                min="0"
+                step="0.01"
+                required
+              />
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium mb-1">Category</label>
+              <select
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                className="w-full px-3 py-2 border rounded-md"
+              >
+                <option value="electronics">Electronics</option>
+                <option value="home">Home & Garden</option>
+                <option value="clothing">Clothing</option>
+                <option value="books">Books</option>
+                <option value="sports">Sports</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Priority</label>
+              <select
+                value={priority}
+                onChange={(e) => setPriority(e.target.value as 'low' | 'medium' | 'high')}
+                className="w-full px-3 py-2 border rounded-md"
+              >
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+              </select>
+            </div>
+          </div>
+          
+          <Button type="submit" className="w-full">
+            Add Item
+          </Button>
+        </form>
+      </CardContent>
+    </Card>
   )
 } 
