@@ -18,4 +18,6 @@ export type {
   EncodedData,
   SlugInfo,
   SlugStoreError
-} from '@farajabien/slug-store-core' 
+} from '@farajabien/slug-store-core'
+
+export { slug, getSlug, copySlug, shareSlug, getSlugData, getSlugDataSync } from './slug.js' 

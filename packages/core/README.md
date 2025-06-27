@@ -9,7 +9,19 @@
 
 ## 🚀 **v3.0 - Unified API**
 
-The core package now provides a unified API that handles URL persistence, offline storage, and database synchronization through a single, simple interface.
+The core package provides universal state persistence that works everywhere - browsers, servers, edge functions, and any JavaScript environment.
+
+## 🎯 **Perfect for React v3.1+ Dev Tools**
+
+This core package powers the new dev tools in the React package:
+
+```tsx
+// React package uses these core functions under the hood
+import { slug, getSlugData, copySlug } from '@farajabien/slug-store'
+
+// Which internally use:
+import { decodeState, encodeState } from '@farajabien/slug-store-core'
+```
 
 ## 📦 **Installation**
 
@@ -34,11 +46,71 @@ const result = await slugStore('user-prefs', { theme: 'dark' }, {
   }
 })
 
-// Load state with automatic fallback
+console.log(result.shareableUrl) // "https://myapp.com?state=N4IgZg9..."
+
+// Load state with automatic fallback: URL → Offline → Default
 const state = await loadSlugStore('user-prefs', { theme: 'light' }, {
   url: true,
   offline: true
 })
+```
+
+### **Server-Side Usage (Next.js, Node, Edge)**
+
+```typescript
+import { decodeState, encodeState } from '@farajabien/slug-store-core'
+
+// API Route
+export async function GET(request: Request) {
+  const url = new URL(request.url)
+  const slug = url.searchParams.get('state')
+  
+  if (slug) {
+    try {
+      const data = await decodeState(slug)
+      return Response.json({ success: true, data })
+    } catch (error) {
+      return Response.json({ success: false, error: 'Invalid state' })
+    }
+  }
+  
+  return Response.json({ success: false, error: 'No state provided' })
+}
+
+// Server Component
+export default async function ServerPage({ searchParams }) {
+  let data = null
+  
+  if (searchParams.state) {
+    try {
+      data = await decodeState(searchParams.state)
+    } catch (error) {
+      console.warn('Failed to decode state:', error)
+    }
+  }
+  
+  return <div>Server-rendered with: {JSON.stringify(data)}</div>
+}
+```
+
+### **Edge Functions & Workers**
+
+```typescript
+import { encodeState, decodeState } from '@farajabien/slug-store-core'
+
+// Cloudflare Worker / Vercel Edge
+export default async function handler(request: Request) {
+  const url = new URL(request.url)
+  const data = { user: 'john', preferences: { theme: 'dark' } }
+  
+  // Encode state for URL sharing
+  const encoded = await encodeState(data, { compress: true })
+  
+  // Generate shareable URL
+  url.searchParams.set('state', encoded)
+  
+  return new Response(`Shareable URL: ${url.toString()}`)
+}
 ```
 
 ### **Offline Storage**
@@ -46,11 +118,12 @@ const state = await loadSlugStore('user-prefs', { theme: 'light' }, {
 ```typescript
 import { saveOffline, loadOffline, clearOffline } from '@farajabien/slug-store-core'
 
-// Save state offline
+// Save state offline with automatic storage fallback
 await saveOffline('todos', [{ id: 1, text: 'Learn Slug Store' }], {
   storage: 'indexeddb',  // 'indexeddb' | 'localstorage' | 'memory'
   encryption: true,
-  password: 'secret'
+  password: 'secret',
+  ttl: 30 * 24 * 60 * 60 * 1000 // 30 days
 })
 
 // Load state from offline storage
@@ -67,19 +140,26 @@ await clearOffline('todos')
 ### **State Encoding/Decoding**
 
 ```typescript
-import { encodeState, decodeState } from '@farajabien/slug-store-core'
+import { encodeState, decodeState, validateSlug, getSlugInfo } from '@farajabien/slug-store-core'
 
 // Encode state for URL sharing
 const encoded = await encodeState({ filters: { category: 'tech' } }, {
-  compress: true,
-  encrypt: true, 
+  compress: true,    // Reduce URL length
+  encrypt: true,     // Encrypt sensitive data
   password: 'secret'
 })
 
-// Decode state from URL
-const state = await decodeState(encoded, {
-  password: 'secret'
-})
+// Validate before decoding
+if (validateSlug(encoded)) {
+  // Get metadata without decoding
+  const info = getSlugInfo(encoded)
+  console.log(`Size: ${info.size}, Compressed: ${info.compressed}`)
+  
+  // Decode state from URL
+  const state = await decodeState(encoded, {
+    password: 'secret'
+  })
+}
 ```
 
 ## 🔧 **API Reference**
@@ -90,7 +170,7 @@ Unified function for saving state with multiple persistence options.
 
 ```typescript
 const result = await slugStore(key, state, {
-  url?: boolean | UrlOptions,      // URL persistence
+  url?: boolean,                   // URL persistence (default: true)
   offline?: boolean | OfflineOptions, // Offline storage
   db?: DbOptions,                  // Database sync
   compress?: boolean,              // Enable compression
@@ -102,10 +182,11 @@ const result = await slugStore(key, state, {
 **Returns:**
 ```typescript
 {
-  slug: string,           // Encoded state for URL
+  slug?: string,          // Encoded state for URL
   state: T,              // The saved state
-  shareableUrl?: string, // Full URL with state (if url: true)
-  dbKey?: string         // Database key (if db: true)
+  shareableUrl?: string, // Full URL with state (if url: true and browser)
+  dbKey?: string,        // Database key (if db: true)
+  offline?: boolean      // Offline save success (if offline: true)
 }
 ```
 
@@ -115,9 +196,8 @@ Load state with automatic fallback chain: URL → Offline → Default.
 
 ```typescript
 const state = await loadSlugStore(key, defaultState, {
-  url?: boolean | UrlOptions,
+  url?: boolean,
   offline?: boolean | OfflineOptions,
-  db?: DbOptions,
   password?: string
 })
 ```
@@ -125,14 +205,14 @@ const state = await loadSlugStore(key, defaultState, {
 ### **Offline Storage Functions**
 
 #### **`saveOffline(key, state, options?)`**
-Save state to offline storage with automatic fallback.
+Save state to offline storage with automatic fallback (IndexedDB → localStorage → memory).
 
 ```typescript
 await saveOffline('key', state, {
   storage?: 'indexeddb' | 'localstorage' | 'memory',
   encryption?: boolean,
   password?: string,
-  ttl?: number // Time to live in seconds
+  ttl?: number // Time to live in milliseconds
 })
 ```
 
@@ -147,22 +227,12 @@ const state = await loadOffline('key', {
 })
 ```
 
-#### **`clearOffline(key, options?)`**
-Clear specific offline data.
+#### **`clearOffline(key, options?)` / `listOfflineKeys(options?)`**
+Clear specific offline data or list all keys.
 
 ```typescript
-await clearOffline('key', {
-  storage?: 'indexeddb' | 'localstorage' | 'memory'
-})
-```
-
-#### **`listOfflineKeys(options?)`**
-List all offline storage keys.
-
-```typescript
-const keys = await listOfflineKeys({
-  storage?: 'indexeddb' | 'localstorage' | 'memory'
-})
+await clearOffline('key', { storage?: 'indexeddb' })
+const keys = await listOfflineKeys({ storage?: 'indexeddb' })
 ```
 
 ### **State Encoding Functions**
@@ -172,9 +242,10 @@ Encode state for URL sharing or storage.
 
 ```typescript
 const encoded = await encodeState(state, {
-  compress?: boolean,
-  encrypt?: boolean,
-  password?: string
+  compress?: boolean,    // LZ-string compression
+  encrypt?: boolean,     // AES-GCM encryption
+  password?: string,     // Encryption password
+  version?: string       // Format version (default: '1.0')
 })
 ```
 
@@ -183,8 +254,19 @@ Decode state from URL or storage.
 
 ```typescript
 const state = await decodeState(encoded, {
-  password?: string
+  password?: string,              // Decryption password
+  validateVersion?: boolean       // Validate format version (default: true)
 })
+```
+
+#### **`validateSlug(slug)` / `getSlugInfo(slug)`**
+Validate and inspect encoded state.
+
+```typescript
+if (validateSlug(slug)) {
+  const info = getSlugInfo(slug)
+  // { version, compressed, encrypted, size, originalSize? }
+}
 ```
 
 ## 🎯 **Use Cases**
@@ -192,133 +274,218 @@ const state = await decodeState(encoded, {
 ### **Use Case 1: URL Sharing Only**
 ```typescript
 const result = await slugStore('filters', { category: 'tech' }, {
-  url: true
+  url: true,
+  compress: true
 })
-// Returns: { slug: 'abc123', state: {...}, shareableUrl: 'https://...' }
+// Returns: { slug: 'abc123', shareableUrl: 'https://...' }
 ```
 
 ### **Use Case 2: Offline Storage Only**
 ```typescript
-const result = await slugStore('todos', [], {
-  offline: { storage: 'indexeddb' }
+await slugStore('preferences', { theme: 'dark' }, {
+  url: false,
+  offline: { storage: 'indexeddb', ttl: 30 * 24 * 60 * 60 * 1000 }
 })
-// Returns: { slug: 'abc123', state: [...] }
 ```
 
 ### **Use Case 3: Database Sync Only**
 ```typescript
-const result = await slugStore('user-data', {}, {
-  db: { endpoint: '/api/user' }
+await slugStore('user-profile', profile, {
+  url: false,
+  db: { 
+    endpoint: '/api/user/profile',
+    method: 'PUT',
+    headers: { 'Authorization': `Bearer ${token}` }
+  }
 })
-// Returns: { slug: 'abc123', state: {...}, dbKey: 'user-data' }
 ```
 
-### **Use Case 4: Everything Combined**
+### **Use Case 4: All Three Combined**
 ```typescript
-const result = await slugStore('dashboard', config, {
+await slugStore('app-state', state, {
+  url: true,          // Share via URL
+  offline: true,      // Store offline
+  compress: true,     // Compress for efficiency
+  db: {              // Sync to database
+    endpoint: '/api/sync'
+  }
+})
+```
+
+## 🚀 **Advanced Features**
+
+### **Encryption for Sensitive Data**
+
+```typescript
+// Encrypt sensitive data before URL sharing
+const result = await slugStore('private-notes', notes, {
   url: true,
-  offline: { storage: 'indexeddb' },
-  db: { endpoint: '/api/dashboard' },
-  compress: true,
   encrypt: true,
-  password: 'secret'
-})
-```
-
-## 🔒 **Security Features**
-
-### **Encryption**
-```typescript
-// Save encrypted data
-await saveOffline('secrets', { apiKey: 'abc123' }, {
-  encryption: true,
-  password: 'my-secret-password'
-})
-
-// Load encrypted data
-const secrets = await loadOffline('secrets', {
-  encryption: true,
-  password: 'my-secret-password'
-})
-```
-
-### **Compression**
-```typescript
-// Automatically compress large states
-const encoded = await encodeState(largeState, {
+  password: userSessionKey, // Derive from user session
   compress: true
 })
-```
 
-## 🚀 **Performance**
-
-- **Bundle Size**: ~20KB gzipped
-- **Encoding**: < 1ms for typical states
-- **Offline Storage**: < 5ms for save/load operations
-- **Automatic Fallback**: Graceful degradation when storage unavailable
-
-## 🔧 **Advanced Configuration**
-
-### **Custom Storage Adapters**
-```typescript
-import { createStorage } from '@farajabien/slug-store-core'
-
-const customStorage = createStorage('custom', {
-  get: async (key) => { /* custom get logic */ },
-  set: async (key, value) => { /* custom set logic */ },
-  delete: async (key) => { /* custom delete logic */ }
+// Only users with the password can decode
+const notes = await decodeState(result.slug, {
+  password: userSessionKey
 })
 ```
 
-### **Error Handling**
+### **Custom Storage Adapters**
+
 ```typescript
-try {
-  const state = await loadSlugStore('key', defaultState)
-} catch (error) {
-  if (error.code === 'OFFLINE_ERROR') {
-    // Handle offline storage errors
-  } else if (error.code === 'ENCODING_ERROR') {
-    // Handle encoding/decoding errors
-  }
-}
+// Use specific storage types
+await saveOffline('data', state, {
+  storage: 'localstorage',  // Force localStorage
+  ttl: 60 * 60 * 1000      // 1 hour TTL
+})
+
+// Automatic fallback: IndexedDB → localStorage → memory
+await saveOffline('data', state, {
+  // Will try IndexedDB first, fall back if not available
+})
 ```
 
-## 📦 **Package Exports**
+### **Performance Optimization**
 
 ```typescript
-// Main functions
-export { slugStore, loadSlugStore }
+// Compress large datasets
+const largeData = { /* thousands of items */ }
+const result = await slugStore('dataset', largeData, {
+  url: true,
+  compress: true  // Can reduce size by 70%+
+})
 
-// Offline storage
-export { saveOffline, loadOffline, clearOffline, listOfflineKeys }
-
-// State encoding
-export { encodeState, decodeState }
-
-// Types
-export type { 
-  SlugStoreOptions, 
-  OfflineOptions, 
-  UrlOptions, 
-  DbOptions 
-}
+console.log(`Original: ${JSON.stringify(largeData).length} chars`)
+console.log(`Compressed: ${result.slug.length} chars`)
 ```
 
-## 🔄 **Migration from v2.x**
-
-The core package maintains backward compatibility with v2.x APIs. The new unified API is additive and doesn't break existing code.
+### **Cross-Platform Compatibility**
 
 ```typescript
-// v2.x - Still works
+// Works in any JavaScript environment
 import { encodeState, decodeState } from '@farajabien/slug-store-core'
 
-// v3.0 - New unified API
-import { slugStore, loadSlugStore } from '@farajabien/slug-store-core'
+// Browser
+const encoded = await encodeState(data)
+
+// Node.js
+const state = await decodeState(encoded)
+
+// Deno
+const result = await slugStore('data', state)
+
+// Bun
+const offline = await loadOffline('cache')
 ```
+
+## 🔄 **Integration with React Package**
+
+The React package (`@farajabien/slug-store`) builds on this core:
+
+```typescript
+// Core package (this one)
+import { slugStore, decodeState } from '@farajabien/slug-store-core'
+
+// React package (uses core internally)
+import { useSlugStore, slug, getSlugData } from '@farajabien/slug-store'
+
+// The React dev tools use these core functions:
+// - slug() → uses window.location.href
+// - getSlugData() → uses decodeState() from core
+// - useSlugStore() → uses slugStore() and loadSlugStore() from core
+```
+
+## 🎯 **Framework Examples**
+
+### **Next.js App Router**
+
+```typescript
+// app/dashboard/page.tsx
+import { decodeState } from '@farajabien/slug-store-core'
+
+export default async function Dashboard({ searchParams }) {
+  const filters = searchParams.state 
+    ? await decodeState(searchParams.state).catch(() => null)
+    : { category: 'all' }
+    
+  return <DashboardComponent initialFilters={filters} />
+}
+
+// app/api/share/route.ts
+export async function POST(request) {
+  const { state } = await request.json()
+  const encoded = await encodeState(state, { compress: true })
+  const shareUrl = `${request.nextUrl.origin}/dashboard?state=${encoded}`
+  return Response.json({ shareUrl })
+}
+```
+
+### **SvelteKit**
+
+```typescript
+// src/routes/+page.server.ts
+import { decodeState } from '@farajabien/slug-store-core'
+
+export async function load({ url }) {
+  const stateParam = url.searchParams.get('state')
+  const data = stateParam 
+    ? await decodeState(stateParam).catch(() => null)
+    : null
+    
+  return { data }
+}
+```
+
+### **Astro**
+
+```typitten
+// src/pages/app.astro
+---
+import { decodeState } from '@farajabien/slug-store-core'
+
+const stateParam = Astro.url.searchParams.get('state')
+const initialData = stateParam 
+  ? await decodeState(stateParam).catch(() => {})
+  : {}
+---
+
+<div id="app" data-initial={JSON.stringify(initialData)}></div>
+```
+
+## 🎉 **Why Use the Core Package?**
+
+### **Universal Compatibility**
+- ✅ **Any JavaScript environment**: Browser, Node.js, Deno, Bun, Edge
+- ✅ **Any framework**: React, Vue, Svelte, Angular, vanilla JS
+- ✅ **Any platform**: Web, mobile, desktop, server
+
+### **Zero Dependencies (except LZ-string)**
+- ✅ **Lightweight**: 5.1KB gzipped
+- ✅ **Tree-shakeable**: Import only what you need
+- ✅ **No bloat**: Clean, focused API
+
+### **Production Ready**
+- ✅ **Type safe**: Full TypeScript support
+- ✅ **Well tested**: Comprehensive test suite
+- ✅ **Error handling**: Graceful fallbacks and clear error messages
+- ✅ **Performance**: Optimized for speed and size
+
+### **Flexible Architecture**
+- ✅ **Composable**: Mix and match persistence strategies
+- ✅ **Extensible**: Easy to add custom storage adapters
+- ✅ **Future-proof**: Versioned format with migration support
+
+## 📚 **Learn More**
+
+- 🎮 [React Package](https://www.npmjs.com/package/@farajabien/slug-store) - React hooks and dev tools
+- 📖 [Complete Documentation](https://github.com/farajabien/slug-store/blob/main/docs/SLUG_STORE_USAGE.md)
+- 💡 [Interactive Demo](https://slugstore.fbien.com/demo)
+- 🚀 [Use Cases & Examples](https://slugstore.fbien.com/faq)
 
 ---
 
-**Universal state persistence core library. Zero obstruction, maximum DevEx.** 🚀
+**Build universal, persistent applications with confidence!** 🚀
 
 ## 📄 License
 

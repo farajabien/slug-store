@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useSlugStore } from '@farajabien/slug-store'
+import { useSlugStore, copySlug } from '@farajabien/slug-store'
 import { WishlistItems } from '@/components/wishlist-items'
 import { WishlistFilters } from '@/components/wishlist-filters'
 import { StateInfo } from '@/components/state-info'
@@ -129,7 +129,7 @@ export function WishlistDemo() {
   const copyShareUrl = async () => {
     if (!isClient) return
     try {
-      await navigator.clipboard.writeText(window.location.href)
+      await copySlug()
       alert('URL copied to clipboard!')
     } catch (error) {
       console.error('Failed to copy URL:', error)

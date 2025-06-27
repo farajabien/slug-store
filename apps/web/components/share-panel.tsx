@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Button } from '@workspace/ui/components/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card'
 import { Share2, Mail, Copy, Check } from 'lucide-react'
+import { slug, copySlug } from '@farajabien/slug-store'
 
 interface WishlistState {
   items: any[]
@@ -42,7 +43,7 @@ export function SharePanel({ state }: SharePanelProps) {
     }
     
     try {
-      await navigator.clipboard.writeText(shareUrl || window.location.href)
+      await copySlug()
       setIsCopied(true)
       setTimeout(() => setIsCopied(false), 2000)
     } catch (error) {
@@ -64,7 +65,7 @@ export function SharePanel({ state }: SharePanelProps) {
         body: JSON.stringify({
           email,
           state,
-          url: shareUrl || window.location.href
+          url: slug()
         }),
       })
 
@@ -119,7 +120,7 @@ export function SharePanel({ state }: SharePanelProps) {
           <div className="flex gap-2">
             <input
               type="text"
-              value={shareUrl || window.location.href}
+              value={shareUrl || slug()}
               readOnly
               className="flex-1 px-3 py-2 border rounded-md bg-muted text-sm"
             />

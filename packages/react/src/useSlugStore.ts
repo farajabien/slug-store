@@ -16,6 +16,7 @@ export function useSlugStore<T>(
   const [state, setState] = useState<T>(initialState)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
+  const [slug, setSlug] = useState<string>('')
   
   const optionsRef = useRef(options)
   optionsRef.current = options
@@ -59,11 +60,24 @@ export function useSlugStore<T>(
     setState(resolvedState)
     
     try {
-      await slugStore(key, resolvedState, optionsRef.current)
+      const result = await slugStore(key, resolvedState, optionsRef.current)
+      // Update slug with the latest URL
+      if (result.shareableUrl && typeof window !== 'undefined') {
+        setSlug(result.shareableUrl)
+      } else if (typeof window !== 'undefined') {
+        setSlug(window.location.href)
+      }
     } catch (e: any) {
       setError(e)
     }
   }, [key, state])
 
-  return [state, setAndPersistState, { isLoading, error }] as const
+  // Initialize slug on mount and when URL changes
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setSlug(window.location.href)
+    }
+  }, [])
+
+  return [state, setAndPersistState, { isLoading, error, slug }] as const
 }

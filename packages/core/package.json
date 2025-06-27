@@ -1,6 +1,6 @@
 {
   "name": "@farajabien/slug-store-core",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Universal state persistence core - URLs, offline storage, and unified API with zero configuration",
   "type": "module",
   "main": "./dist/index.js",

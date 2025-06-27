@@ -7,9 +7,25 @@
 > **Universal state persistence for React. Zero obstruction, maximum DevEx.**  
 > One hook. Three use cases. Everything you need.
 
-## 🚀 **v3.0 - Unified React Hook**
+## 🚀 **v3.1 - Built-in Dev Tools**
 
-The React package provides a simple, `useState`-like hook that automatically handles URL persistence, offline storage, and database synchronization with zero configuration.
+Two powerful utilities that make URL state management effortless:
+
+```tsx
+import { slug, getSlugData, copySlug, shareSlug } from '@farajabien/slug-store'
+
+// 🎯 Get the current shareable URL anywhere
+console.log(slug()) // "https://myapp.com/dashboard?state=N4IgZg9..."
+
+// 🎯 Get the decoded state from URL anywhere
+const data = await getSlugData() // { filters: {...}, view: 'grid' }
+
+// 🎯 Copy URL to clipboard
+await copySlug()
+
+// 🎯 Share via native share dialog
+await shareSlug('My App', 'Check out this state!')
+```
 
 ## 📦 **Installation**
 
@@ -22,7 +38,7 @@ npm install @farajabien/slug-store
 ### **Basic Usage - Like useState, but with persistence**
 
 ```tsx
-import { useSlugStore } from '@farajabien/slug-store'
+import { useSlugStore, copySlug } from '@farajabien/slug-store'
 
 function TodoApp() {
   const [todos, setTodos, { isLoading, error }] = useSlugStore('todos', [], {
@@ -45,6 +61,9 @@ function TodoApp() {
       <button onClick={() => setTodos([...todos, { id: Date.now(), text: 'New todo' }])}>
         Add Todo
       </button>
+      <button onClick={copySlug}>
+        📋 Share Todo List
+      </button>
     </div>
   )
 }
@@ -53,6 +72,8 @@ function TodoApp() {
 ### **URL Sharing Only**
 
 ```tsx
+import { useSlugStore, copySlug } from '@farajabien/slug-store'
+
 function FilterComponent() {
   const [filters, setFilters, { isLoading }] = useSlugStore('filters', { 
     category: 'tech',
@@ -72,6 +93,10 @@ function FilterComponent() {
         <option value="tech">Tech</option>
         <option value="books">Books</option>
       </select>
+      
+      <button onClick={copySlug}>
+        📋 Share Filters
+      </button>
     </div>
   )
 }
@@ -146,12 +171,31 @@ A React hook that provides persistent state management with automatic synchroniz
   setState: (newState: T | (prevState: T) => T) => void, // State setter  
   { 
     isLoading: boolean,                                   // Loading state
-    error: Error | null                                   // Error state
+    error: Error | null,                                  // Error state
+    slug: string                                          // Current shareable URL
   }
 ]
 ```
 
-**Options:**
+### **Dev Tools**
+
+```typescript
+// Get current shareable URL
+slug(): string
+
+// Get decoded state from URL
+getSlugData(): Promise<any | undefined>
+getSlugDataSync(): any | undefined  // Client-only sync version
+
+// Copy URL to clipboard
+copySlug(): Promise<void>
+
+// Share via native share dialog
+shareSlug(title?: string, text?: string): Promise<void>
+```
+
+### **Options**
+
 ```typescript
 interface SlugStoreOptions<T> {
   // URL persistence
@@ -186,6 +230,8 @@ interface SlugStoreOptions<T> {
 Perfect for analytics dashboards, data tables, and any UI where users need to bookmark and share specific views.
 
 ```tsx
+import { useSlugStore, copySlug } from '@farajabien/slug-store'
+
 function Dashboard() {
   const [filters, setFilters] = useSlugStore('dashboard-filters', {
     dateRange: { start: '2025-01-01', end: '2025-12-31' },
@@ -205,7 +251,9 @@ function Dashboard() {
         value={filters.dateRange}
         onChange={(range) => setFilters({ ...filters, dateRange: range })}
       />
-      {/* More filter controls */}
+      <button onClick={copySlug}>
+        📋 Share Dashboard View
+      </button>
     </div>
   )
 }
@@ -318,158 +366,84 @@ function LargeDataset() {
 - **Memory Usage**: Minimal overhead over useState
 - **Offline Storage**: IndexedDB with automatic fallback
 
-## 🔄 **Migration from v2.x**
+## �� **Migration from v3.0**
 
-### **Before (v2.x)**
-```tsx
-const { state, setState, syncStatus } = useSlugStore(initialState, {
-  key: 'my-store',
-  syncToUrl: true,
-  debounceMs: 100,
-  offlineSync: {
-    conflictResolution: 'merge',
-    syncInterval: 30
-  }
-})
-```
-
-### **After (v3.0)**
-```tsx
-const [state, setState, { isLoading, error }] = useSlugStore('my-store', initialState, {
-  url: true,
-  offline: true,
-  db: { endpoint: '/api/sync' }
-})
-```
-
-**Key Changes:**
-- ✅ **80% simpler API** - One hook for everything
-- ✅ **useState-like interface** - Familiar React patterns
-- ✅ **Built-in loading states** - No more manual sync status tracking
-- ✅ **Automatic error handling** - Graceful degradation
-- ✅ **Zero configuration** - Works out of the box
-
-## 🎯 **Framework Compatibility**
-
-Works with all React versions and frameworks:
-
-| Framework | Status | Notes |
-|-----------|--------|-------|
-| **React 18+** | ✅ Recommended | Full support for all features |
-| **React 17** | ✅ Supported | All features work |
-| **Next.js** | ✅ Supported | SSR compatible |
-| **Remix** | ✅ Supported | Works with loaders/actions |
-| **Gatsby** | ✅ Supported | Static generation compatible |
-| **Vite** | ✅ Supported | Fast dev experience |
-| **Create React App** | ✅ Supported | Zero config setup |
-
-## 🚀 **Advanced Features**
-
-### **Custom Error Handling**
+### **New Features (No Breaking Changes!)**
 
 ```tsx
-function AppWithErrorHandling() {
-  const [data, setData, { isLoading, error }] = useSlugStore('data', [])
+// ✨ NEW: Dev tools for easier URL/data access
+import { slug, getSlugData, copySlug, shareSlug } from '@farajabien/slug-store'
 
-  if (error) {
-    return (
-      <div className="error">
-        <h3>Failed to load data</h3>
-        <p>{error.message}</p>
-        <button onClick={() => window.location.reload()}>
-          Retry
-        </button>
-      </div>
-    )
-  }
+// ✨ NEW: Enhanced hook return value
+const [state, setState, { isLoading, error, slug }] = useSlugStore(...)
 
-  return <div>{/* your app */}</div>
+// ✨ OLD: Manual clipboard handling
+const shareOld = () => {
+  navigator.clipboard.writeText(window.location.href)
+}
+
+// ✨ NEW: One-liner sharing
+const shareNew = () => {
+  copySlug()
 }
 ```
 
-### **Loading States**
+## 🎉 **Why Slug Store?**
 
+### **Before: Manual State Management**
 ```tsx
-function AppWithLoading() {
-  const [data, setData, { isLoading }] = useSlugStore('data', [])
+// Complex, error-prone, lots of boilerplate
+const [state, setState] = useState(initialState)
 
-  if (isLoading) {
-    return (
-      <div className="loading">
-        <Spinner />
-        <p>Loading your data...</p>
-      </div>
-    )
+// Manual URL handling
+useEffect(() => {
+  const params = new URLSearchParams(window.location.search)
+  const encoded = params.get('state')
+  if (encoded) {
+    try {
+      const decoded = JSON.parse(atob(encoded))
+      setState(decoded)
+    } catch (error) {
+      console.error('Failed to decode state')
+    }
   }
+}, [])
 
-  return <div>{/* your app */}</div>
+// Manual sharing
+const share = () => {
+  const encoded = btoa(JSON.stringify(state))
+  const url = `${window.location.origin}${window.location.pathname}?state=${encoded}`
+  navigator.clipboard.writeText(url)
 }
 ```
 
-### **Function Updates**
-
+### **After: Slug Store**
 ```tsx
-function Counter() {
-  const [count, setCount] = useSlugStore('counter', 0)
+// Simple, reliable, zero boilerplate
+const [state, setState] = useSlugStore('my-app', initialState, { url: true })
 
-  return (
-    <div>
-      <p>Count: {count}</p>
-      <button onClick={() => setCount(prev => prev + 1)}>
-        Increment
-      </button>
-    </div>
-  )
-}
+// One-liner sharing
+const share = () => copySlug()
 ```
 
-## 📦 **What's Included**
+### **Key Benefits**
+- ✅ **Zero Configuration**: Works out of the box
+- ✅ **Universal**: Client, server, anywhere
+- ✅ **Type Safe**: Full TypeScript support
+- ✅ **Lightweight**: 5.5KB gzipped total
+- ✅ **Dev Tools**: Built-in utilities for common tasks
+- ✅ **Flexible**: URL, offline, database - use what you need
+- ✅ **Reliable**: Comprehensive error handling and fallbacks
 
-```typescript
-// Main hook
-export { useSlugStore } from './useSlugStore'
+## 📚 **Learn More**
 
-// Specialized hooks (v3.1+)
-export { 
-  useUrlState,        // URL sharing only
-  useOfflineState,    // Offline storage only  
-  useDbState,         // Database sync only
-  useSharedOfflineState, // Shared offline state
-  useFullState        // All features enabled
-} from './specialized-hooks'
-
-// Types
-export type { SlugStoreOptions, SlugStoreResult } from '@farajabien/slug-store-core'
-```
-
-## 🔧 **Development**
-
-```bash
-# Install dependencies
-pnpm install
-
-# Run tests
-pnpm test
-
-# Build package
-pnpm build
-
-# Development mode
-pnpm dev
-```
-
-## 🌟 **Why Choose Slug Store?**
-
-- **🎯 Zero Configuration** - Works out of the box
-- **🔄 Universal Persistence** - URL, offline, database in one hook
-- **⚡ Lightweight** - 5.5KB gzipped total
-- **🔒 Secure** - Built-in encryption and compression
-- **📱 Offline-First** - Works without internet
-- **🎨 Developer Experience** - TypeScript, React DevTools, great docs
-- **🚀 Production Ready** - Used by teams worldwide
+- 📖 [Complete Documentation](https://github.com/farajabien/slug-store/blob/main/docs/SLUG_STORE_USAGE.md)
+- 🎮 [Interactive Demo](https://slugstore.fbien.com/demo)
+- 💡 [Use Cases & Examples](https://slugstore.fbien.com/faq)
+- 🚀 [Core Package](https://www.npmjs.com/package/@farajabien/slug-store-core)
 
 ---
 
-**Universal state persistence for React. Zero obstruction, maximum DevEx.** 🚀
+**Start building persistent, shareable applications today!** 🚀
 
 [**View Demo**](https://slugstore.fbien.com) • [**GitHub**](https://github.com/farajabien/slug-store) • [**npm**](https://www.npmjs.com/package/@farajabien/slug-store)

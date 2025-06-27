@@ -3,6 +3,102 @@
 > **Universal state persistence for React. Zero obstruction, maximum DevEx.**  
 > One hook. Three use cases. Everything you need.
 
+---
+
+## 🚀 New in v3.1: Effortless Sharing & Data Access
+
+### **Core Dev Tools: `slug` & `getSlugData`**
+
+Two powerful utilities that make URL state management effortless:
+
+```tsx
+import { slug, getSlugData, copySlug, shareSlug } from '@farajabien/slug-store'
+
+// 🎯 Get the current shareable URL
+console.log(slug()) // "https://myapp.com/dashboard?state=N4IgZg9..."
+
+// 🎯 Get the decoded state from URL
+const data = await getSlugData() // { filters: {...}, view: 'grid' }
+
+// 🎯 Copy URL to clipboard
+await copySlug()
+
+// 🎯 Share via native share dialog
+await shareSlug('My App', 'Check out this state!')
+```
+
+### **Universal Data Access**
+
+**Client Components:**
+```tsx
+import { getSlugData, getSlugDataSync } from '@farajabien/slug-store'
+
+function MyComponent() {
+  // Async (recommended)
+  const [data, setData] = useState(null)
+  
+  useEffect(() => {
+    getSlugData().then(setData)
+  }, [])
+
+  // Sync (client only, best effort)
+  const dataSync = getSlugDataSync()
+  
+  return <div>Current state: {JSON.stringify(data)}</div>
+}
+```
+
+**Server Components (Next.js):**
+```tsx
+import { decodeState } from '@farajabien/slug-store-core'
+
+export default async function ServerComponent({ 
+  searchParams 
+}: { 
+  searchParams: { state?: string } 
+}) {
+  let data = null
+  
+  if (searchParams.state) {
+    try {
+      data = await decodeState(searchParams.state)
+    } catch (error) {
+      console.warn('Failed to decode state:', error)
+    }
+  }
+  
+  return (
+    <div>
+      <h1>Server-rendered with state:</h1>
+      <pre>{JSON.stringify(data, null, 2)}</pre>
+    </div>
+  )
+}
+```
+
+**API Routes:**
+```tsx
+import { decodeState } from '@farajabien/slug-store-core'
+
+export async function GET(request: Request) {
+  const url = new URL(request.url)
+  const slug = url.searchParams.get('state')
+  
+  if (slug) {
+    try {
+      const data = await decodeState(slug)
+      return Response.json({ success: true, data })
+    } catch (error) {
+      return Response.json({ success: false, error: 'Invalid state' })
+    }
+  }
+  
+  return Response.json({ success: false, error: 'No state provided' })
+}
+```
+
+---
+
 Complete guide to using Slug Store v3.0 - from simple URL sharing to complex offline-first applications.
 
 ## 🎯 Installation
@@ -19,6 +115,7 @@ npm install @farajabien/slug-store
 - ✅ **Core functionality** - Compression, encryption, validation
 - ✅ **TypeScript support** - Full type safety
 - ✅ **5.5KB gzipped** - 72% smaller than v2.x
+- ✅ **Dev tools** - `slug()` and `getSlugData()` for universal access
 
 ## 🎯 The Three Use Cases
 
@@ -26,7 +123,7 @@ npm install @farajabien/slug-store
 *Perfect for dashboards, filters, configurations that need external sharing*
 
 ```tsx
-import { useSlugStore } from '@farajabien/slug-store'
+import { useSlugStore, copySlug } from '@farajabien/slug-store'
 
 function Dashboard() {
   const [filters, setFilters, { isLoading, error }] = useSlugStore('dashboard-filters', {
@@ -50,7 +147,7 @@ function Dashboard() {
         value={filters.dateRange}
         onChange={(range) => setFilters({ ...filters, dateRange: range })}
       />
-      <button onClick={() => navigator.clipboard.writeText(window.location.href)}>
+      <button onClick={copySlug}>
         📋 Share Dashboard
       </button>
     </div>
@@ -64,54 +161,54 @@ function Dashboard() {
 ```tsx
 import { useSlugStore } from '@farajabien/slug-store'
 
-function UserSettings() {
-  const [settings, setSettings, { isLoading, error }] = useSlugStore('user-settings', {
+function UserPreferences() {
+  const [preferences, setPreferences, { isLoading, error }] = useSlugStore('user-preferences', {
     theme: 'dark',
-    notifications: true,
-    language: 'en'
+    language: 'en',
+    notifications: { email: true, push: false },
+    dashboard: { layout: 'grid', widgets: ['revenue', 'users'] }
   }, {
-    url: false,
-    db: { 
-      endpoint: '/api/user/settings',
-      method: 'PUT'
+    url: false,       // Don't put in URL (private data)
+    offline: true,    // Store offline
+    db: {             // Sync to database
+      endpoint: '/api/preferences',
+      method: 'POST'
     }
   })
 
-  if (isLoading) return <div>Loading settings...</div>
+  if (isLoading) return <div>Loading preferences...</div>
   if (error) return <div>Error: {error.message}</div>
 
-  // Settings automatically sync to your database
-  // Works with any backend: Supabase, Firebase, PostgreSQL, etc.
-  
   return (
     <div>
-      <Toggle 
-        checked={settings.notifications}
-        onChange={(checked) => setSettings({ ...settings, notifications: checked })}
+      <ThemeToggle 
+        value={preferences.theme}
+        onChange={(theme) => setPreferences({ ...preferences, theme })}
       />
-      <p>✅ Settings sync across all your devices</p>
+      <LanguageSelector 
+        value={preferences.language}
+        onChange={(language) => setPreferences({ ...preferences, language })}
+      />
     </div>
   )
 }
 ```
 
-### 3. **Offline-First Storage**
-*Perfect for productivity apps, shopping carts, any app that needs to work offline*
+### 3. **Offline-First Applications**
+*Perfect for mobile apps, PWAs, and apps that work without internet*
 
 ```tsx
 import { useSlugStore } from '@farajabien/slug-store'
 
-function TodoApp() {
-  const [state, setState, { isLoading, error }] = useSlugStore('todos', {
-    todos: [],
-    filter: 'all'
-  }, {
-    url: false,
-    offline: {
+function OfflineTodoApp() {
+  const [todos, setTodos, { isLoading, error }] = useSlugStore('offline-todos', [], {
+    url: true,        // Share via URL when online
+    offline: {        // Offline storage configuration
       storage: 'indexeddb',
-      encryption: true
+      ttl: 30 * 24 * 60 * 60 * 1000, // 30 days
+      encryption: false
     },
-    db: {
+    db: {             // Sync when online
       endpoint: '/api/todos/sync',
       method: 'POST'
     }
@@ -121,224 +218,163 @@ function TodoApp() {
   if (error) return <div>Error: {error.message}</div>
 
   const addTodo = (text: string) => {
-    setState({
-      ...state,
-      todos: [...state.todos, { 
-        id: crypto.randomUUID(), 
-        text, 
-        completed: false,
-        createdAt: new Date().toISOString()
-      }]
-    })
+    setTodos([...todos, {
+      id: Date.now(),
+      text,
+      completed: false,
+      createdAt: new Date().toISOString()
+    }])
   }
 
-  // Works offline automatically!
-  // Data syncs when back online
-  
+  const toggleTodo = (id: number) => {
+    setTodos(todos.map(todo => 
+      todo.id === id ? { ...todo, completed: !todo.completed } : todo
+    ))
+  }
+
   return (
     <div>
-      <input 
-        placeholder="Add a todo..."
-        onKeyPress={(e) => {
-          if (e.key === 'Enter' && e.currentTarget.value.trim()) {
-            addTodo(e.currentTarget.value.trim())
-            e.currentTarget.value = ''
-          }
-        }}
+      <h1>Offline Todo App</h1>
+      <p>Works offline, syncs when online!</p>
+      
+      <AddTodoForm onAdd={addTodo} />
+      
+      <TodoList 
+        todos={todos}
+        onToggle={toggleTodo}
       />
       
-      <ul>
-        {state.todos.map(todo => (
-          <li key={todo.id}>
-            <label>
-              <input
-                type="checkbox"
-                checked={todo.completed}
-                onChange={() => setState({
-                  ...state,
-                  todos: state.todos.map(t => 
-                    t.id === todo.id ? { ...t, completed: !t.completed } : t
-                  )
-                })}
-              />
-              <span className={todo.completed ? 'completed' : ''}>
-                {todo.text}
-              </span>
-            </label>
-          </li>
-        ))}
-      </ul>
-    </div>
-  )
-}
-```
-
-## 🔧 API Reference
-
-### **`useSlugStore<T>(key, initialState, options?)`**
-
-The main React hook that provides persistent state management.
-
-**Parameters:**
-- `key` (string): Unique identifier for the state
-- `initialState` (T): Initial state value
-- `options` (SlugStoreOptions): Configuration options
-
-**Returns:**
-```typescript
-[
-  state: T,                                               // Current state
-  setState: (newState: T | (prevState: T) => T) => void, // State setter
-  { 
-    isLoading: boolean,                                   // Loading state
-    error: Error | null                                   // Error state
-  }
-]
-```
-
-**Options:**
-```typescript
-interface SlugStoreOptions {
-  // URL persistence
-  url?: boolean
-  
-  // Offline storage
-  offline?: boolean | {
-    storage?: 'indexeddb' | 'localstorage' | 'memory'
-    encryption?: boolean
-    password?: string
-    ttl?: number // Time to live in seconds
-  }
-  
-  // Database sync
-  db?: {
-    endpoint: string
-    method?: 'POST' | 'PUT'
-    headers?: Record<string, string>
-  }
-  
-  // Global options
-  compress?: boolean
-  encrypt?: boolean
-  password?: string
-}
-```
-
-## 🚀 Real-World Examples
-
-### E-commerce Shopping Cart
-
-```tsx
-import { useSlugStore } from '@farajabien/slug-store'
-
-interface CartItem {
-  id: string
-  productId: string
-  name: string
-  price: number
-  quantity: number
-}
-
-interface CartState {
-  items: CartItem[]
-  total: number
-  promoCode?: string
-}
-
-function ShoppingCart() {
-  const [cart, setCart, { isLoading, error }] = useSlugStore<CartState>('shopping-cart', {
-    items: [],
-    total: 0
-  }, {
-    url: false,                    // Private data
-    offline: { 
-      storage: 'indexeddb',
-      encryption: true,
-      password: 'user-session-id'
-    },
-    db: { 
-      endpoint: '/api/cart/sync',
-      method: 'POST'
-    }
-  })
-
-  if (isLoading) return <div>Loading cart...</div>
-  if (error) return <div>Error: {error.message}</div>
-
-  const addToCart = (product: Omit<CartItem, 'id'>) => {
-    const existingItem = cart.items.find(i => i.productId === product.productId)
-    
-    if (existingItem) {
-      setCart({
-        ...cart,
-        items: cart.items.map(i => 
-          i.productId === product.productId 
-            ? { ...i, quantity: i.quantity + product.quantity }
-            : i
-        ),
-        total: cart.total + (product.price * product.quantity)
-      })
-    } else {
-      setCart({
-        ...cart,
-        items: [...cart.items, { ...product, id: crypto.randomUUID() }],
-        total: cart.total + (product.price * product.quantity)
-      })
-    }
-  }
-
-  const removeFromCart = (itemId: string) => {
-    const item = cart.items.find(i => i.id === itemId)
-    if (item) {
-      setCart({
-        ...cart,
-        items: cart.items.filter(i => i.id !== itemId),
-        total: cart.total - (item.price * item.quantity)
-      })
-    }
-  }
-
-  return (
-    <div>
-      <h2>Shopping Cart ({cart.items.length} items)</h2>
-      
-      {cart.items.map(item => (
-        <div key={item.id} className="cart-item">
-          <span>{item.name}</span>
-          <span>${item.price} x {item.quantity}</span>
-          <button onClick={() => removeFromCart(item.id)}>Remove</button>
-        </div>
-      ))}
-      
-      <div className="cart-total">
-        <strong>Total: ${cart.total.toFixed(2)}</strong>
-      </div>
-      
-      <button 
-        onClick={() => {
-          // Cart persists offline and syncs when online
-          window.location.href = '/checkout'
-        }}
-        disabled={cart.items.length === 0}
-      >
-        Checkout
+      <button onClick={copySlug}>
+        📋 Share Todo List
       </button>
     </div>
   )
 }
 ```
 
-### Analytics Dashboard with URL Sharing
+## 🔧 Advanced Usage
+
+### **Custom Storage Adapters**
 
 ```tsx
 import { useSlugStore } from '@farajabien/slug-store'
 
-interface DashboardState {
-  dateRange: { start: string; end: string }
-  metrics: string[]
-  view: 'grid' | 'list'
-  filters: { department: string; status: string }
+function CustomStorageApp() {
+  const [data, setData] = useSlugStore('custom-storage', {
+    items: [],
+    settings: {}
+  }, {
+    url: true,
+    offline: {
+      storage: 'localstorage', // or 'indexeddb', 'sessionstorage'
+      prefix: 'myapp_',
+      ttl: 24 * 60 * 60 * 1000 // 24 hours
+    }
+  })
+
+  return <div>Custom storage configured!</div>
 }
+```
+
+### **Encryption for Sensitive Data**
+
+```tsx
+import { useSlugStore } from '@farajabien/slug-store'
+
+function SecureApp() {
+  const [sensitiveData, setSensitiveData] = useSlugStore('secure-data', {
+    apiKeys: [],
+    privateNotes: []
+  }, {
+    url: true,
+    encrypt: true,
+    password: 'user-secret-key', // Derive from user session
+    compress: true
+  })
+
+  return <div>Encrypted and secure!</div>
+}
+```
+
+### **Performance Optimization**
+
+```tsx
+import { useSlugStore } from '@farajabien/slug-store'
+
+function OptimizedApp() {
+  const [largeDataset, setLargeDataset] = useSlugStore('large-data', {
+    items: [],
+    metadata: {}
+  }, {
+    url: true,
+    compress: true,   // Compress large datasets
+    debounceMs: 500   // Debounce rapid updates
+  })
+
+  return <div>Optimized for large datasets!</div>
+}
+```
+
+## 📊 Real-World Examples
+
+### **E-commerce Filter State**
+
+```tsx
+import { useSlugStore, copySlug } from '@farajabien/slug-store'
+
+function ProductFilters() {
+  const [filters, setFilters, { isLoading }] = useSlugStore('product-filters', {
+    category: 'all',
+    priceRange: [0, 1000],
+    brands: [],
+    sortBy: 'price',
+    view: 'grid',
+    page: 1
+  }, {
+    url: true,
+    compress: true
+  })
+
+  if (isLoading) return <div>Loading filters...</div>
+
+  const updateFilters = (newFilters: Partial<typeof filters>) => {
+    setFilters({ ...filters, ...newFilters, page: 1 })
+  }
+
+  const shareFilters = () => {
+    copySlug()
+    alert('Filtered product list shared!')
+  }
+
+  return (
+    <div>
+      <CategorySelector 
+        value={filters.category}
+        onChange={(category) => updateFilters({ category })}
+      />
+      
+      <PriceRangeSlider 
+        value={filters.priceRange}
+        onChange={(priceRange) => updateFilters({ priceRange })}
+      />
+      
+      <BrandSelector 
+        selected={filters.brands}
+        onChange={(brands) => updateFilters({ brands })}
+      />
+      
+      <button onClick={shareFilters}>
+        📋 Share Filtered Results
+      </button>
+    </div>
+  )
+}
+```
+
+### **Analytics Dashboard**
+
+```tsx
+import { useSlugStore, copySlug } from '@farajabien/slug-store'
 
 function AnalyticsDashboard() {
   const [dashboard, setDashboard, { isLoading }] = useSlugStore<DashboardState>('analytics-dashboard', {
@@ -354,8 +390,7 @@ function AnalyticsDashboard() {
   if (isLoading) return <div>Loading dashboard...</div>
 
   const shareCurrentView = async () => {
-    const url = window.location.href
-    await navigator.clipboard.writeText(url)
+    await copySlug()
     alert('Dashboard configuration copied! Share with your team.')
   }
 
@@ -399,10 +434,10 @@ function AnalyticsDashboard() {
 }
 ```
 
-### Collaborative Form Builder
+### **Collaborative Form Builder**
 
 ```tsx
-import { useSlugStore } from '@farajabien/slug-store'
+import { useSlugStore, copySlug } from '@farajabien/slug-store'
 
 interface FormField {
   id: string
@@ -469,496 +504,422 @@ function FormBuilder() {
   }
 
   const shareForm = async () => {
-    const url = window.location.href
-    await navigator.clipboard.writeText(url)
+    await copySlug()
     alert('Form shared! Anyone with this link can view and collaborate.')
   }
 
   return (
-    <div className="form-builder">
-      <div className="builder-header">
-        <input
-          value={form.title}
-          onChange={(e) => setForm({ ...form, title: e.target.value })}
-          placeholder="Form title"
-          className="form-title-input"
-        />
-        <button onClick={shareForm}>📋 Share Form</button>
-      </div>
-
-      <textarea
-        value={form.description}
-        onChange={(e) => setForm({ ...form, description: e.target.value })}
-        placeholder="Form description"
-        className="form-description-input"
-      />
-
-      <div className="field-toolbar">
-        <button onClick={() => addField('text')}>+ Text Field</button>
-        <button onClick={() => addField('email')}>+ Email Field</button>
-        <button onClick={() => addField('select')}>+ Select Field</button>
-        <button onClick={() => addField('textarea')}>+ Textarea</button>
-      </div>
-
-      <div className="form-fields">
-        {form.fields.map(field => (
-          <div key={field.id} className="field-editor">
-            <input
-              value={field.label}
-              onChange={(e) => updateField(field.id, { label: e.target.value })}
-              placeholder="Field label"
-            />
-            
-            <label>
-              <input
-                type="checkbox"
-                checked={field.required}
-                onChange={(e) => updateField(field.id, { required: e.target.checked })}
-              />
-              Required
-            </label>
-            
-            {field.type === 'select' && (
-              <div>
-                {field.options?.map((option, index) => (
-                  <input
-                    key={index}
-                    value={option}
-                    onChange={(e) => {
-                      const newOptions = [...(field.options || [])]
-                      newOptions[index] = e.target.value
-                      updateField(field.id, { options: newOptions })
-                    }}
-                    placeholder={`Option ${index + 1}`}
-                  />
-                ))}
-                <button onClick={() => {
-                  const newOptions = [...(field.options || []), `Option ${(field.options?.length || 0) + 1}`]
-                  updateField(field.id, { options: newOptions })
-                }}>
-                  + Add Option
-                </button>
-              </div>
-            )}
-            
-            <button onClick={() => removeField(field.id)}>🗑️ Remove</button>
-          </div>
-        ))}
-      </div>
-
-      <div className="form-preview">
-        <h3>Preview</h3>
-        <FormPreview form={form} />
+    <div>
+      <div className="form-header">
+        <h1>Form Builder</h1>
+        <button onClick={shareForm}>
+          📋 Share Form
+        </button>
       </div>
       
-      <p className="collaboration-note">
-        💡 This form is automatically saved and shareable. Team members can 
-        collaborate in real-time using the shared URL.
+      <FormSettings 
+        title={form.title}
+        description={form.description}
+        settings={form.settings}
+        onChange={(updates) => setForm({ ...form, ...updates })}
+      />
+      
+      <FieldList 
+        fields={form.fields}
+        onUpdate={updateField}
+        onRemove={removeField}
+      />
+      
+      <AddFieldPanel onAdd={addField} />
+      
+      <FormPreview form={form} />
+    </div>
+  )
+}
+```
+
+### **AI Chat Application**
+
+```tsx
+import { useSlugStore, copySlug } from '@farajabien/slug-store'
+
+interface ChatMessage {
+  role: 'user' | 'assistant'
+  content: string
+  timestamp: string
+}
+
+interface ChatState {
+  messages: ChatMessage[]
+  model: string
+  temperature: number
+  systemPrompt: string
+  conversationId: string
+}
+
+function AIChatApp() {
+  const [chat, setChat, { isLoading, error }] = useSlugStore<ChatState>('ai-chat', {
+    messages: [],
+    model: 'gpt-4',
+    temperature: 0.7,
+    systemPrompt: 'You are a helpful assistant.',
+    conversationId: crypto.randomUUID()
+  }, {
+    url: true,
+    compress: true,   // Compress long conversations
+    // Note: Consider encryption for sensitive conversations
+  })
+
+  if (isLoading) return <div>Loading chat...</div>
+  if (error) return <div>Error: {error.message}</div>
+
+  const sendMessage = async (content: string) => {
+    const userMessage: ChatMessage = {
+      role: 'user',
+      content,
+      timestamp: new Date().toISOString()
+    }
+
+    setChat({
+      ...chat,
+      messages: [...chat.messages, userMessage]
+    })
+
+    // Simulate AI response
+    const aiMessage: ChatMessage = {
+      role: 'assistant',
+      content: `Response to: ${content}`,
+      timestamp: new Date().toISOString()
+    }
+
+    setTimeout(() => {
+      setChat({
+        ...chat,
+        messages: [...chat.messages, userMessage, aiMessage]
+      })
+    }, 1000)
+  }
+
+  const shareConversation = async () => {
+    await copySlug()
+    alert('Conversation shared! Anyone can continue this chat.')
+  }
+
+  const clearChat = () => {
+    setChat({
+      ...chat,
+      messages: [],
+      conversationId: crypto.randomUUID()
+    })
+  }
+
+  return (
+    <div>
+      <div className="chat-header">
+        <h1>AI Chat</h1>
+        <div className="chat-controls">
+          <button onClick={shareConversation}>
+            📋 Share Chat
+          </button>
+          <button onClick={clearChat}>
+            🗑️ Clear Chat
+          </button>
+        </div>
+      </div>
+      
+      <ChatSettings 
+        model={chat.model}
+        temperature={chat.temperature}
+        systemPrompt={chat.systemPrompt}
+        onChange={(settings) => setChat({ ...chat, ...settings })}
+      />
+      
+      <MessageList messages={chat.messages} />
+      
+      <MessageInput onSend={sendMessage} />
+      
+      <p className="sharing-note">
+        💡 Your conversation is automatically saved in the URL. 
+        Share the link to continue this exact conversation.
       </p>
     </div>
   )
 }
 ```
 
-## 🛠️ Framework Integration
+## 🚀 Migration from v2.x
 
-### Next.js App Router
+### **Breaking Changes**
+
+1. **Hook signature changed:**
+   ```tsx
+   // v2.x
+   const [state, setState] = useSlugStore(initialState, options)
+   
+   // v3.0
+   const [state, setState, { isLoading, error }] = useSlugStore(key, initialState, options)
+   ```
+
+2. **Options simplified:**
+   ```tsx
+   // v2.x
+   const options = {
+     url: { enabled: true, compress: true },
+     offline: { enabled: true, storage: 'indexeddb' },
+     db: { endpoint: '/api/sync', method: 'POST' }
+   }
+   
+   // v3.0
+   const options = {
+     url: true,
+     compress: true,
+     offline: true,
+     db: { endpoint: '/api/sync', method: 'POST' }
+   }
+   ```
+
+3. **New unified API:**
+   ```tsx
+   // v2.x - Separate hooks
+   const [urlState, setUrlState] = useUrlState(initialState)
+   const [offlineState, setOfflineState] = useOfflineState(initialState)
+   const [dbState, setDbState] = useDbState(initialState)
+   
+   // v3.0 - One hook, multiple persistence options
+   const [state, setState] = useSlugStore('my-app', initialState, {
+     url: true,
+     offline: true,
+     db: { endpoint: '/api/sync' }
+   })
+   ```
+
+### **Migration Guide**
+
+1. **Add a unique key** to your `useSlugStore` calls
+2. **Update options** to use the new simplified format
+3. **Handle loading states** with the new `isLoading` and `error` properties
+4. **Use the new dev tools** (`slug()`, `getSlugData()`) for better DX
 
 ```tsx
-// app/dashboard/page.tsx (Server Component)
-import { ClientDashboard } from './client-dashboard'
-
-export default async function DashboardPage({ 
-  searchParams 
-}: { 
-  searchParams: { state?: string } 
-}) {
-  // Load shared state from URL if present
-  let sharedState = null
-  if (searchParams.state) {
-    try {
-      // You can decode the state server-side if needed
-      // For now, we'll pass it to the client
-      sharedState = searchParams.state
-    } catch (error) {
-      console.warn('Invalid shared state in URL')
-    }
+// Before (v2.x)
+function MyApp() {
+  const [state, setState] = useSlugStore(initialState, {
+    url: { enabled: true, compress: true },
+    offline: { enabled: true }
+  })
+  
+  const shareUrl = () => {
+    navigator.clipboard.writeText(window.location.href)
   }
-
-  return <ClientDashboard sharedState={sharedState} />
+  
+  return <div>...</div>
 }
 
-// app/dashboard/client-dashboard.tsx (Client Component)
-'use client'
-import { useSlugStore } from '@farajabien/slug-store'
-import { useEffect } from 'react'
-
-export function ClientDashboard({ sharedState }: { sharedState?: string }) {
-  const [dashboard, setDashboard, { isLoading, error }] = useSlugStore('dashboard', {
-    widgets: ['users', 'revenue'],
-    filters: { dateRange: 'last-30-days' },
-    view: 'grid'
-  }, {
+// After (v3.0)
+function MyApp() {
+  const [state, setState, { isLoading, error }] = useSlugStore('my-app', initialState, {
     url: true,
     compress: true,
-    db: {
-      endpoint: '/api/dashboard/save',
-      method: 'POST'
-    }
+    offline: true
   })
-
-  // Handle shared state from URL
-  useEffect(() => {
-    if (sharedState && !isLoading) {
-      // The hook will automatically decode the shared state
-      // No manual intervention needed
-    }
-  }, [sharedState, isLoading])
-
-  if (isLoading) return <div>Loading dashboard...</div>
-  if (error) return <div>Error: {error.message}</div>
-
-  return (
-    <div>
-      <DashboardControls 
-        config={dashboard} 
-        onChange={setDashboard} 
-      />
-      <DashboardWidgets config={dashboard} />
-    </div>
-  )
-}
-
-// app/api/dashboard/save/route.ts (API Route)
-export async function POST(request: Request) {
-  try {
-    const body = await request.json()
-    const { key, state } = body
-    
-    // Save to your database
-    await saveUserDashboard(key, state)
-    
-    return Response.json({ success: true })
-  } catch (error) {
-    return Response.json({ error: 'Failed to save dashboard' }, { status: 500 })
-  }
-}
-```
-
-### Remix
-
-```tsx
-// app/routes/dashboard.tsx
-import type { LoaderFunctionArgs } from '@remix-run/node'
-import { json } from '@remix-run/node'
-import { useLoaderData } from '@remix-run/react'
-import { useSlugStore } from '@farajabien/slug-store'
-
-export async function loader({ request }: LoaderFunctionArgs) {
-  const url = new URL(request.url)
-  const sharedState = url.searchParams.get('state')
   
-  // Optionally decode server-side or pass to client
-  return json({ sharedState })
-}
-
-export default function Dashboard() {
-  const { sharedState } = useLoaderData<typeof loader>()
-  
-  const [dashboard, setDashboard, { isLoading, error }] = useSlugStore('dashboard', {
-    widgets: ['users', 'revenue'],
-    view: 'grid'
-  }, {
-    url: true,
-    compress: true
-  })
-
   if (isLoading) return <div>Loading...</div>
   if (error) return <div>Error: {error.message}</div>
-
-  return (
-    <div>
-      <DashboardControls 
-        config={dashboard} 
-        onChange={setDashboard} 
-      />
-    </div>
-  )
-}
-```
-
-## 🔒 Security & Performance
-
-### Encryption for Sensitive Data
-
-```tsx
-import { useSlugStore } from '@farajabien/slug-store'
-
-function SecureNotesApp() {
-  const [notes, setNotes, { isLoading, error }] = useSlugStore('secure-notes', [], {
-    url: false,                    // Never expose in URL
-    offline: {
-      storage: 'indexeddb',
-      encryption: true,
-      password: 'user-specific-key' // Use user-specific encryption
-    },
-    db: {
-      endpoint: '/api/notes/sync',
-      method: 'POST'
-    }
-  })
-
-  // Notes are encrypted before storage using Web Crypto API
-  // Even if someone accesses IndexedDB, data is encrypted
   
-  if (isLoading) return <div>Loading secure notes...</div>
-  if (error) return <div>Error: {error.message}</div>
-
-  return (
-    <div>
-      <h2>🔒 Secure Notes</h2>
-      <p>Your notes are encrypted before storage</p>
-      {/* Notes interface */}
-    </div>
-  )
-}
-```
-
-### Performance Optimization
-
-```tsx
-import { useSlugStore } from '@farajabien/slug-store'
-
-function OptimizedApp() {
-  const [data, setData, { isLoading }] = useSlugStore('large-dataset', [], {
-    url: true,
-    compress: true,    // Automatic compression for large data
-    // debounceMs: 500, // Coming in v3.1 - debounce URL updates
-  })
-
-  // Compression reduces URL size by 60-80% for typical data
-  // Automatic fallback if URL gets too long
+  const shareUrl = () => {
+    copySlug()
+  }
   
-  return <div>{/* Your app */}</div>
+  return <div>...</div>
 }
 ```
 
-## 📱 Mobile & PWA
+## 📚 API Reference
+
+### **useSlugStore Hook**
 
 ```tsx
-import { useSlugStore } from '@farajabien/slug-store'
+const [state, setState, { isLoading, error, slug }] = useSlugStore<T>(
+  key: string,
+  initialState: T,
+  options?: UseSlugStoreOptions<T>
+)
+```
 
-function MobileApp() {
-  const [appState, setAppState, { isLoading, error }] = useSlugStore('mobile-app', {
-    theme: 'light',
-    preferences: {},
-    offlineData: []
-  }, {
-    url: false,                    // No URL pollution on mobile
-    offline: {
-      storage: 'indexeddb',
-      encryption: true,
-      ttl: 86400 * 7               // 7 days cache
-    },
-    db: {
-      endpoint: '/api/mobile/sync',
-      method: 'POST'
-    }
-  })
+**Parameters:**
+- `key` (string): Unique identifier for the state
+- `initialState` (T): Default state value
+- `options` (object): Configuration options
 
-  // Perfect for mobile web apps that need to work offline
-  // Automatically syncs when connection is restored
+**Returns:**
+- `state` (T): Current state value
+- `setState` (function): State setter (like useState)
+- `isLoading` (boolean): Loading state
+- `error` (Error | null): Error state
+- `slug` (string): Current shareable URL
+
+### **Options**
+
+```tsx
+interface UseSlugStoreOptions<T> {
+  // URL persistence
+  url?: boolean
+  compress?: boolean
   
-  if (isLoading) return <div>Loading app...</div>
-  if (error) return <div>Error: {error.message}</div>
-
-  return (
-    <div className="mobile-app">
-      {/* Your mobile app interface */}
-    </div>
-  )
+  // Offline storage
+  offline?: boolean | OfflineOptions
+  
+  // Database sync
+  db?: {
+    endpoint: string
+    method?: 'POST' | 'PUT'
+    headers?: Record<string, string>
+  }
+  
+  // Legacy support
+  encrypt?: boolean
+  password?: string
 }
 ```
 
-## 🧪 Testing
+### **Dev Tools**
 
 ```tsx
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import { useSlugStore } from '@farajabien/slug-store'
+// Get current shareable URL
+slug(): string
 
-// Mock the hook for testing
-jest.mock('@farajabien/slug-store', () => ({
-  useSlugStore: jest.fn()
-}))
+// Get decoded state from URL
+getSlugData(): Promise<any | undefined>
+getSlugDataSync(): any | undefined
 
-const mockUseSlugStore = useSlugStore as jest.MockedFunction<typeof useSlugStore>
+// Copy URL to clipboard
+copySlug(): Promise<void>
 
-describe('TodoApp', () => {
-  beforeEach(() => {
-    mockUseSlugStore.mockReturnValue([
-      { todos: [], filter: 'all' },
-      jest.fn(),
-      { isLoading: false, error: null }
-    ])
-  })
-
-  it('should render todos', () => {
-    render(<TodoApp />)
-    expect(screen.getByText('Todo App')).toBeInTheDocument()
-  })
-
-  it('should handle loading state', () => {
-    mockUseSlugStore.mockReturnValue([
-      { todos: [], filter: 'all' },
-      jest.fn(),
-      { isLoading: true, error: null }
-    ])
-
-    render(<TodoApp />)
-    expect(screen.getByText('Loading...')).toBeInTheDocument()
-  })
-
-  it('should handle error state', () => {
-    mockUseSlugStore.mockReturnValue([
-      { todos: [], filter: 'all' },
-      jest.fn(),
-      { isLoading: false, error: new Error('Test error') }
-    ])
-
-    render(<TodoApp />)
-    expect(screen.getByText('Error: Test error')).toBeInTheDocument()
-  })
-})
+// Share via native share dialog
+shareSlug(title?: string, text?: string): Promise<void>
 ```
 
-## 🔄 Migration from v2.x
+### **Core Functions**
 
-### Before (v2.x)
 ```tsx
-const { state, setState, syncStatus } = useSlugStore(initialState, {
-  key: 'my-store',
-  syncToUrl: true,
-  debounceMs: 100,
-  offlineSync: {
-    conflictResolution: 'merge',
-    syncInterval: 30
-  }
-})
+// Encode state to URL-safe string
+encodeState(state: any, options?: EncodeOptions): Promise<string>
+
+// Decode URL-safe string to state
+decodeState(slug: string, options?: DecodeOptions): Promise<any>
+
+// Validate slug format
+validateSlug(slug: string): boolean
+
+// Get slug metadata
+getSlugInfo(slug: string): SlugInfo
 ```
 
-### After (v3.0)
+## 🎯 Best Practices
+
+### **1. Choose the Right Persistence Strategy**
+
+- **URL only**: For shareable, public data (filters, configurations)
+- **Offline only**: For private, device-specific data
+- **Database only**: For user-specific, cross-device data
+- **Combined**: For complex apps that need multiple persistence layers
+
+### **2. Optimize for Performance**
+
+- Use `compress: true` for large datasets
+- Set appropriate TTL for offline storage
+- Debounce rapid state updates
+- Consider encryption only for sensitive data
+
+### **3. Handle Loading States**
+
 ```tsx
-const [state, setState, { isLoading, error }] = useSlugStore('my-store', initialState, {
-  url: true,
-  offline: true,
-  db: { endpoint: '/api/sync' }
-})
+const [state, setState, { isLoading, error }] = useSlugStore('my-app', initialState)
+
+if (isLoading) return <LoadingSpinner />
+if (error) return <ErrorMessage error={error} />
+
+return <MyApp state={state} />
 ```
 
-**Key Changes:**
-- ✅ **80% simpler API** - One hook for everything
-- ✅ **useState-like interface** - Familiar React patterns
-- ✅ **Built-in loading states** - No more manual sync status
-- ✅ **Automatic error handling** - Graceful degradation
-- ✅ **Zero configuration** - Works out of the box
+### **4. Use TypeScript for Type Safety**
 
-## 🌟 Best Practices
-
-### 1. **Choose the Right Persistence**
 ```tsx
-// URL sharing - for public, shareable state
-const [filters, setFilters] = useSlugStore('filters', defaultFilters, {
-  url: true,
-  compress: true
-})
-
-// Database storage - for private, cross-device state
-const [preferences, setPreferences] = useSlugStore('preferences', defaultPrefs, {
-  url: false,
-  db: { endpoint: '/api/user/preferences' }
-})
-
-// Offline storage - for apps that need to work offline
-const [todos, setTodos] = useSlugStore('todos', [], {
-  url: false,
-  offline: { storage: 'indexeddb', encryption: true },
-  db: { endpoint: '/api/todos/sync' }
-})
-```
-
-### 2. **Handle Loading and Error States**
-```tsx
-function MyComponent() {
-  const [state, setState, { isLoading, error }] = useSlugStore('my-state', defaultState)
-
-  if (isLoading) {
-    return <div>Loading your data...</div>
-  }
-
-  if (error) {
-    return (
-      <div>
-        <p>Error: {error.message}</p>
-        <button onClick={() => window.location.reload()}>
-          Retry
-        </button>
-      </div>
-    )
-  }
-
-  return <div>{/* Your app */}</div>
+interface AppState {
+  filters: FilterState
+  data: DataItem[]
+  settings: AppSettings
 }
+
+const [state, setState] = useSlugStore<AppState>('my-app', initialState)
 ```
 
-### 3. **Optimize for Performance**
+### **5. Leverage Dev Tools**
+
 ```tsx
-// For large datasets
-const [data, setData] = useSlugStore('large-data', [], {
-  url: true,
-  compress: true  // Essential for large data
-})
+// Debug current state
+console.log('Current URL:', slug())
+console.log('Current data:', await getSlugData())
 
-// For sensitive data
-const [secrets, setSecrets] = useSlugStore('secrets', {}, {
-  url: false,
-  offline: { 
-    storage: 'indexeddb',
-    encryption: true,
-    password: userSpecificKey
-  }
-})
+// Easy sharing
+await copySlug()
+await shareSlug('Check out this app!')
 ```
 
-## 📊 Performance Metrics
+## 🚀 Getting Started
 
-| Feature | Bundle Impact | Performance |
-|---------|---------------|-------------|
-| **Core Hook** | 5.5KB gzipped | < 1ms initialization |
-| **URL Sync** | +0KB | < 10ms per update |
-| **Offline Storage** | +0KB | < 50ms read/write |
-| **Database Sync** | +0KB | Network dependent |
-| **Compression** | +0KB | 60-80% size reduction |
-| **Encryption** | +0KB | < 20ms encrypt/decrypt |
+1. **Install the package:**
+   ```bash
+   npm install @farajabien/slug-store
+   ```
 
-## 🎯 Use Case Decision Tree
+2. **Start with URL sharing:**
+   ```tsx
+   import { useSlugStore, copySlug } from '@farajabien/slug-store'
+   
+   function MyApp() {
+     const [state, setState] = useSlugStore('my-app', { count: 0 }, { url: true })
+     
+     return (
+       <div>
+         <p>Count: {state.count}</p>
+         <button onClick={() => setState({ count: state.count + 1 })}>
+           Increment
+         </button>
+         <button onClick={copySlug}>
+           Share State
+         </button>
+       </div>
+     )
+   }
+   ```
 
-```
-Need to share state externally?
-├─ Yes → Use `url: true`
-│   ├─ Large data? → Add `compress: true`
-│   └─ Sensitive? → Add `encrypt: true`
-└─ No → Use `url: false`
-    ├─ Cross-device sync? → Add `db: { endpoint: '/api/sync' }`
-    ├─ Offline support? → Add `offline: true`
-    └─ Local only? → Use defaults
-```
+3. **Add offline storage:**
+   ```tsx
+   const [state, setState] = useSlugStore('my-app', initialState, {
+     url: true,
+     offline: true
+   })
+   ```
 
----
+4. **Add database sync:**
+   ```tsx
+   const [state, setState] = useSlugStore('my-app', initialState, {
+     url: true,
+     offline: true,
+     db: { endpoint: '/api/sync' }
+   })
+   ```
 
-**Ready to simplify your state management?**
+## 🎉 That's It!
 
-```bash
-npm install @farajabien/slug-store
-```
+Slug Store v3.0 provides everything you need for universal state persistence:
 
-**Universal state persistence for React. Zero obstruction, maximum DevEx.** 🚀 
+- ✅ **One hook** for all persistence needs
+- ✅ **Zero configuration** for common use cases
+- ✅ **TypeScript support** for type safety
+- ✅ **Performance optimized** with compression and debouncing
+- ✅ **Developer tools** for easy debugging and sharing
+- ✅ **Universal compatibility** with any React setup
+
+Start building persistent, shareable applications today! 

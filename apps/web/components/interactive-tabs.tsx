@@ -1,31 +1,62 @@
 'use client'
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@workspace/ui/components/card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@workspace/ui/components/tabs'
-import { Layers, Code2, Sparkles } from 'lucide-react'
-import { useState, useEffect } from 'react'
-import { useSlugStore } from '@farajabien/slug-store'
+import { Sparkles } from 'lucide-react'
+import { useState } from 'react'
 
 export function InteractiveTabs() {
-  return (
-    <Tabs defaultValue="url" className="w-full">
-      <TabsList className="grid w-full grid-cols-3">
-        <TabsTrigger value="url">URL Sharing</TabsTrigger>
-        <TabsTrigger value="offline">Offline-First</TabsTrigger>
-        <TabsTrigger value="database">Database Sync</TabsTrigger>
-      </TabsList>
+  const [activeTab, setActiveTab] = useState('url')
 
-      <TabsContent value="url" className="space-y-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-red-600 flex items-center gap-2">
-                ❌ Traditional React State
-              </CardTitle>
-              <CardDescription>Complex, non-persistent, hard to share</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <pre className="bg-muted p-4 rounded-lg text-xs overflow-x-auto">
+  return (
+    <div className="w-full">
+      {/* Tab Navigation */}
+      <div className="bg-muted text-muted-foreground inline-flex h-9 w-fit items-center justify-center rounded-lg p-[3px]">
+        <button
+          onClick={() => setActiveTab('url')}
+          className={`inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-md border border-transparent px-2 py-1 text-sm font-medium whitespace-nowrap transition-[color,box-shadow] disabled:pointer-events-none disabled:opacity-50 ${
+            activeTab === 'url' 
+              ? 'bg-background text-foreground shadow-sm' 
+              : 'text-foreground'
+          }`}
+        >
+          URL Sharing
+        </button>
+        <button
+          onClick={() => setActiveTab('offline')}
+          className={`inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-md border border-transparent px-2 py-1 text-sm font-medium whitespace-nowrap transition-[color,box-shadow] disabled:pointer-events-none disabled:opacity-50 ${
+            activeTab === 'offline' 
+              ? 'bg-background text-foreground shadow-sm' 
+              : 'text-foreground'
+          }`}
+        >
+          Offline-First
+        </button>
+        <button
+          onClick={() => setActiveTab('database')}
+          className={`inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-md border border-transparent px-2 py-1 text-sm font-medium whitespace-nowrap transition-[color,box-shadow] disabled:pointer-events-none disabled:opacity-50 ${
+            activeTab === 'database' 
+              ? 'bg-background text-foreground shadow-sm' 
+              : 'text-foreground'
+          }`}
+        >
+          Database Sync
+        </button>
+      </div>
+
+      {/* Tab Content */}
+      <div className="mt-6 flex-1 outline-none">
+        {activeTab === 'url' && (
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-red-600 flex items-center gap-2">
+                    ❌ Traditional React State
+                  </CardTitle>
+                  <CardDescription>Complex, non-persistent, hard to share</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <pre className="bg-muted p-4 rounded-lg text-xs overflow-x-auto">
 {`import { useState, useEffect } from 'react'
 
 function Dashboard() {
@@ -52,21 +83,21 @@ function Dashboard() {
     // Complex sharing logic needed
   }
 }`}
-              </pre>
-            </CardContent>
-          </Card>
+                  </pre>
+                </CardContent>
+              </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-green-600 flex items-center gap-2">
-                <Sparkles className="h-4 w-4" />
-                ✅ Slug Store v3.0
-              </CardTitle>
-              <CardDescription>Simple, persistent, instantly shareable</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <pre className="bg-muted p-4 rounded-lg text-xs overflow-x-auto">
-{`import { useSlugStore } from '@farajabien/slug-store'
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-green-600 flex items-center gap-2">
+                    <Sparkles className="h-4 w-4" />
+                    ✅ Slug Store v3.1
+                  </CardTitle>
+                  <CardDescription>Simple, persistent, instantly shareable</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <pre className="bg-muted p-4 rounded-lg text-xs overflow-x-auto">
+{`import { useSlugStore, copySlug } from '@farajabien/slug-store'
 
 function Dashboard() {
   const [state, setState, { isLoading, error }] = useSlugStore('dashboard', {
@@ -91,26 +122,28 @@ function Dashboard() {
   
   const shareState = () => {
     // URL is already shareable!
-    navigator.clipboard.writeText(window.location.href)
+    copySlug()
   }
 }`}
-              </pre>
-            </CardContent>
-          </Card>
-        </div>
-      </TabsContent>
+                  </pre>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        )}
 
-      <TabsContent value="offline" className="space-y-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-red-600 flex items-center gap-2">
-                ❌ Traditional PWA Approach
-              </CardTitle>
-              <CardDescription>Complex service workers, manifest files, build tools</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <pre className="bg-muted p-4 rounded-lg text-xs overflow-x-auto">
+        {activeTab === 'offline' && (
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-red-600 flex items-center gap-2">
+                    ❌ Traditional PWA Approach
+                  </CardTitle>
+                  <CardDescription>Complex service workers, manifest files, build tools</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <pre className="bg-muted p-4 rounded-lg text-xs overflow-x-auto">
 {`// Complex PWA setup
 // 1. Service worker
 // 2. Manifest file
@@ -131,20 +164,20 @@ useEffect(() => {
 }, [])
 
 // Complex offline logic needed`}
-              </pre>
-            </CardContent>
-          </Card>
+                  </pre>
+                </CardContent>
+              </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-green-600 flex items-center gap-2">
-                <Sparkles className="h-4 w-4" />
-                ✅ Slug Store Offline-First
-              </CardTitle>
-              <CardDescription>Any webapp works offline without PWA complexity</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <pre className="bg-muted p-4 rounded-lg text-xs overflow-x-auto">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-green-600 flex items-center gap-2">
+                    <Sparkles className="h-4 w-4" />
+                    ✅ Slug Store Offline-First
+                  </CardTitle>
+                  <CardDescription>Any webapp works offline without PWA complexity</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <pre className="bg-muted p-4 rounded-lg text-xs overflow-x-auto">
 {`import { useSlugStore } from '@farajabien/slug-store'
 
 function TodoApp() {
@@ -169,23 +202,25 @@ function TodoApp() {
     // Syncs when online automatically!
   }
 }`}
-              </pre>
-            </CardContent>
-          </Card>
-        </div>
-      </TabsContent>
+                  </pre>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        )}
 
-      <TabsContent value="database" className="space-y-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-red-600 flex items-center gap-2">
-                ❌ Manual Database Sync
-              </CardTitle>
-              <CardDescription>Complex API calls, error handling, loading states</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <pre className="bg-muted p-4 rounded-lg text-xs overflow-x-auto">
+        {activeTab === 'database' && (
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-red-600 flex items-center gap-2">
+                    ❌ Manual Database Sync
+                  </CardTitle>
+                  <CardDescription>Complex API calls, error handling, loading states</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <pre className="bg-muted p-4 rounded-lg text-xs overflow-x-auto">
 {`import { useState, useEffect } from 'react'
 
 function UserSettings() {
@@ -201,6 +236,7 @@ function UserSettings() {
       .finally(() => setLoading(false))
   }, [])
   
+  // Save to database
   const updatePreferences = async (newPrefs) => {
     setLoading(true)
     try {
@@ -212,48 +248,53 @@ function UserSettings() {
       setLoading(false)
     }
   }
-}`}
-              </pre>
-            </CardContent>
-          </Card>
+  
+  // Complex sync logic needed`}
+                  </pre>
+                </CardContent>
+              </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-green-600 flex items-center gap-2">
-                <Sparkles className="h-4 w-4" />
-                ✅ Slug Store Database Sync
-              </CardTitle>
-              <CardDescription>Automatic database sync with zero configuration</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <pre className="bg-muted p-4 rounded-lg text-xs overflow-x-auto">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-green-600 flex items-center gap-2">
+                    <Sparkles className="h-4 w-4" />
+                    ✅ Slug Store Database Sync
+                  </CardTitle>
+                  <CardDescription>Automatic database synchronization</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <pre className="bg-muted p-4 rounded-lg text-xs overflow-x-auto">
 {`import { useSlugStore } from '@farajabien/slug-store'
 
 function UserSettings() {
-  const [state, setState, { isLoading, error }] = useSlugStore('preferences', {
+  const [preferences, setPreferences, { isLoading, error }] = useSlugStore('user-preferences', {
     theme: 'light',
-    notifications: true,
-    layout: 'sidebar'
+    language: 'en',
+    notifications: true
   }, {
-    db: { 
+    url: false,       // Keep preferences private
+    db: {             // Auto-sync to database
       endpoint: '/api/user/preferences',
-      method: 'POST'
+      method: 'PUT',
+      headers: { 'Authorization': 'Bearer ' + userToken }
     }
   })
   
   if (isLoading) return <div>Loading...</div>
   if (error) return <div>Error: {error.message}</div>
   
-  const updatePreferences = (newPrefs) => {
-    setState({ ...state, ...newPrefs })
+  const updateTheme = (theme) => {
+    setPreferences({ ...preferences, theme })
     // Automatically syncs to database!
   }
 }`}
-              </pre>
-            </CardContent>
-          </Card>
-        </div>
-      </TabsContent>
-    </Tabs>
+                  </pre>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
   )
-} 
+}
