@@ -15,9 +15,9 @@ export function Header() {
           <Link href="/" className="font-bold text-xl">
             Slug Store
           </Link>
-          <span className="text-sm text-muted-foreground">
-            Demo App
-          </span>
+          <Link href="/demo" className="font-bold text-xl">
+            <span className="text-sm">Demo App</span>
+          </Link>
         </div>
 
         <div className="flex items-center space-x-4">

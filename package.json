@@ -2,6 +2,26 @@
   "name": "slug-store",
   "version": "0.1.0",
   "private": true,
+  "description": "Universal state persistence for modern web apps. Zero obstruction, maximum DevEx.",
+  "author": "Faraja Bien <hello@fbien.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/farajabien/slug-store.git"
+  },
+  "bugs": {
+    "url": "https://github.com/farajabien/slug-store/issues"
+  },
+  "homepage": "https://slugstore.fbien.com",
+  "keywords": [
+    "react",
+    "state-management",
+    "url-state",
+    "offline-storage",
+    "database-sync",
+    "typescript",
+    "monorepo"
+  ],
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev",

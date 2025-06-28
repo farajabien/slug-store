@@ -51,26 +51,36 @@ export function useSlugStore<T>(
     }
   }, [key])
 
-  // Persist state when it changes
+  // Persist state when it changes - FIXED: removed state dependency
   const setAndPersistState = useCallback(async (newState: T | ((prevState: T) => T)) => {
-    const resolvedState = typeof newState === 'function' 
-      ? (newState as (prevState: T) => T)(state) 
-      : newState
+    setState(prevState => {
+      const resolvedState = typeof newState === 'function' 
+        ? (newState as (prevState: T) => T)(prevState) 
+        : newState
       
-    setState(resolvedState)
-    
-    try {
-      const result = await slugStore(key, resolvedState, optionsRef.current)
-      // Update slug with the latest URL
-      if (result.shareableUrl && typeof window !== 'undefined') {
-        setSlug(result.shareableUrl)
-      } else if (typeof window !== 'undefined') {
-        setSlug(window.location.href)
-      }
-    } catch (e: any) {
-      setError(e)
-    }
-  }, [key, state])
+      // Persist the resolved state
+      slugStore(key, resolvedState, optionsRef.current)
+        .then(result => {
+          // Update browser URL if URL persistence is enabled
+          if (optionsRef.current.url !== false && result.slug && typeof window !== 'undefined') {
+            const currentUrl = new URL(window.location.href)
+            currentUrl.searchParams.set('state', result.slug)
+            const newUrl = currentUrl.toString()
+            
+            // Update browser URL without triggering a page reload
+            window.history.pushState({}, '', newUrl)
+            setSlug(newUrl)
+          } else if (typeof window !== 'undefined') {
+            setSlug(window.location.href)
+          }
+        })
+        .catch(e => {
+          setError(e)
+        })
+      
+      return resolvedState
+    })
+  }, [key]) // Only depend on key, not state
 
   // Initialize slug on mount and when URL changes
   useEffect(() => {
