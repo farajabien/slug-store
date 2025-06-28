@@ -26,6 +26,9 @@ jobs:
         with:
           version: 10
 
+      - name: Add pnpm to PATH
+        run: echo "$(pnpm bin)" >> $GITHUB_PATH
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
@@ -62,6 +65,9 @@ jobs:
         uses: pnpm/action-setup@v4
         with:
           version: 10
+
+      - name: Add pnpm to PATH
+        run: echo "$(pnpm bin)" >> $GITHUB_PATH
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile

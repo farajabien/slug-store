@@ -15,7 +15,7 @@ We actively support the following versions with security updates:
 
 **Please do not report security vulnerabilities through public GitHub issues.**
 
-Instead, please send an email to: **security@fbien.com**
+Instead, please send an email to: **hello@fbien.com**
 
 Include the following information:
 - Type of issue (buffer overflow, SQL injection, cross-site scripting, etc.)
@@ -136,7 +136,7 @@ Security updates will be:
 
 ## Contact
 
-For security concerns: **security@fbien.com**
+For security concerns: **hello@fbien.com**
 For general questions: **hello@fbien.com**
 
 Thank you for helping keep Slug Store secure! 🔒 
