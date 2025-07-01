@@ -91,26 +91,23 @@ function Dashboard() {
                 <CardHeader>
                   <CardTitle className="text-green-600 flex items-center gap-2">
                     <Sparkles className="h-4 w-4" />
-                    ✅ Slug Store v3.1
+                    ✅ Slug Store v4.0
                   </CardTitle>
                   <CardDescription>Simple, persistent, instantly shareable</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <pre className="bg-muted p-4 rounded-lg text-xs overflow-x-auto">
-{`import { useSlugStore, copySlug } from '@farajabien/slug-store'
+{`import { useSlugStore } from 'slug-store/client'
 
 function Dashboard() {
-  const [state, setState, { isLoading, error }] = useSlugStore('dashboard', {
+  const [state, setState] = useSlugStore('dashboard', {
     filters: { status: 'all', category: 'all' },
     view: 'grid',
     data: []
   }, {
     url: true,        // Automatic URL sync
-    compress: true    // Automatic compression
+    autoConfig: true  // Automatic optimization
   })
-  
-  if (isLoading) return <div>Loading...</div>
-  if (error) return <div>Error: {error.message}</div>
   
   const updateFilters = (newFilters) => {
     setState({
@@ -120,10 +117,18 @@ function Dashboard() {
     // URL automatically updated!
   }
   
-  const shareState = () => {
-    // URL is already shareable!
-    copySlug()
-  }
+  // URL is already shareable!
+  return (
+    <div>
+      <select 
+        value={state.filters.category} 
+        onChange={(e) => updateFilters({ category: e.target.value })}
+      >
+        <option value="all">All Categories</option>
+        <option value="tech">Tech</option>
+      </select>
+    </div>
+  )
 }`}
                   </pre>
                 </CardContent>
@@ -178,20 +183,17 @@ useEffect(() => {
                 </CardHeader>
                 <CardContent>
                   <pre className="bg-muted p-4 rounded-lg text-xs overflow-x-auto">
-{`import { useSlugStore } from '@farajabien/slug-store'
+{`import { useSlugStore } from 'slug-store/client'
 
 function TodoApp() {
-  const [state, setState, { isLoading, error }] = useSlugStore('todos', {
+  const [state, setState] = useSlugStore('todos', {
     todos: [],
     filters: { status: 'all' },
     settings: { theme: 'light' }
   }, {
     offline: true,    // That's it!
-    db: { endpoint: '/api/sync' } // Optional server sync
+    autoConfig: true  // Auto-optimize
   })
-  
-  if (isLoading) return <div>Loading...</div>
-  if (error) return <div>Error: {error.message}</div>
   
   const addTodo = (text) => {
     setState({
@@ -264,28 +266,22 @@ function UserSettings() {
                 </CardHeader>
                 <CardContent>
                   <pre className="bg-muted p-4 rounded-lg text-xs overflow-x-auto">
-{`import { useSlugStore } from '@farajabien/slug-store'
+{`import { useSlugStore } from 'slug-store/client'
 
 function UserSettings() {
-  const [preferences, setPreferences, { isLoading, error }] = useSlugStore('user-preferences', {
+  const [preferences, setPreferences] = useSlugStore('user-preferences', {
     theme: 'light',
     language: 'en',
     notifications: true
   }, {
     url: false,       // Keep preferences private
-    db: {             // Auto-sync to database
-      endpoint: '/api/user/preferences',
-      method: 'PUT',
-      headers: { 'Authorization': 'Bearer ' + userToken }
-    }
+    offline: true,    // Store locally
+    autoConfig: true  // Auto-optimize
   })
-  
-  if (isLoading) return <div>Loading...</div>
-  if (error) return <div>Error: {error.message}</div>
   
   const updateTheme = (theme) => {
     setPreferences({ ...preferences, theme })
-    // Automatically syncs to database!
+    // Automatically optimized!
   }
 }`}
                   </pre>

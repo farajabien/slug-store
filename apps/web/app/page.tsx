@@ -48,7 +48,7 @@ export default function HomePage() {
             <div className="flex items-center justify-center gap-2 mb-4">
               <Badge variant="default" className="px-4 py-2 text-sm">
                 <Sparkles className="h-4 w-4 mr-2" />
-                v4.0.0 - Next.js Native
+                v4.0.2 - Simple & Powerful
               </Badge>
               <Badge variant="outline" className="px-3 py-1 text-xs">
                 <Brain className="h-3 w-3 mr-1" />
@@ -61,8 +61,8 @@ export default function HomePage() {
             </h1>
             
             <p className="text-xl md:text-2xl text-muted-foreground max-w-4xl mx-auto leading-relaxed">
-              The perfect state management solution for AI-built apps. After 3 versions and 500+ downloads, we've finally cracked the code for zero-boilerplate, full-stack state management that works seamlessly with Next.js App Router.
-              <strong className="text-foreground block mt-2">No database configs needed - just pure, intelligent state persistence.</strong>
+              Simple state management that works everywhere. One hook, infinite possibilities with intelligent Auto Config System.
+              <strong className="text-foreground block mt-2">No complex setup - just pure, intelligent state persistence.</strong>
             </p>
             
             <HeroActions />
@@ -79,7 +79,7 @@ export default function HomePage() {
               </div>
               <div className="flex items-center gap-1">
                 <CheckCircle className="h-4 w-4 text-green-500" />
-                <span>Next.js native</span>
+                <span>Works everywhere</span>
               </div>
               <div className="flex items-center gap-1">
                 <CheckCircle className="h-4 w-4 text-green-500" />
@@ -90,13 +90,13 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* What is Slug Store - v4.0.0 API */}
+      {/* What is Slug Store - Simple API */}
       <section className="py-12 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold mb-4">What is Slug Store v4.0.0?</h2>
+            <h2 className="text-3xl font-bold mb-4">What is Slug Store v4.0.2?</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Next.js native state management with intelligent Auto Config System
+              Simple state management with intelligent Auto Config System
             </p>
           </div>
           
@@ -117,9 +117,10 @@ export default function HomePage() {
                   <div>• Zero configuration needed</div>
                 </div>
                 <code className="text-xs bg-blue-100 p-2 rounded block">
-                  {`const UserState = createNextState({
-  loader: (id) => getUser(id),
-  updater: updateUserAction,
+                  {`const [filters, setFilters] = useSlugStore('filters', {
+  category: 'tech',
+  sort: 'newest'
+}, {
   autoConfig: true  // 🎯 Automatic optimization
 })`}
                 </code>
@@ -128,50 +129,49 @@ export default function HomePage() {
 
             <Card className="relative overflow-hidden border-purple-200 bg-purple-50/50">
               <CardHeader>
-                <Server className="h-12 w-12 text-purple-600 mb-4" />
-                <CardTitle className="text-xl text-purple-700">Next.js Native</CardTitle>
+                <Zap className="h-12 w-12 text-purple-600 mb-4" />
+                <CardTitle className="text-xl text-purple-700">Simple API</CardTitle>
                 <CardDescription className="text-base">
-                  Built specifically for App Router with Server Components
+                  One hook that works everywhere - client, server, anywhere
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="text-sm text-purple-600 space-y-2 mb-4">
-                  <div>• Server Component providers</div>
-                  <div>• Client Component hooks</div>
-                  <div>• Server Actions integration</div>
-                  <div>• Full-stack type safety</div>
+                  <div>• Single hook API</div>
+                  <div>• Works in any component</div>
+                  <div>• Type-safe by default</div>
+                  <div>• Zero boilerplate</div>
                 </div>
                 <code className="text-xs bg-purple-100 p-2 rounded block">
-                  {`// Server Component
-<UserState.Provider id="user123">
-  <UserProfile />
-</UserState.Provider>
-
-// Client Component
-const [user, setUser] = UserState.use()`}
+                  {`// Simple state management
+const [state, setState] = useSlugStore('key', initialState, {
+  url: true,        // Share via URL
+  offline: true,    // Store offline
+  autoConfig: true  // Auto-optimize
+})`}
                 </code>
               </CardContent>
             </Card>
 
             <Card className="relative overflow-hidden border-green-200 bg-green-50/50">
               <CardHeader>
-                <Zap className="h-12 w-12 text-green-600 mb-4" />
-                <CardTitle className="text-xl text-green-700">Strategic Obstruction</CardTitle>
+                <Rocket className="h-12 w-12 text-green-600 mb-4" />
+                <CardTitle className="text-xl text-green-700">Perfect for AI Apps</CardTitle>
                 <CardDescription className="text-base">
-                  Reduces complexity by hiding unnecessary configuration
+                  Designed for AI-built applications with intelligent defaults
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="text-sm text-green-600 space-y-2 mb-4">
                   <div>• 72% smaller bundle than v3.x</div>
-                  <div>• Zero boilerplate code</div>
                   <div>• Intelligent defaults</div>
-                  <div>• Perfect for AI-built apps</div>
+                  <div>• Zero configuration</div>
+                  <div>• Works out of the box</div>
                 </div>
                 <code className="text-xs bg-green-100 p-2 rounded block">
-                  {`// Before: Complex configuration
-// After: Just works automatically
-const [state, setState] = UserState.use()`}
+                  {`// AI can focus on business logic
+// Not complex state setup
+const [cart, setCart] = useSlugStore('cart', [])`}
                 </code>
               </CardContent>
             </Card>
@@ -187,13 +187,13 @@ const [state, setState] = UserState.use()`}
         </div>
       </section>
 
-      {/* How It Works - v4.0.0 API */}
+      {/* How It Works - Simple API */}
       <section className="py-12">
         <div className="container mx-auto px-4">
           <div className="text-center mb-10">
             <h2 className="text-3xl font-bold mb-4">How It Works</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              One factory function for full-stack state management with automatic optimization
+              One hook for simple state management with automatic optimization
             </p>
           </div>
           
@@ -201,41 +201,36 @@ const [state, setState] = UserState.use()`}
             <Card className="text-center">
               <CardHeader>
                 <Code className="h-12 w-12 mx-auto text-primary mb-4" />
-                <CardTitle>1. Create State Factory</CardTitle>
+                <CardTitle>1. Import the Hook</CardTitle>
                 <CardDescription>
-                  Define your state behavior once with createNextState
+                  Import useSlugStore from slug-store/client
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <code className="text-xs bg-muted p-2 rounded block">
-                  {`import { createNextState } from 'slug-store/server'
+                  {`import { useSlugStore } from 'slug-store/client'
 
-const UserState = createNextState({
-  loader: (id) => getUser(id),
-  updater: updateUserAction,
-  autoConfig: true
-})`}
+// That's it! Ready to use.`}
                 </code>
               </CardContent>
             </Card>
 
             <Card className="text-center">
               <CardHeader>
-                <Server className="h-12 w-12 mx-auto text-primary mb-4" />
-                <CardTitle>2. Use in Server Component</CardTitle>
+                <Settings className="h-12 w-12 mx-auto text-primary mb-4" />
+                <CardTitle>2. Use the Hook</CardTitle>
                 <CardDescription>
-                  Wrap your app with the generated Provider
+                  Call useSlugStore with your key and initial state
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <code className="text-xs bg-muted p-2 rounded block">
-                  {`// app/users/[id]/page.tsx
-export default function Page({ params }) {
-  return (
-    <UserState.Provider id={params.id}>
-      <UserProfile />
-    </UserState.Provider>
-  )
+                  {`function TodoApp() {
+  const [todos, setTodos] = useSlugStore('todos', [], {
+    url: true,        // Share via URL
+    offline: true,    // Store offline
+    autoConfig: true  // Auto-optimize
+  })
 }`}
                 </code>
               </CardContent>
@@ -244,20 +239,24 @@ export default function Page({ params }) {
             <Card className="text-center">
               <CardHeader>
                 <Smartphone className="h-12 w-12 mx-auto text-primary mb-4" />
-                <CardTitle>3. Use in Client Component</CardTitle>
+                <CardTitle>3. That's It!</CardTitle>
                 <CardDescription>
-                  Access state with the generated hook
+                  Your state is automatically persisted and optimized
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <code className="text-xs bg-muted p-2 rounded block">
-                  {`// components/user-profile.tsx
-'use client'
-export function UserProfile() {
-  const [user, setUser] = UserState.use()
-  
-  return <input value={user?.name} />
-}`}
+                  {`// Use like useState
+return (
+  <div>
+    {todos.map(todo => (
+      <div key={todo.id}>{todo.text}</div>
+    ))}
+    <button onClick={() => setTodos([...todos, newTodo])}>
+      Add Todo
+    </button>
+  </div>
+)`}
                 </code>
               </CardContent>
             </Card>
@@ -271,7 +270,7 @@ export function UserProfile() {
           <div className="text-center mb-10">
             <h2 className="text-3xl font-bold mb-4">Perfect for AI-Built Apps</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              No database configuration needed - just pure state management that always has context
+              Simple API that works everywhere - no complex setup needed
             </p>
           </div>
           
