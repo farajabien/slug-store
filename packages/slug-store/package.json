@@ -1,6 +1,6 @@
 {
   "name": "slug-store",
-  "version": "4.0.1",
+  "version": "4.0.2",
   "description": "The State Management Solution for the Next.js App Router.",
   "keywords": [
     "react",
