@@ -24,20 +24,39 @@ export async function compress(data: string, algorithm: CompressionAlgorithm = '
 }
 
 export async function decompress(data: string, algorithm?: CompressionAlgorithm): Promise<string> {
-  if (!algorithm) {
-    // Try to detect algorithm from data format
-    algorithm = detectAlgorithm(data);
+  if (algorithm && algorithm !== 'auto') {
+    switch (algorithm) {
+      case 'lz-string':
+        return decompressLZString(data);
+      case 'gzip':
+        return decompressGzip(data);
+      case 'brotli':
+        return decompressBrotli(data);
+      default:
+        return data;
+    }
   }
 
-  switch (algorithm) {
-    case 'lz-string':
-      return decompressLZString(data);
-    case 'gzip':
-      return decompressGzip(data);
-    case 'brotli':
-      return decompressBrotli(data);
-    default:
-      return data;
+  // Auto-detection: try all supported algorithms until one succeeds.
+  try {
+    const brotliResult = await decompressBrotli(data);
+    return brotliResult;
+  } catch (brotliError) {
+    // Brotli failed, try Gzip
+    try {
+      const gzipResult = await decompressGzip(data);
+      return gzipResult;
+    } catch (gzipError) {
+      // Gzip failed, try LZ-String
+      try {
+        const lzResult = decompressLZString(data);
+        return lzResult;
+      } catch (lzError) {
+        // All failed, return data as-is
+        console.warn('Decompression failed with all available algorithms.');
+        return data;
+      }
+    }
   }
 }
 
@@ -49,9 +68,13 @@ function compressLZString(data: string): string {
 
 function decompressLZString(data: string): string {
   try {
-    return decodeURIComponent(escape(atob(data)));
-  } catch {
-    return data; // Return original if decompression fails
+    const decoded = decodeURIComponent(escape(atob(data)));
+    // Add a check to see if the decoded data is different from the input.
+    // A successful decode should almost always result in a different string.
+    if (decoded === data) throw new Error('LZ-String input might not be compressed');
+    return decoded;
+  } catch(e) {
+    throw new Error('Failed to decompress with LZ-String');
   }
 }
 
@@ -93,7 +116,7 @@ async function compressGzip(data: string, level: number = 6): Promise<string> {
 
 async function decompressGzip(data: string): Promise<string> {
   if (typeof window === 'undefined' || !window.DecompressionStream) {
-    return decompressLZString(data); // Fallback
+    throw new Error('DecompressionStream API not available');
   }
 
   try {
@@ -120,8 +143,8 @@ async function decompressGzip(data: string): Promise<string> {
     }
     
     return new TextDecoder().decode(decompressed);
-  } catch {
-    return decompressLZString(data); // Fallback
+  } catch(e) {
+    throw new Error('Failed to decompress with Gzip');
   }
 }
 
@@ -132,7 +155,7 @@ async function compressBrotli(data: string, level: number = 11): Promise<string>
   }
 
   try {
-    const stream = new CompressionStream('br');
+    const stream = new CompressionStream('br' as any);
     const writer = stream.writable.getWriter();
     const reader = stream.readable.getReader();
     
@@ -163,11 +186,11 @@ async function compressBrotli(data: string, level: number = 11): Promise<string>
 
 async function decompressBrotli(data: string): Promise<string> {
   if (typeof window === 'undefined' || !window.DecompressionStream) {
-    return decompressLZString(data); // Fallback
+    throw new Error('DecompressionStream API not available');
   }
 
   try {
-    const stream = new DecompressionStream('br');
+    const stream = new DecompressionStream('br' as any);
     const writer = stream.writable.getWriter();
     const reader = stream.readable.getReader();
     
@@ -190,8 +213,8 @@ async function decompressBrotli(data: string): Promise<string> {
     }
     
     return new TextDecoder().decode(decompressed);
-  } catch {
-    return decompressLZString(data); // Fallback
+  } catch(e) {
+    throw new Error('Failed to decompress with Brotli');
   }
 }
 

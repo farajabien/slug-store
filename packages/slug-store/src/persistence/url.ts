@@ -40,13 +40,10 @@ export class URLPersistence {
       
       // Compress if enabled
       let encodedState = jsonState;
-      if (this.options.compress !== false) {
-        // Convert compress option to CompressionAlgorithm
+      if (this.options.compress) {
         let algorithm: CompressionAlgorithm = 'auto';
         if (typeof this.options.compress === 'string') {
-          algorithm = this.options.compress as CompressionAlgorithm;
-        } else if (this.options.compress === true) {
-          algorithm = 'auto';
+          algorithm = this.options.compress;
         }
         encodedState = await compress(jsonState, algorithm);
       }
@@ -99,17 +96,23 @@ export class URLPersistence {
       
       // Decompress if needed
       let jsonState = decodedState;
-      if (this.options.compress !== false) {
-        jsonState = await decompress(decodedState);
+      if (this.options.compress) {
+        // Here we assume 'auto' is handled by the decompress function.
+        const compressionAlgorithm = typeof this.options.compress === 'string' ? this.options.compress : undefined;
+        jsonState = await decompress(decodedState, compressionAlgorithm);
       }
       
       // Parse JSON
-      const state = JSON.parse(jsonState) as T;
+      if (!jsonState) {
+        return { success: false, error: 'Decompressed state is empty' };
+      }
       
-      return {
-        success: true,
-        state
-      };
+      try {
+        const state = JSON.parse(jsonState) as T;
+        return { success: true, state };
+      } catch (e: any) {
+        return { success: false, error: `JSON parse error: ${e.message} for input: "${jsonState}"` };
+      }
     } catch (error) {
       return {
         success: false,

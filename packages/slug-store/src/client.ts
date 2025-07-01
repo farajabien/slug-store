@@ -2,9 +2,9 @@
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 // Import necessary components from other modules
-import { analyzeDataPatterns, explainAutoConfig, AutoConfigAnalysisResult } from './auto-config';
-import { URLPersistence } from './persistence/url';
-import { OfflinePersistence } from './persistence/offline';
+import { analyzeDataPatterns, explainAutoConfig, AutoConfigAnalysisResult } from './auto-config.js';
+import { URLPersistence } from './persistence/url.js';
+import { OfflinePersistence } from './persistence/offline.js';
 
 // --- Constants ---
 // Define a constant for the key used to store the encryption key in localStorage.
@@ -33,7 +33,7 @@ type SetState<T> = (newState: T | ((prevState: T) => T)) => void;
 
 // --- The Hook ---
 // This is the main hook that provides state management with persistence.
-export function useSlugStore<T>(
+ function useSlugStore<T>(
   key: string,
   initialState: T,
   options: SlugStoreOptions = {}
@@ -59,7 +59,7 @@ export function useSlugStore<T>(
     if (storedKey) return storedKey;
     
     // Dynamically import encryption utils only when needed to reduce bundle size.
-    const { generateKey } = await import('./encryption');
+    const { generateKey } = await import('./encryption.js');
     const newKey = await generateKey();
     localStorage.setItem(ENCRYPTION_KEY_STORAGE_KEY, newKey);
     return newKey;
@@ -114,7 +114,7 @@ export function useSlugStore<T>(
       let analysis: AutoConfigAnalysisResult | null = null;
       if (autoConfig) {
         analysis = analyzeDataPatterns(state);
-        if (debug && process.env.NODE_ENV === 'development') {
+        if (debug && typeof process !== 'undefined' && process.env && process.env.NODE_ENV === 'development') {
           explainAutoConfig(state);
         }
       }
@@ -165,4 +165,114 @@ export function useSlugStore<T>(
   }, [state, key, autoConfig, debug, url, offline, getEncryptionKey, customEncryptionKey]);
 
   return [state, setState as SetState<T>];
-} 
+}
+
+// --- Utility Functions ---
+
+/**
+ * Returns the current window's URL.
+ * @returns The current URL string.
+ */
+function getSlug(): string {
+  if (typeof window === 'undefined') {
+    console.warn('getSlug() can only be used in the browser.');
+    return '';
+  }
+  return window.location.href;
+}
+
+/**
+ * Options for the shareSlug function.
+ */
+export interface ShareSlugOptions {
+  /** The title of the content to be shared. */
+  title?: string;
+  /** The text of the content to be shared. */
+  text?: string;
+}
+
+/**
+ * Shares the current URL using the Web Share API.
+ * Falls back to copying the URL to the clipboard if Web Share is not available.
+ * @param options - Options for sharing, such as title and text.
+ */
+async function shareSlug(options: ShareSlugOptions = {}): Promise<void> {
+  const url = getSlug();
+  if (!url) return;
+
+  if (typeof window !== 'undefined' && navigator.share) {
+    const { title = document.title, text = 'Check out this state!' } = options;
+    try {
+      await navigator.share({ title, text, url });
+    } catch (error) {
+      console.error('Error sharing slug:', error);
+      // Don't rethrow, as user cancelling share is not an error.
+    }
+  } else {
+    // Fallback for browsers that don't support Web Share API
+    await copySlug();
+  }
+}
+
+/**
+ * Copies the current URL to the clipboard.
+ */
+async function copySlug(): Promise<void> {
+  const url = getSlug();
+  if (!url) return;
+
+  if (typeof window !== 'undefined' && navigator.clipboard) {
+    try {
+      await navigator.clipboard.writeText(url);
+    } catch (error) {
+      console.error('Error copying slug to clipboard:', error);
+      throw error;
+    }
+  } else {
+    console.warn('Clipboard API is not available in this browser.');
+  }
+}
+
+/**
+ * Retrieves and decodes state data from the URL for a specific key.
+ * @param key The key for the state in the URL.
+ * @param options An optional object to provide an encryption key.
+ * @returns The decoded state object, or undefined if not found or on error.
+ */
+async function getSlugData<T>(
+  key: string,
+  options: { encryptionKey?: string } = {}
+): Promise<T | undefined> {
+  if (typeof window === 'undefined') {
+    return undefined;
+  }
+
+  // Use the existing URLPersistence class to handle decoding
+  const urlPersistence = new URLPersistence({
+    enabled: true,
+    paramName: key,
+    compress: false,
+    encrypt: !!options.encryptionKey,
+    encryptionKey: options.encryptionKey,
+  });
+
+  const result = await urlPersistence.decodeState<T>();
+
+  if (result.success) {
+    return result.state;
+  }
+
+  // Don't log an error if state is just not present
+  if (result.error && result.error.includes('No state in URL')) {
+      return undefined;
+  }
+  
+  if(result.error){
+      console.error(`Failed to get slug data for key "${key}":`, result.error);
+  }
+  
+  return undefined;
+}
+
+export { useSlugStore, shareSlug, copySlug, getSlug, getSlugData, URLPersistence, OfflinePersistence };
+ 
