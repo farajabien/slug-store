@@ -70,7 +70,7 @@ export function analyzeDataPatterns<T>(data: T): AutoConfigAnalysisResult {
 function detectSensitiveFields(obj: any): boolean {
   const sensitiveKeywords = [
     'password', 'token', 'secret', 'key', 'auth', 'credential',
-    'ssn', 'social', 'credit', 'card', 'email', 'phone'
+    'ssn', 'social', 'credit', 'card'
   ];
   
   const jsonString = JSON.stringify(obj).toLowerCase();

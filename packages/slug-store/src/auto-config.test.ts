@@ -48,8 +48,8 @@ describe('Auto Config System', () => {
 
     it('should not recommend URL persistence for sensitive data', () => {
       const sensitiveData = {
-        user: { email: 'user@example.com' },
-        preferences: { theme: 'dark' }
+        session: { token: 'jwt-secret-token-blah-blah' },
+        user: { id: 'user-123' }
       };
       
       const analysis = analyzeDataPatterns(sensitiveData);
