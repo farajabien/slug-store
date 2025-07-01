@@ -1,351 +1,214 @@
-# Slug Store Documentation 📚
+# Slug Store v4.0.0 Documentation
 
-> **⚠️ Upcoming Breaking Changes: Slug Store v3.0 is coming!**
-> 
-> - Major API simplification, smaller bundles, and better DX
-> - See the [v3.0 Breaking Changes & Migration Guide](./V3_BREAKING_CHANGES.md)
-> - Track progress in the [v3.0 Implementation TODO](./V3_IMPLEMENTATION_TODO.md)
+**The State Management Solution for Next.js App Router**
 
----
+> **Core Philosophy**: Easy state persistence across components with zero boilerplate.
 
-Welcome to the comprehensive documentation for **Slug Store** - the revolutionary state persistence library that bridges the gap between ephemeral client state and complex database architectures.
+## 🚀 Quick Start
 
-## 🚦 v3.0 Roadmap & Migration
-
-- [Breaking Changes & Migration Guide](./V3_BREAKING_CHANGES.md)
-- [Implementation TODO & Progress](./V3_IMPLEMENTATION_TODO.md)
-
----
-
-## 🎯 **What is Slug Store?**
-
-Slug Store is **more than state management, not quite a database, but with true persistence and infinite scalability**. It provides multiple layers of intelligent state management that work seamlessly together:
-
-### 🌟 **The Three Pillars**
-
-1. **🌐 URL Persistence** (Client-side)
-   - State encoded directly into URLs
-   - Instantly shareable across devices and users
-   - Zero backend infrastructure required
-   - Perfect for demos, prototypes, and stateless applications
-
-2. **⚡ Server Caching** (Server-side)
-   - Multi-backend persistence (Redis, Memory, File, URL)
-   - Intelligent caching with TTL and stale-while-revalidate
-   - Framework-agnostic server-side integration
-   - Production-ready performance optimization
-
-3. **🔗 Hybrid Architecture** (Full-stack)
-   - Combine URL state + server caching for maximum flexibility
-   - User data in traditional databases, app state in URLs
-   - Server cache for performance, URLs for shareability
-   - Enterprise-ready scalability
-
-## 🚀 **Who Should Use Slug Store?**
-
-### 👨‍💻 **Solo Developers & Startups**
-**Perfect for rapid prototyping and MVP development**
-
-- **AI/LLM Applications**: ChatGPT clones where every conversation is a shareable URL
-- **Creative Tools**: Design apps, configuration builders, code playgrounds
-- **Demo Applications**: Showcase your ideas without backend complexity
-- **Portfolio Projects**: Stand out with instantly shareable state
-
-**Why Slug Store?**
-- ⚡ Zero backend setup required
-- 🚀 Deploy anywhere (Vercel, Netlify, GitHub Pages)
-- 💰 No database costs
-- 🔗 Built-in sharing functionality
-
-### 🏢 **Growing Companies**
-**Scale efficiently with intelligent persistence**
-
-- **SaaS Dashboards**: Shareable filtered views and custom configurations
-- **E-commerce Platforms**: Persistent carts that work across devices
-- **Analytics Tools**: Shareable reports and data visualizations
-- **Collaboration Apps**: URL-based state sharing between team members
-
-**Why Slug Store?**
-- 📈 Scale from prototype to production seamlessly
-- 💡 Reduce infrastructure complexity
-- 🔄 Zero migration needed from simple to complex
-- 🛡️ Built-in error resilience and fallbacks
-
-### 🏗️ **Enterprise Applications**
-**Enterprise-grade persistence with maximum flexibility**
-
-- **Complex Workflows**: Multi-step processes with URL checkpoints
-- **A/B Testing**: Share configurations and experimental states
-- **Customer Support**: Reproducible issue states for debugging
-- **Training Platforms**: Trackable lesson progress and shareable states
-
-**Why Slug Store?**
-- 🔐 Enterprise security with encryption support
-- 📊 Built-in analytics and performance monitoring
-- 🌐 Multi-backend persistence for redundancy
-- 🔧 Custom adapters for existing infrastructure
-
-## 📦 **Package Ecosystem**
-
-> **Note:**
-> Slug Store v3.0 will introduce a new, simplified package structure:
-> - `@farajabien/slug-store` (main React package, simplified)
-> - `@farajabien/slug-store-core` (core with offline support)
-> - `@farajabien/slug-store-offline` (advanced offline, optional)
-> - `@farajabien/slug-store-server` (server utilities, optional)
-> See [v3.0 Breaking Changes](./V3_BREAKING_CHANGES.md) for details.
-
-### 🌐 **Client-Side State Management**
-
-#### `@farajabien/slug-store` ✅ Production Ready
-React hooks with Zustand-like simplicity
-
+### 1. Install
 ```bash
-npm install @farajabien/slug-store
+npm install slug-store
 ```
 
-**Features:**
-- `useSlugStore()` - useState-like hook with URL persistence
-- `create()` - Zustand-like store creator with URL synchronization
-- Automatic compression and optional encryption
-- Debounced URL updates for performance
-- TypeScript support with full type inference
+### 2. Create State
+```typescript
+// lib/state.ts
+import { createNextState } from 'slug-store/server';
+import { updateUserAction } from '@/app/actions';
 
-**Perfect for:**
-- React applications requiring shareable state
-- URL-based application state management
-- Demo applications and prototypes
-
-#### `@farajabien/slug-store-core` ✅ Production Ready
-Framework-agnostic core functionality
-
-```bash
-npm install @farajabien/slug-store-core
+export const UserState = createNextState({
+  loader: (id: string) => db.user.findUnique({ where: { id } }),
+  updater: updateUserAction,
+  autoConfig: true  // 🎯 Automatic optimization
+});
 ```
 
-**Features:**
-- State ⇄ URL slug conversion
-- LZ-String compression (30-70% size reduction)
-- Web Crypto API encryption
-- Schema migration support
-- Error handling and validation
+### 3. Use in Server Component
+```typescript
+// app/users/[id]/page.tsx
+import { UserState } from '@/lib/state';
 
-**Perfect for:**
-- Vue, Angular, Svelte, or vanilla JavaScript apps
-- Custom framework integrations
-- Server-side rendering applications
-
-### ⚡ **Server-Side Persistence** 
-
-#### `@farajabien/slug-store-server` 🆕 Production Ready
-Multi-backend server caching and persistence
-
-```bash
-npm install @farajabien/slug-store-server
+export default async function Page({ params }) {
+  return (
+    <UserState.Provider id={params.id}>
+      <UserProfile />
+    </UserState.Provider>
+  );
+}
 ```
 
-**Features:**
-- Multiple persistence backends (Redis, Memory, File, URL)
-- Stale-while-revalidate caching patterns
-- Automatic fallback chains
-- Framework-agnostic (Next.js, Remix, Astro, Express)
-- Built-in performance monitoring
+### 4. Use in Client Component
+```typescript
+// app/users/[id]/user-profile.tsx
+'use client';
+import { UserState } from '@/lib/state';
 
-**Perfect for:**
-- High-performance server-side applications
-- API caching and optimization
-- Hybrid client-server architectures
-
-### 🔧 **Development Tools**
-
-#### `@workspace/ui` - Shared Component Library
-Production-ready UI components built on Radix UI
-
-#### `@workspace/eslint-config` - Shared Linting Rules
-Consistent code quality across the entire ecosystem
-
-#### `@workspace/typescript-config` - TypeScript Configurations
-Optimized TypeScript settings for different use cases
-
-## 🏗️ **Architecture Patterns**
-
-### 🎯 **Pattern 1: Pure URL State** (Simplest)
-Perfect for demos, prototypes, and simple applications
-
-```tsx
-import { useSlugStore } from '@farajabien/slug-store'
-
-function SimpleApp() {
-  const { state, setState } = useSlugStore({
-    tasks: [],
-    filter: 'all',
-    theme: 'light'
-  })
+export function UserProfile() {
+  const [user, setUser] = UserState.use();
   
-  // All state is in URL - instantly shareable!
-  // No backend required
+  return (
+    <input
+      value={user?.name || ''}
+      onChange={(e) => setUser({ ...user, name: e.target.value })}
+    />
+  );
 }
 ```
 
-**Use Cases:**
-- Todo applications
-- Configuration builders
-- Design tools
-- AI chat interfaces
+**That's it!** Your state is now:
+- ✅ **Persisted** across page refreshes
+- ✅ **Synchronized** between server and client
+- ✅ **Optimized** automatically (compression, encryption, etc.)
+- ✅ **Type-safe** end-to-end
 
-### ⚡ **Pattern 2: Server Caching** (Performance)
-Add server-side caching for expensive operations
+## 🧠 Auto Config System
 
-```tsx
-import { useServerSlugStore } from '@farajabien/slug-store'
+Slug Store automatically detects your data patterns and optimizes accordingly:
 
-// Server component (Next.js App Router)
-export default async function DashboardPage({ params, searchParams }) {
-  const { data, cached, stale } = await useServerSlugStore(
-    async (params, searchParams) => {
-      // Expensive database query
-      return await runAnalyticsQuery(searchParams)
+```typescript
+// Small, shareable data → URL persistence
+const [filters, setFilters] = useSlugStore({ category: 'tech', sort: 'newest' });
+// ✅ Automatically persisted in URL for sharing
+
+// Large data → Offline storage
+const [products, setProducts] = useSlugStore({ items: Array(1000).fill('...') });
+// ✅ Automatically compressed and stored offline
+
+// Sensitive data → Encryption
+const [user, setUser] = useSlugStore({ email: 'user@example.com', password: 'secret' });
+// ✅ Automatically encrypted for security
+```
+
+## 📦 Advanced Features
+
+### Manual Configuration (Optional)
+```typescript
+const ProductState = createNextState({
+  loader: (id) => getProduct(id),
+  updater: updateProductAction,
+  persistence: {
+    url: {
+      enabled: true,
+      compress: 'brotli',  // Manual compression
+      encrypt: false
     },
-    params,
-    searchParams,
-    { persist: 'redis', ttl: 1800 } // 30 min cache
-  )
-
-  return <AnalyticsDashboard data={data} />
-}
+    offline: {
+      enabled: true,
+      storage: 'indexeddb',
+      ttl: 3600  // 1 hour
+    }
+  }
+});
 ```
 
-**Use Cases:**
-- Analytics dashboards
-- E-commerce product listings
-- API responses with heavy computation
-- Database query optimization
+### URL Persistence
+```typescript
+// State automatically appears in URL
+// https://yourapp.com/products?state=eyJmaWx0ZXJzIjp7ImNhdGVnb3J5IjoidGVjaCJ9fQ==
 
-### 🔗 **Pattern 3: Hybrid Architecture** (Enterprise)
-Combine URL state + server caching + traditional database
-
-```tsx
-// Client: UI state in URLs
-const { state: uiState } = useSlugStore({
-  filters: { category: 'electronics', priceRange: [0, 1000] },
-  view: 'grid',
-  sortBy: 'popularity'
-})
-
-// Server: Data caching for performance
-const { data: products } = await useServerSlugStore(
-  async (params, searchParams) => {
-    return await db.products.findMany({
-      where: buildWhereClause(searchParams),
-      orderBy: buildOrderBy(searchParams)
-    })
-  },
-  params,
-  searchParams,
-  { persist: 'redis', ttl: 300 }
-)
-
-// Database: User data and relationships
-const user = await db.users.findUnique({ where: { id: userId }})
+// Share the URL and state is restored
 ```
 
-**Use Cases:**
-- Large-scale SaaS applications
-- E-commerce platforms
-- Content management systems
-- Enterprise workflow applications
-
-## 🛠️ **Server Persistence Backends**
-
-### 🧠 **Memory Adapter** (Development)
-In-memory caching for development and testing
-
-```tsx
-{
-  persist: 'memory',
-  maxSize: 1000,
-  cleanupInterval: 60000
-}
+### Offline Storage
+```typescript
+// State persists even when offline
+// Automatically syncs when connection returns
 ```
 
-**Characteristics:**
-- ⚡ Sub-millisecond access time
-- 💾 Lost on process restart
-- 🔄 Automatic cleanup of expired entries
-- 🧪 Perfect for development and testing
+## 🔧 TypeScript Plugin
 
-### 🔴 **Redis Adapter** (Production)
-High-performance distributed caching
+Get real-time optimization suggestions in your IDE:
 
-```tsx
-{
-  persist: 'redis',
-  host: 'localhost',
-  port: 6379,
-  password: 'your-password',
-  ttl: 3600
-}
+```typescript
+import { useSlugStore } from 'slug-store'; // ⚠️ Plugin detects this
+
+// Plugin suggests:
+// 💡 Import from 'slug-store/client' for 2KB smaller bundle
+// 📊 Current bundle impact: +6KB
+// 🔧 Auto-fix available: Click to optimize imports
 ```
 
-**Characteristics:**
-- ⚡ 1-5ms access time (network dependent)
-- 🌐 Distributed caching across multiple servers
-- 📈 Production-ready with clustering support
-- 🔄 Automatic expiration and eviction
+## 📚 API Reference
 
-### 📁 **File System Adapter** (Persistent)
-Disk-based persistence for single-server deployments
+### `createNextState(options)`
 
-```tsx
-{
-  persist: 'file',
-  baseDir: './cache',
-  maxFiles: 10000,
-  compression: true
-}
+Creates a state factory with automatic optimization.
+
+**Options:**
+- `loader: (id) => Promise<T>` - Server-side data loading
+- `updater: (id, data) => Promise<any>` - Server Action for updates
+- `autoConfig?: boolean` - Enable automatic optimization (default: true)
+- `persistence?: PersistenceOptions` - Manual configuration (optional)
+
+### `State.Provider`
+
+Server Component that loads initial data.
+
+**Props:**
+- `id: string` - Unique identifier for the state
+
+### `State.use()`
+
+Client hook that returns `[state, setState, { isLoading, error }]`.
+
+## 🎯 Use Cases
+
+### E-commerce Product State
+```typescript
+const ProductState = createNextState({
+  loader: (id) => getProduct(id),
+  updater: updateProductAction,
+  autoConfig: true // Detects image data, enables compression
+});
 ```
 
-**Characteristics:**
-- 💾 Survives process restarts
-- 📊 Good for analytics and historical data
-- 🔧 Simple setup with no external dependencies
-- 🗜️ Optional compression for storage efficiency
-
-### 🔗 **URL Adapter** (Shareable)
-Leverage core URL encoding for server-side caching
-
-```tsx
-{
-  persist: 'url',
-  compress: true,
-  encrypt: true,
-  password: 'encryption-key'
-}
+### User Authentication
+```typescript
+const AuthState = createNextState({
+  loader: (userId) => getUserProfile(userId),
+  updater: updateProfileAction,
+  autoConfig: true // Detects email/password, enables encryption
+});
 ```
 
-**Characteristics:**
-- 📤 Instantly shareable cache entries
-- 🗜️ Automatic compression via LZ-String
-- 🔐 Optional encryption for sensitive data
-- 🔗 Perfect for shareable configurations
-
-### ⛓️ **Fallback Chain** (Reliability)
-Multiple backends with automatic failover
-
-```tsx
-{
-  persist: ['memory', 'redis', 'file'],
-  fallbackStrategy: 'write-all-read-first'
-}
+### Shopping Cart
+```typescript
+const CartState = createNextState({
+  loader: (sessionId) => getCart(sessionId),
+  updater: updateCartAction,
+  autoConfig: true // Small cart = URL, large cart = offline
+});
 ```
 
-**Characteristics:**
-- 🛡️ Automatic failover on backend failures
-- ⚡ Read from fastest available backend
-- 💾 Write to all backends for redundancy
-- 🔄 Self-healing when backends recover
+## 🚀 Migration from v3.x
 
-## 💡 **Real-World Examples**
-
-### 🤖 **AI Chat Application**
+### Before (v3.x)
+```typescript
+const [state, setState] = useSlugStore('key', initialState, options);
 ```
+
+### After (v4.0)
+```typescript
+// 1. Create state factory
+const MyState = createNextState({
+  loader: (id) => loadData(id),
+  updater: updateAction,
+  autoConfig: true
+});
+
+// 2. Use in components
+const [state, setState] = MyState.use();
+```
+
+## 🤝 Contributing
+
+See [CONTRIBUTING.md](../CONTRIBUTING.md) for development guidelines.
+
+## 📄 License
+
+MIT License - see [LICENSE](../LICENSE) for details.
+
+---
+
+**Slug Store v4.0.0**: Easy state persistence across components with strategic obstruction of complexity. 

@@ -1,0 +1,50 @@
+{
+  "name": "@workspace/typescript-plugin",
+  "version": "0.0.1",
+  "type": "module",
+  "private": true,
+  "description": "TypeScript Language Service Plugin for slug-store",
+  "keywords": [
+    "typescript",
+    "plugin",
+    "slug-store",
+    "language-service",
+    "ast",
+    "optimization"
+  ],
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./transformer": {
+      "types": "./dist/transformer.d.ts", 
+      "import": "./dist/transformer.js"
+    }
+  },
+  "files": [
+    "dist/**"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "lint": "eslint . --max-warnings 0",
+    "test": "vitest",
+    "clean": "rm -rf .turbo && rm -rf dist"
+  },
+  "dependencies": {
+    "typescript": "^5.7.3"
+  },
+  "devDependencies": {
+    "@workspace/eslint-config": "workspace:*",
+    "@workspace/typescript-config": "workspace:*",
+    "eslint": "^9.20.1",
+    "tsup": "^8.0.1",
+    "vitest": "^1.2.0"
+  },
+  "peerDependencies": {
+    "typescript": ">=4.0.0"
+  }
+} 

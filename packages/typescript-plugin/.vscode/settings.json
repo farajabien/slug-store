@@ -1,0 +1,44 @@
+{
+  "typescript.suggest.includeCompletionsForModuleExports": true,
+  "typescript.suggest.includeAutomaticOptionalChainCompletions": true,
+  "typescript.preferences.includeComplexCallSignatures": false,
+  "typescript.inlayHints.parameterNames.enabled": "all",
+  "typescript.inlayHints.variableTypes.enabled": true,
+  "typescript.inlayHints.functionLikeReturnTypes.enabled": true,
+  
+  // Slug Store TypeScript Plugin Configuration
+  "typescript.preferences.quoteStyle": "single",
+  "typescript.format.insertSpaceAfterFunctionKeywordForAnonymousFunctions": false,
+  
+  // Enable enhanced IntelliSense for slug-store
+  "typescript.suggest.autoImports": true,
+  "typescript.suggest.completeFunctionCalls": true,
+  
+  // Show diagnostics from slug-store plugin
+  "typescript.validate.enable": true,
+  "typescript.format.enable": true,
+  
+  // Plugin-specific settings (would be read by the plugin)
+  "slugStore.plugin.analyze": true,
+  "slugStore.plugin.autoConfig": true,
+  "slugStore.plugin.bundleOptimization": true,
+  "slugStore.plugin.debug": false,
+  
+  // File associations for better TypeScript experience
+  "files.associations": {
+    "*.tsx": "typescriptreact",
+    "*.ts": "typescript"
+  },
+  
+  // Auto-save to trigger real-time analysis
+  "files.autoSave": "onFocusChange",
+  
+  // Show whitespace for better code formatting
+  "editor.renderWhitespace": "boundary",
+  
+  // Enable semantic highlighting
+  "editor.semanticHighlighting.enabled": true,
+  
+  // Show inline parameter hints
+  "typescript.inlayHints.parameterNames.suppressWhenArgumentMatchesName": false
+} 

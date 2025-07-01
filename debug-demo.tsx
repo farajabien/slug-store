@@ -10,8 +10,8 @@ export function DebugDemo() {
     count: 0,
     message: 'Hello World'
   }, {
-    url: true,
-    compress: true
+    url: true
+    // Encryption and compression are enabled by default!
   })
 
   useEffect(() => {

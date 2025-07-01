@@ -1,0 +1,340 @@
+import * as ts from 'typescript';
+import { SlugStoreASTAnalyzer } from './ast-analyzer.js';
+import { SlugStoreBundleAnalyzer } from './bundle-analyzer.js';
+import type { 
+  SlugStorePluginConfig, 
+  SlugStoreLanguageServicePlugin,
+  UsageAnalysis,
+  BundleAnalysis,
+  Recommendation
+} from './types.js';
+
+/**
+ * TypeScript Language Service Plugin for slug-store
+ * Provides IDE integration with real-time analysis and suggestions
+ */
+export class LanguageServicePlugin implements SlugStoreLanguageServicePlugin {
+  public readonly pluginInfo = {
+    name: 'slug-store-typescript-plugin',
+    version: '1.0.0',
+  };
+
+  private astAnalyzer: SlugStoreASTAnalyzer;
+  private bundleAnalyzer: SlugStoreBundleAnalyzer;
+  private config: SlugStorePluginConfig;
+
+  constructor(config: SlugStorePluginConfig = {}) {
+    this.config = {
+      analyze: true,
+      autoConfig: true,
+      bundleOptimization: true,
+      debug: false,
+      ...config,
+    };
+
+    this.astAnalyzer = new SlugStoreASTAnalyzer(this.config);
+    this.bundleAnalyzer = new SlugStoreBundleAnalyzer(this.config);
+  }
+
+  /**
+   * Analyze slug-store usage in a TypeScript file
+   */
+  analyzeFile(fileName: string, source: string): UsageAnalysis[] {
+    try {
+      const sourceFile = ts.createSourceFile(
+        fileName,
+        source,
+        ts.ScriptTarget.Latest,
+        true
+      );
+
+      return this.astAnalyzer.analyzeSourceFile(sourceFile);
+    } catch (error) {
+      if (this.config.debug) {
+        console.error(`Error analyzing file ${fileName}:`, error);
+      }
+      return [];
+    }
+  }
+
+  /**
+   * Get bundle analysis for the entire project
+   */
+  getBundleAnalysis(program: ts.Program): BundleAnalysis {
+    try {
+      return this.bundleAnalyzer.analyzeBundleOptimization(program);
+    } catch (error) {
+      if (this.config.debug) {
+        console.error('Error analyzing bundle:', error);
+      }
+      return {
+        estimatedBundleSize: 0,
+        featuresUsed: [],
+        unusedFeatures: [],
+        optimizations: [],
+      };
+    }
+  }
+
+  /**
+   * Get TypeScript diagnostics for slug-store usage
+   */
+  getDiagnostics(fileName: string, source: string): ts.Diagnostic[] {
+    const usages = this.analyzeFile(fileName, source);
+    const diagnostics: ts.Diagnostic[] = [];
+
+    for (const usage of usages) {
+      for (const recommendation of usage.recommendations) {
+        const diagnostic = this.createDiagnosticFromRecommendation(
+          recommendation,
+          usage.node,
+          fileName
+        );
+        
+        if (diagnostic) {
+          diagnostics.push(diagnostic);
+        }
+      }
+    }
+
+    return diagnostics;
+  }
+
+  /**
+   * Create a TypeScript diagnostic from a recommendation
+   */
+  private createDiagnosticFromRecommendation(
+    recommendation: Recommendation,
+    node: ts.Node,
+    fileName: string
+  ): ts.Diagnostic | null {
+    const category = this.getCategoryFromSeverity(recommendation.severity);
+    
+    const diagnostic: ts.Diagnostic = {
+      file: undefined, // Will be set by TypeScript
+      start: node.getStart(),
+      length: node.getWidth(),
+      messageText: `[slug-store] ${recommendation.message}`,
+      category,
+      code: this.getCodeFromRecommendationType(recommendation.type),
+      source: 'slug-store-plugin',
+    };
+
+    return diagnostic;
+  }
+
+  /**
+   * Convert recommendation severity to TypeScript diagnostic category
+   */
+  private getCategoryFromSeverity(severity: 'info' | 'warning' | 'error'): ts.DiagnosticCategory {
+    switch (severity) {
+      case 'error':
+        return ts.DiagnosticCategory.Error;
+      case 'warning':
+        return ts.DiagnosticCategory.Warning;
+      case 'info':
+      default:
+        return ts.DiagnosticCategory.Suggestion;
+    }
+  }
+
+  /**
+   * Get diagnostic code from recommendation type
+   */
+  private getCodeFromRecommendationType(type: string): number {
+    const codes: Record<string, number> = {
+      'compression': 5001,
+      'encryption': 5002,
+      'bundle-split': 5003,
+      'persistence': 5004,
+      'performance': 5005,
+    };
+
+    return codes[type] || 5000;
+  }
+}
+
+/**
+ * TypeScript Language Service Plugin factory function
+ * This is the entry point that TypeScript calls to create the plugin
+ */
+export function init(modules: { typescript: typeof import('typescript') }): import('typescript').server.PluginModule {
+  const ts = modules.typescript;
+
+  function create(info: ts.server.PluginCreateInfo): ts.LanguageService {
+    const config: SlugStorePluginConfig = info.config || {};
+    const plugin = new LanguageServicePlugin(config);
+    
+    // Get the original language service
+    const originalLS = info.languageService;
+
+    // Create a proxy that adds our functionality
+    const proxy: ts.LanguageService = Object.create(null);
+    
+    // Copy all original methods
+    for (const k of Object.keys(originalLS) as Array<keyof ts.LanguageService>) {
+      const originalMethod = originalLS[k];
+      if (typeof originalMethod === 'function') {
+        (proxy as any)[k] = originalMethod.bind(originalLS);
+      }
+    }
+
+    // Override getSemanticDiagnostics to add our diagnostics
+    proxy.getSemanticDiagnostics = (fileName: string): ts.Diagnostic[] => {
+      const originalDiagnostics = originalLS.getSemanticDiagnostics(fileName);
+      
+      if (!config.analyze) {
+        return originalDiagnostics;
+      }
+
+      try {
+        const sourceFile = info.project.getSourceFile(fileName);
+        if (!sourceFile) {
+          return originalDiagnostics;
+        }
+
+        const source = sourceFile.getFullText();
+        const pluginDiagnostics = plugin.getDiagnostics(fileName, source);
+        
+        return [...originalDiagnostics, ...pluginDiagnostics];
+      } catch (error) {
+        if (config.debug) {
+          console.error('Error getting slug-store diagnostics:', error);
+        }
+        return originalDiagnostics;
+      }
+    };
+
+    // Override getCompletionsAtPosition to add our suggestions
+    proxy.getCompletionsAtPosition = (
+      fileName: string, 
+      position: number, 
+      options?: ts.GetCompletionsAtPositionOptions
+    ): ts.CompletionInfo | undefined => {
+      const originalCompletions = originalLS.getCompletionsAtPosition(fileName, position, options);
+      
+      if (!config.autoConfig) {
+        return originalCompletions;
+      }
+
+      try {
+        const sourceFile = info.project.getSourceFile(fileName);
+        if (!sourceFile) {
+          return originalCompletions;
+        }
+
+        // Add slug-store specific completions
+        const additionalCompletions = getSlugStoreCompletions(sourceFile, position);
+        
+        if (originalCompletions && additionalCompletions.length > 0) {
+          return {
+            ...originalCompletions,
+            entries: [...originalCompletions.entries, ...additionalCompletions],
+          };
+        }
+
+        return originalCompletions;
+      } catch (error) {
+        if (config.debug) {
+          console.error('Error getting slug-store completions:', error);
+        }
+        return originalCompletions;
+      }
+    };
+
+    // Override getQuickInfoAtPosition to add our hover information
+    proxy.getQuickInfoAtPosition = (fileName: string, position: number): ts.QuickInfo | undefined => {
+      const originalQuickInfo = originalLS.getQuickInfoAtPosition(fileName, position);
+      
+      try {
+        const sourceFile = info.project.getSourceFile(fileName);
+        if (!sourceFile) {
+          return originalQuickInfo;
+        }
+
+        const source = sourceFile.getFullText();
+        const usages = plugin.analyzeFile(fileName, source);
+        
+        // Find if the position is within a slug-store usage
+        const relevantUsage = usages.find(usage => 
+          position >= usage.node.getStart() && 
+          position <= usage.node.getEnd()
+        );
+
+        if (relevantUsage && relevantUsage.recommendations.length > 0) {
+          const recommendations = relevantUsage.recommendations
+            .map(rec => `• ${rec.message}`)
+            .join('\n');
+
+          const additionalInfo = `\n\n🚀 Slug Store Recommendations:\n${recommendations}`;
+          
+          if (originalQuickInfo) {
+            return {
+              ...originalQuickInfo,
+              displayParts: [
+                ...originalQuickInfo.displayParts,
+                { text: additionalInfo, kind: 'text' }
+              ],
+            };
+          }
+        }
+
+        return originalQuickInfo;
+      } catch (error) {
+        if (config.debug) {
+          console.error('Error getting slug-store quick info:', error);
+        }
+        return originalQuickInfo;
+      }
+    };
+
+    return proxy;
+  }
+
+  return { create };
+}
+
+/**
+ * Get slug-store specific completions
+ */
+function getSlugStoreCompletions(sourceFile: ts.SourceFile, position: number): ts.CompletionEntry[] {
+  const completions: ts.CompletionEntry[] = [];
+
+  // Add common slug-store options
+  const commonOptions = [
+    {
+      name: 'autoConfig: true',
+      kind: ts.ScriptElementKind.propertyElement,
+      kindModifiers: '',
+      sortText: '0',
+      displayParts: [{ text: 'autoConfig: true', kind: 'text' }],
+      documentation: [{ text: 'Enable automatic configuration based on data patterns', kind: 'text' }],
+    },
+    {
+      name: 'compress: true',
+      kind: ts.ScriptElementKind.propertyElement,
+      kindModifiers: '',
+      sortText: '1',
+      displayParts: [{ text: 'compress: true', kind: 'text' }],
+      documentation: [{ text: 'Enable compression for large state objects', kind: 'text' }],
+    },
+    {
+      name: 'encrypt: true',
+      kind: ts.ScriptElementKind.propertyElement,
+      kindModifiers: '',
+      sortText: '2',
+      displayParts: [{ text: 'encrypt: true', kind: 'text' }],
+      documentation: [{ text: 'Enable encryption for sensitive data', kind: 'text' }],
+    },
+  ];
+
+  // Check if we're in a slug-store context
+  const text = sourceFile.getFullText();
+  const beforePosition = text.substring(0, position);
+  
+  if (beforePosition.includes('useSlugStore') || beforePosition.includes('createNextState')) {
+    completions.push(...commonOptions);
+  }
+
+  return completions;
+} 
