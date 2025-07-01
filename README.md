@@ -1,4 +1,4 @@
-# Slug Store v4.0.0: The Perfect State Management Solution for AI-Built Apps
+# Slug Store v4.0.8: The Perfect State Management Solution for AI-Built Apps
 
 **After 3 versions and 500+ downloads, we've finally cracked the code for zero-boilerplate, full-stack state management that works seamlessly with Next.js App Router. No database configs needed - just pure, intelligent state persistence.**
 
@@ -8,7 +8,7 @@
 
 ---
 
-`slug-store` v4.0.0 embraces Server Actions and modern Next.js patterns to create a seamless developer experience. Define your data logic once, and get a typesafe, full-stack state management solution that "just works" with intelligent Auto Config System.
+`slug-store` v4.0.8 embraces Server Actions and modern Next.js patterns to create a seamless developer experience. Define your data logic once, and get a typesafe, full-stack state management solution that "just works" with intelligent Auto Config System.
 
 ## 🧠 Auto Config System
 
@@ -163,7 +163,7 @@ Instead of infinite configuration options, we strategically obstruct complexity 
 ## 📦 Package Details
 
 ### Core Package: `slug-store`
-- **Version**: `4.0.0`
+- **Version**: `4.0.8`
 - **Bundle Size**: ~6KB gzipped (72% smaller than v3.x)
 - **Entry Points**: `slug-store/server` and `slug-store/client`
 
@@ -215,7 +215,7 @@ Slug Store is the perfect state management solution for AI-built applications be
 
 ## Contribution
 
-This project is in active development for v4.0.0. Contributions are welcome! Please see the [Contributing Guide](CONTRIBUTING.md) for more details.
+This project is in active development for v4.1.0. Contributions are welcome! Please see the [Contributing Guide](CONTRIBUTING.md) for more details.
 
 **Priority Contributions Needed:**
 - ✅ Auto Config System implementation (COMPLETED)
@@ -231,4 +231,4 @@ This project is in active development for v4.0.0. Contributions are welcome! Ple
 
 ---
 
-**Slug Store v4.0.0**: Easy state persistence across components with strategic obstruction of complexity.
+**Slug Store v4.0.8**: Easy state persistence across components with strategic obstruction of complexity.

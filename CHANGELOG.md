@@ -2,6 +2,42 @@
 
 All notable changes to this project will be documented in this file.
 
+## [4.0.8] - 2025-07-01
+
+### 🔧 Bug Fixes
+
+**Export Issues Fixed:**
+- Fixed missing exports for utility functions (`getSlug`, `shareSlug`, `copySlug`, `getSlugData`) in client module
+- Resolved duplicate export declarations causing build errors
+
+**Import Path Updates:**
+- Updated all import references from `@farajabien/slug-store` to `slug-store/client`
+- Fixed demo app and component imports to use correct package paths
+- Updated documentation and examples with new import syntax
+
+**Documentation Consistency:**
+- Corrected package references across all markdown files
+- Updated README files in workspace packages to reflect new package structure
+- Fixed GitHub issue templates and contributing guidelines
+
+### ✨ Improvements
+
+- **Package Structure**: Cleaner exports configuration with proper TypeScript declarations
+- **Developer Experience**: All utility functions now properly exported and accessible
+- **Build Process**: Resolved all duplicate export warnings during compilation
+- **Demo App**: Updated to use published package instead of workspace reference
+
+### 📦 Package Details
+
+- **npm Registry**: Successfully published as `slug-store@4.0.8`
+- **Bundle Size**: 31.5KB (tarball), 157.1KB (unpacked)
+- **Exports**: 7 client functions/classes + 1 server function
+- **TypeScript**: Full declaration files included
+
+**Migration**: No breaking changes - this is a patch release fixing export issues in v4.0.7.
+
+---
+
 ## [4.0.0] - 2025-07-01
 
 ### 🚀 Major Features

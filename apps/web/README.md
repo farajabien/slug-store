@@ -1,6 +1,6 @@
 # Slug Store Demo Website
 
-Interactive demonstration and documentation website for **slug-store** v4.0.
+Interactive demonstration and documentation website for **slug-store** v4.0.8.
 
 ## 🌟 Features
 

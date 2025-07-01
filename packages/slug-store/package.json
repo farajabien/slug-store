@@ -13,7 +13,7 @@
   "homepage": "https://github.com/farajabien/slug-store",
   "repository": {
     "type": "git",
-    "url": "https://github.com/farajabien/slug-store.git",
+    "url": "git+https://github.com/farajabien/slug-store.git",
     "directory": "packages/slug-store"
   },
   "license": "MIT",
