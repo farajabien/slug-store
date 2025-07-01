@@ -33,7 +33,7 @@ type SetState<T> = (newState: T | ((prevState: T) => T)) => void;
 
 // --- The Hook ---
 // This is the main hook that provides state management with persistence.
- function useSlugStore<T>(
+export function useSlugStore<T>(
   key: string,
   initialState: T,
   options: SlugStoreOptions = {}
@@ -169,11 +169,7 @@ type SetState<T> = (newState: T | ((prevState: T) => T)) => void;
 
 // --- Utility Functions ---
 
-/**
- * Returns the current window's URL.
- * @returns The current URL string.
- */
-function getSlug(): string {
+export function getSlug(): string {
   if (typeof window === 'undefined') {
     console.warn('getSlug() can only be used in the browser.');
     return '';
@@ -191,12 +187,7 @@ export interface ShareSlugOptions {
   text?: string;
 }
 
-/**
- * Shares the current URL using the Web Share API.
- * Falls back to copying the URL to the clipboard if Web Share is not available.
- * @param options - Options for sharing, such as title and text.
- */
-async function shareSlug(options: ShareSlugOptions = {}): Promise<void> {
+export async function shareSlug(options: ShareSlugOptions = {}): Promise<void> {
   const url = getSlug();
   if (!url) return;
 
@@ -209,37 +200,33 @@ async function shareSlug(options: ShareSlugOptions = {}): Promise<void> {
       // Don't rethrow, as user cancelling share is not an error.
     }
   } else {
-    // Fallback for browsers that don't support Web Share API
+    // Fallback: copy to clipboard
     await copySlug();
   }
 }
 
-/**
- * Copies the current URL to the clipboard.
- */
-async function copySlug(): Promise<void> {
+export async function copySlug(): Promise<void> {
   const url = getSlug();
   if (!url) return;
 
-  if (typeof window !== 'undefined' && navigator.clipboard) {
-    try {
+  try {
+    if (typeof window !== 'undefined' && navigator.clipboard) {
       await navigator.clipboard.writeText(url);
-    } catch (error) {
-      console.error('Error copying slug to clipboard:', error);
-      throw error;
+    } else {
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = url;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
     }
-  } else {
-    console.warn('Clipboard API is not available in this browser.');
+  } catch (error) {
+    console.error('Error copying slug to clipboard:', error);
   }
 }
 
-/**
- * Retrieves and decodes state data from the URL for a specific key.
- * @param key The key for the state in the URL.
- * @param options An optional object to provide an encryption key.
- * @returns The decoded state object, or undefined if not found or on error.
- */
-async function getSlugData<T>(
+export async function getSlugData<T>(
   key: string,
   options: { encryptionKey?: string } = {}
 ): Promise<T | undefined> {
@@ -274,5 +261,6 @@ async function getSlugData<T>(
   return undefined;
 }
 
-export { useSlugStore, shareSlug, copySlug, getSlug, getSlugData, URLPersistence, OfflinePersistence };
+// Export persistence classes for advanced use cases
+export { URLPersistence, OfflinePersistence };
  

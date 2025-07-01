@@ -8,9 +8,13 @@ import { ArrowLeft, Code2, Share2, Zap, Globe, Sparkles, Brain } from 'lucide-re
 import Link from 'next/link'
 import { DemoActions } from '@/components/demo-actions'
 import { WishlistDemo } from '@/components/wishlist-demo'
+import { shareSlug, copySlug, getSlug, getSlugData, useSlugStore } from 'slug-store/client'
 
 // --- The Page ---
 export default async function DemoPage() {
+  // Test: Log imported functions to verify import works
+  console.log({ shareSlug, copySlug, getSlug, getSlugData })
+
   return (
     <div className="min-h-screen bg-background">
       <Header />

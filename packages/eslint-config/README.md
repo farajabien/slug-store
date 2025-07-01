@@ -1,15 +1,15 @@
-# @farajabien/slug-store-eslint-config
+# @workspace/eslint-config
 
-[![npm version](https://badge.fury.io/js/%40farajabien%2Fslug-store-eslint-config.svg)](https://badge.fury.io/js/%40farajabien%2Fslug-store-eslint-config)
+[![npm version](https://badge.fury.io/js/%40workspace%2Feslint-config.svg)](https://badge.fury.io/js/%40workspace%2Feslint-config)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-> **Shared ESLint configuration for Slug Store ecosystem**  
+> **Shared ESLint configuration for the Slug Store monorepo**  
 > Consistent code quality across all packages in the monorepo.
 
 ## 🚀 Installation
 
 ```bash
-pnpm add -D @farajabien/slug-store-eslint-config
+pnpm add -D @workspace/eslint-config
 ```
 
 ## 💡 Usage
@@ -17,7 +17,7 @@ pnpm add -D @farajabien/slug-store-eslint-config
 ### Base Configuration
 ```javascript
 // eslint.config.js
-import baseConfig from '@farajabien/slug-store-eslint-config/base.js'
+import baseConfig from '@workspace/eslint-config/base.js'
 
 export default baseConfig
 ```
@@ -25,26 +25,26 @@ export default baseConfig
 ### Next.js Configuration
 ```javascript
 // eslint.config.js
-import nextConfig from '@farajabien/slug-store-eslint-config/next.js'
+import nextConfig from '@workspace/eslint-config/next.js'
 
 export default nextConfig
 ```
 
-### React Library Configuration
+### React Internal Configuration
 ```javascript
 // eslint.config.js
-import reactConfig from '@farajabien/slug-store-eslint-config/react-internal.js'
+import reactConfig from '@workspace/eslint-config/react-internal.js'
 
 export default reactConfig
 ```
 
 ## 📦 Related Packages
 
-| Package | Description | NPM |
-|---------|-------------|-----|
-| [@farajabien/slug-store-core](https://www.npmjs.com/package/@farajabien/slug-store-core) | Framework-agnostic core library | [![npm](https://img.shields.io/npm/v/@farajabien/slug-store-core.svg)](https://www.npmjs.com/package/@farajabien/slug-store-core) |
-| [@farajabien/slug-store](https://www.npmjs.com/package/@farajabien/slug-store) | React hooks with Zustand-like API | [![npm](https://img.shields.io/npm/v/@farajabien/slug-store.svg)](https://www.npmjs.com/package/@farajabien/slug-store) |
-| [@farajabien/slug-store-ui](https://www.npmjs.com/package/@farajabien/slug-store-ui) | UI components and themes | [![npm](https://img.shields.io/npm/v/@farajabien/slug-store-ui.svg)](https://www.npmjs.com/package/@farajabien/slug-store-ui) |
+| Package | Description | Version |
+|---------|-------------|---------|
+| [slug-store](https://www.npmjs.com/package/slug-store) | Next.js state management with Auto Config System | [![npm](https://img.shields.io/npm/v/slug-store.svg)](https://www.npmjs.com/package/slug-store) |
+| [@workspace/typescript-plugin](../typescript-plugin) | TypeScript plugin for compile-time optimization | Development |
+| [@workspace/ui](../ui) | Shared UI components | Development |
 
 ## 🤝 Contributing
 

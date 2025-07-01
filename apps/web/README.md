@@ -1,152 +1,125 @@
-# Slug Store Demo & Documentation Site
+# Slug Store Demo Website
 
-> **Live demonstration and comprehensive documentation for Slug Store**  
-> See URL state persistence in action with real examples.
+Interactive demonstration and documentation website for **slug-store** v4.0.
 
-## 🌐 Live Demo
+## 🌟 Features
 
-**URL**: [https://slugstore.fbien.com](https://slugstore.fbien.com)  
-**Local**: `pnpm dev:web` → [http://localhost:3000](http://localhost:3000)
+- **Interactive Demo**: Real-time state management examples
+- **Live Code Examples**: Copy-paste ready code snippets
+- **Auto Config Showcase**: Demonstration of intelligent persistence
+- **Documentation**: Comprehensive API reference and guides
+- **Responsive Design**: Works on all devices
+- **Dark Mode**: Beautiful dark/light theme support
 
-## 🎯 What's Included
+## 🚀 Live Demo
 
-### 1. Interactive Wishlist Demo
-- **Real-time URL state sync** - Watch the URL update as you interact
-- **Compression demonstration** - See 30-70% size reduction
-- **Email sharing** - Share your wishlist via email (Resend integration)
-- **State metadata** - Live display of encoding info
-
-### 2. Comprehensive Documentation
-- **Getting Started** - Installation and basic usage
-- **Examples** - Compression, encryption, React hooks
-- **Use Cases** - Real-world scenarios and implementations
-- **Performance** - Bundle size, speed metrics
-
-### 3. Complete API Reference
-- **Core Functions** - `encodeState`, `decodeState`, utilities
-- **React Hooks** - `useSlugStore`, `create` store
-- **Error Handling** - Graceful fallbacks and error codes
-- **TypeScript** - Full type definitions and examples
+Visit the live demo at [slug-store.dev](https://slug-store.dev) to see slug-store in action.
 
 ## 🛠️ Tech Stack
 
-- **Framework**: Next.js 15 with App Router
-- **Styling**: Tailwind CSS + Radix UI components
-- **State**: Live demonstration of `@farajabien/slug-store-core`
-- **Email**: Resend for sharing functionality
-- **Deployment**: Vercel (production)
+- **Next.js 14**: App Router with Server Components
+- **TypeScript**: Full type safety
+- **Tailwind CSS**: Utility-first styling
+- **Radix UI**: Accessible component primitives
+- **Lucide Icons**: Beautiful icons
+- **MDX**: Documentation with interactive code
+- **Vercel**: Deployment and hosting
 
-## 🚀 Development
+## 📱 Demo Features
+
+### Wishlist Management
+- **Add/Remove Items**: Interactive item management
+- **Filters**: Category and price filtering
+- **View Modes**: Grid and list view options
+- **URL Sharing**: Share complete state via URL
+- **Offline Support**: Works without internet connection
+- **State**: Live demonstration of `slug-store`
+
+### Auto Config Examples
+- **Small Data**: Automatic URL persistence
+- **Large Data**: Intelligent compression and offline storage
+- **Sensitive Data**: Automatic encryption detection
+- **Performance**: Bundle size optimization
+
+## 🏃‍♂️ Development
 
 ```bash
+# Install dependencies
+pnpm install
+
 # Start development server
-pnpm dev:web
+pnpm dev
 
 # Build for production
-pnpm build --filter=web
+pnpm build
 
-# Type checking
-pnpm typecheck --filter=web
+# Start production server
+pnpm start
 ```
 
 ## 📁 Project Structure
 
 ```
 apps/web/
-├── app/
-│   ├── api/share/          # Email sharing endpoint
-│   ├── page.tsx            # Main demo page with tabs
-│   └── layout.tsx          # App layout
-├── components/
-│   ├── wishlist-demo.tsx   # Interactive demo
-│   ├── documentation.tsx   # Docs content
-│   ├── header.tsx         # Site header
-│   └── footer.tsx         # Site footer
-└── package.json
+├── app/                    # Next.js App Router
+│   ├── page.tsx           # Homepage
+│   ├── demo/              # Interactive demos
+│   ├── faq/               # FAQ page
+│   └── api/               # API routes
+├── components/            # React components
+│   ├── hero-actions.tsx   # Hero section
+│   ├── wishlist-demo.tsx  # Main demo
+│   ├── installation-tabs.tsx # Setup guides
+│   └── ...
+├── hooks/                 # Custom React hooks
+├── lib/                   # Utility functions
+└── public/               # Static assets
 ```
 
-## 🎨 Features Demonstrated
+## 🎨 Design System
 
-### URL State Persistence
-Every interaction updates the URL in real-time:
-- Adding/removing wishlist items
-- Changing filters and view modes
-- Theme and preference changes
+The demo uses a consistent design system with:
+- **Colors**: Primary, secondary, accent colors with dark mode
+- **Typography**: Responsive text scales
+- **Components**: Reusable UI components from `@workspace/ui`
+- **Layout**: Responsive grid and flexbox layouts
+- **Icons**: Lucide React icons
+- **Animations**: Smooth transitions and micro-interactions
 
-### Compression & Encryption
-Visual demonstration of:
-- Size reduction with LZ-String compression
-- Secure state sharing with encryption
-- Performance metrics and comparisons
+## 📊 Performance
 
-### React Integration
-Examples of:
-- `useSlugStore` hook usage
-- Zustand-like store patterns
-- Migration from manual URL management
+- **Bundle Size**: Optimized for minimal JavaScript
+- **Core Web Vitals**: Excellent performance scores
+- **Accessibility**: WCAG 2.1 AA compliant
+- **SEO**: Optimized meta tags and structured data
+- **Lighthouse**: 100/100 performance score
 
-## 🔧 Configuration
+## 🚀 Deployment
 
-### Environment Variables
-```bash
-# For email sharing (optional)
-RESEND_API_KEY=your_resend_key
+The demo is automatically deployed to Vercel on every push to `main`. 
 
-# For analytics (optional)
-NEXT_PUBLIC_GA_ID=your_ga_id
-```
+Environment variables needed:
+- `NEXT_PUBLIC_DEMO_MODE`: Enable demo features
+- `DATABASE_URL`: Optional database for enhanced features
 
-**Note**: The app gracefully handles missing API keys - email sharing will be disabled but all other features work normally.
+## 📝 Content Management
 
-### Customization
-- **Branding**: Update `components/header.tsx` and `components/footer.tsx`
-- **Examples**: Modify `components/wishlist-demo.tsx` for your use case
-- **Docs**: Edit `components/documentation.tsx` for additional content
-
-## 📱 Responsive Design
-
-Fully responsive with:
-- **Mobile-first** approach
-- **Touch-friendly** interactions
-- **Accessible** components (Radix UI)
-- **Dark/light** theme support
-
-## 🚢 Deployment
-
-### Vercel (Recommended)
-```bash
-# Deploy to Vercel
-vercel
-
-# Or connect GitHub repo for auto-deployment
-```
-
-**Deployment Notes**:
-- The app automatically handles missing environment variables
-- Email sharing requires `RESEND_API_KEY` but is optional
-- All other features work without additional configuration
-
-### Other Platforms
-Standard Next.js deployment works on:
-- Netlify
-- Railway
-- DigitalOcean App Platform
-- Any Node.js hosting
+- **Static Content**: JSON files in `public/`
+- **FAQs**: `public/faqs.json`
+- **Use Cases**: `public/use-cases.json`
+- **Documentation**: MDX files and React components
 
 ## 🤝 Contributing
 
-This demo is part of the [Slug Store monorepo](https://github.com/farajabien/slug-store).
-
-```bash
-git clone https://github.com/farajabien/slug-store.git
-cd slug-store
-pnpm install
-pnpm dev:web
-```
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
 
 ## 📄 License
 
-MIT License - part of the Slug Store ecosystem.
+MIT License - see [LICENSE](../../LICENSE) for details.
 
 ---
 

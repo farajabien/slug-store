@@ -1,47 +1,44 @@
 ---
 name: Bug report
 about: Create a report to help us improve
-title: '[BUG] '
-labels: bug
-assignees: farajabien
+title: ''
+labels: ''
+assignees: ''
 
 ---
 
-## 🐛 Bug Description
+**Describe the bug**
 A clear and concise description of what the bug is.
 
-## 🔄 Steps to Reproduce
+**To Reproduce**
+Steps to reproduce the behavior:
 1. Go to '...'
 2. Click on '....'
 3. Scroll down to '....'
 4. See error
 
-## ✅ Expected Behavior
+**Expected behavior**
 A clear and concise description of what you expected to happen.
 
-## ❌ Actual Behavior
-A clear and concise description of what actually happened.
+**Screenshots**
+If applicable, add screenshots to help explain your problem.
 
-## 💻 Environment
-- **OS**: [e.g. macOS 14.0, Windows 11, Ubuntu 22.04]
-- **Node.js**: [e.g. 20.0.0]
-- **Browser**: [e.g. Chrome 120, Firefox 121, Safari 17]
-- **Package Version**: [e.g. @farajabien/slug-store@3.1.0]
-- **Framework**: [e.g. Next.js 15, React 18, etc.]
+**Environment (please complete the following information):**
+- **OS**: [e.g. macOS, Windows, Linux]
+- **Browser**: [e.g. chrome, safari]
+- **Package Version**: [e.g. slug-store@4.0.8]
+- **Next.js Version**: [e.g. 14.1.0]
 
-## 📝 Code Sample
-```typescript
-// Minimal code that reproduces the issue
-import { useSlugStore } from '@farajabien/slug-store'
+**Code Example**
+```javascript
+import { useSlugStore } from 'slug-store/client'
 
 function MyComponent() {
-  const [state, setState] = useSlugStore('test', {}, { url: true })
-  // ... rest of the code that causes the issue
+  const [state, setState] = useSlugStore('my-key', initialState)
+  
+  // Code that demonstrates the bug
 }
 ```
 
-## 📊 Additional Context
-Add any other context about the problem here. Screenshots, error messages, network logs, etc.
-
-## 🔍 Possible Solution
-If you have any ideas on how to fix the issue, please describe them here. 
+**Additional context**
+Add any other context about the problem here. 

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useSlugStore } from '@farajabien/slug-store'
+import { useSlugStore } from 'slug-store/client'
 
 export function DebugDemo() {
   const [isClient, setIsClient] = useState(false)

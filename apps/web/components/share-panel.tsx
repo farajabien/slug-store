@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Button } from '@workspace/ui/components/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card'
 import { Share2, Mail, Copy, Check } from 'lucide-react'
-import { slug, copySlug } from '@farajabien/slug-store'
+import { getSlug, copySlug } from 'slug-store/client'
 
 interface WishlistState {
   items: any[]
@@ -26,11 +26,8 @@ export function SharePanel({ state }: SharePanelProps) {
   // Generate share URL
   const generateShareUrl = async () => {
     try {
-      const { encodeState } = await import('@farajabien/slug-store-core')
-      const slug = await encodeState(state, { compress: true })
-      const url = new URL(window.location.href)
-      url.searchParams.set('state', slug)
-      setShareUrl(url.toString())
+      const url = getSlug()
+      setShareUrl(url)
     } catch (error) {
       console.error('Failed to generate share URL:', error)
     }
@@ -65,7 +62,7 @@ export function SharePanel({ state }: SharePanelProps) {
         body: JSON.stringify({
           email,
           state,
-          url: slug()
+          url: getSlug()
         }),
       })
 
@@ -120,7 +117,7 @@ export function SharePanel({ state }: SharePanelProps) {
           <div className="flex gap-2">
             <input
               type="text"
-              value={shareUrl || slug()}
+              value={shareUrl || getSlug()}
               readOnly
               className="flex-1 px-3 py-2 border rounded-md bg-muted text-sm"
             />

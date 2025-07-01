@@ -48,8 +48,8 @@ importers:
         specifier: ^3.5.0
         version: 3.5.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       slug-store:
-        specifier: ^4.0.0
-        version: 4.0.0(next@15.2.3(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)
+        specifier: ^4.0.7
+        version: 4.0.7(next@15.2.3(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)
       zod:
         specifier: ^3.24.2
         version: 3.24.2
@@ -3305,8 +3305,8 @@ packages:
     resolution: {integrity: sha512-g9Q1haeby36OSStwb4ntCGGGaKsaVSjQ68fBxoQcutl5fS1vuY18H3wSt3jFyFtrkx+Kz0V1G85A4MyAdDMi2Q==}
     engines: {node: '>=8'}
 
-  slug-store@4.0.0:
-    resolution: {integrity: sha512-yiD9AWkcO5R7u60vvrzSkUHPazR6HPw5ZJDCPtKaU5hhKhVCdjukpsS3F+uoak+j30iXz/78Qk5V0Djg1Fxmgw==}
+  slug-store@4.0.7:
+    resolution: {integrity: sha512-fq9nd5B+W+xjoplpCDTYjKdniq7nDMRPrDGs6+NL5JczNUe1YzgkfDxHVdtfJE4SEfD2ISbISM398izsv1GNdg==}
     peerDependencies:
       next: ^14.0.0
       react: ^18.0.0
@@ -7172,7 +7172,7 @@ snapshots:
 
   slash@3.0.0: {}
 
-  slug-store@4.0.0(next@15.2.3(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0):
+  slug-store@4.0.7(next@15.2.3(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0):
     dependencies:
       next: 15.2.3(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       react: 19.0.0

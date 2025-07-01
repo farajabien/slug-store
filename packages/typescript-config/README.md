@@ -1,15 +1,15 @@
-# @farajabien/slug-store-typescript-config
+# @workspace/typescript-config
 
-[![npm version](https://badge.fury.io/js/%40farajabien%2Fslug-store-typescript-config.svg)](https://badge.fury.io/js/%40farajabien%2Fslug-store-typescript-config)
+[![npm version](https://badge.fury.io/js/%40workspace%2Ftypescript-config.svg)](https://badge.fury.io/js/%40workspace%2Ftypescript-config)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-> **Shared TypeScript configuration for Slug Store ecosystem**  
+> **Shared TypeScript configuration for the Slug Store monorepo**  
 > Consistent TypeScript settings across all packages in the monorepo.
 
 ## 🚀 Installation
 
 ```bash
-pnpm add -D @farajabien/slug-store-typescript-config
+pnpm add -D @workspace/typescript-config
 ```
 
 ## 💡 Usage
@@ -18,7 +18,7 @@ pnpm add -D @farajabien/slug-store-typescript-config
 ```json
 // tsconfig.json
 {
-  "extends": "@farajabien/slug-store-typescript-config/base.json"
+  "extends": "@workspace/typescript-config/base.json"
 }
 ```
 
@@ -26,7 +26,7 @@ pnpm add -D @farajabien/slug-store-typescript-config
 ```json
 // tsconfig.json
 {
-  "extends": "@farajabien/slug-store-typescript-config/nextjs.json"
+  "extends": "@workspace/typescript-config/nextjs.json"
 }
 ```
 
@@ -34,18 +34,17 @@ pnpm add -D @farajabien/slug-store-typescript-config
 ```json
 // tsconfig.json
 {
-  "extends": "@farajabien/slug-store-typescript-config/react-library.json"
+  "extends": "@workspace/typescript-config/react-library.json"
 }
 ```
 
 ## 📦 Related Packages
 
-| Package | Description | NPM |
-|---------|-------------|-----|
-| [@farajabien/slug-store-core](https://www.npmjs.com/package/@farajabien/slug-store-core) | Framework-agnostic core library | [![npm](https://img.shields.io/npm/v/@farajabien/slug-store-core.svg)](https://www.npmjs.com/package/@farajabien/slug-store-core) |
-| [@farajabien/slug-store](https://www.npmjs.com/package/@farajabien/slug-store) | React hooks with Zustand-like API | [![npm](https://img.shields.io/npm/v/@farajabien/slug-store.svg)](https://www.npmjs.com/package/@farajabien/slug-store) |
-| [@farajabien/slug-store-ui](https://www.npmjs.com/package/@farajabien/slug-store-ui) | UI components and themes | [![npm](https://img.shields.io/npm/v/@farajabien/slug-store-ui.svg)](https://www.npmjs.com/package/@farajabien/slug-store-ui) |
-| [@farajabien/slug-store-eslint-config](https://www.npmjs.com/package/@farajabien/slug-store-eslint-config) | Shared ESLint configuration | [![npm](https://img.shields.io/npm/v/@farajabien/slug-store-eslint-config.svg)](https://www.npmjs.com/package/@farajabien/slug-store-eslint-config) |
+| Package | Description | Version |
+|---------|-------------|---------|
+| [slug-store](https://www.npmjs.com/package/slug-store) | Next.js state management with Auto Config System | [![npm](https://img.shields.io/npm/v/slug-store.svg)](https://www.npmjs.com/package/slug-store) |
+| [@workspace/typescript-plugin](../typescript-plugin) | TypeScript plugin for compile-time optimization | Development |
+| [@workspace/eslint-config](../eslint-config) | Shared ESLint configuration | Development |
 
 ## 🤝 Contributing
 

@@ -1,67 +1,123 @@
-# @farajabien/slug-store-ui
+# @workspace/ui
 
-> **Shared UI components for Slug Store ecosystem**  
-> Beautiful, accessible components built with Radix UI and Tailwind CSS.
+Shared UI components for the Slug Store monorepo, built with Tailwind CSS and Radix UI.
 
-## 📦 Components
+## Features
 
-### Core Components
-- **Button** - Multiple variants, sizes, and states
-- **Card** - Content containers with headers and footers  
-- **Badge** - Status indicators and tags
-- **Alert** - Contextual feedback messages
-- **Tabs** - Radix UI powered tab navigation
+- 🎨 **Beautiful Components**: Pre-built, accessible components
+- 🌙 **Dark Mode**: Full dark mode support
+- 📱 **Responsive**: Mobile-first design
+- ♿ **Accessible**: Built with Radix UI primitives
+- 🎯 **TypeScript**: Full type safety
+- 🎨 **Customizable**: Tailwind CSS for easy styling
 
-### Utilities
-- **cn()** - Tailwind class merging utility
-- **Button variants** - Consistent styling system
-- **Theme support** - Dark/light mode compatible
-
-## 🚀 Installation
+## Installation
 
 ```bash
-pnpm add @farajabien/slug-store-ui
+pnpm add @workspace/ui
 ```
 
-## 💡 Usage
+## Usage
 
-```tsx
-import { Button, Card, Badge, Alert, Tabs } from '@farajabien/slug-store-ui'
+```typescript
+import { Button, Card, Badge, Alert, Tabs } from '@workspace/ui'
 
-export function MyComponent() {
+function MyComponent() {
   return (
     <Card>
       <Card.Header>
-        <h2>Slug Store Demo</h2>
-        <Badge variant="success">Active</Badge>
+        <Badge variant="success">Status</Badge>
       </Card.Header>
-      
       <Card.Content>
-        <Alert>
-          <AlertCircle className="h-4 w-4" />
-          <Alert.Title>Pro Tip</Alert.Title>
-          <Alert.Description>
-            Enable compression to reduce URL length by 30-70%
-          </Alert.Description>
+        <Alert variant="info">
+          Information message
         </Alert>
-        
-        <Tabs defaultValue="demo">
-          <Tabs.List>
-            <Tabs.Trigger value="demo">Demo</Tabs.Trigger>
-            <Tabs.Trigger value="docs">Docs</Tabs.Trigger>
-          </Tabs.List>
-          
-          <Tabs.Content value="demo">
-            <Button onClick={handleDemo}>
-              Try Slug Store
-            </Button>
-          </Tabs.Content>
-        </Tabs>
+        <Button variant="primary">
+          Action Button
+        </Button>
       </Card.Content>
     </Card>
   )
 }
 ```
+
+## Components
+
+### Button
+```typescript
+<Button variant="primary" size="md">Click me</Button>
+<Button variant="secondary" size="sm">Secondary</Button>
+<Button variant="outline" size="lg">Outline</Button>
+```
+
+### Card
+```typescript
+<Card>
+  <Card.Header>
+    <Card.Title>Title</Card.Title>
+    <Card.Description>Description</Card.Description>
+  </Card.Header>
+  <Card.Content>
+    Content goes here
+  </Card.Content>
+</Card>
+```
+
+### Badge
+```typescript
+<Badge variant="success">Success</Badge>
+<Badge variant="warning">Warning</Badge>
+<Badge variant="error">Error</Badge>
+```
+
+### Alert
+```typescript
+<Alert variant="info">
+  Information message
+</Alert>
+<Alert variant="warning">
+  Warning message
+</Alert>
+```
+
+### Tabs
+```typescript
+<Tabs defaultValue="tab1">
+  <Tabs.List>
+    <Tabs.Trigger value="tab1">Tab 1</Tabs.Trigger>
+    <Tabs.Trigger value="tab2">Tab 2</Tabs.Trigger>
+  </Tabs.List>
+  <Tabs.Content value="tab1">
+    Content 1
+  </Tabs.Content>
+  <Tabs.Content value="tab2">
+    Content 2
+  </Tabs.Content>
+</Tabs>
+```
+
+### Progress
+```typescript
+<Progress value={50} max={100} />
+<Progress value={75} variant="success" />
+```
+
+### Toast
+```typescript
+import { toast } from '@workspace/ui'
+
+toast.success('Success message')
+toast.error('Error message')
+toast.info('Info message')
+```
+
+## Slug Store Ecosystem
+
+| Package | Description | Version |
+|---------|-------------|---------|
+| [slug-store](https://www.npmjs.com/package/slug-store) | Next.js state management with Auto Config System | [![npm](https://img.shields.io/npm/v/slug-store.svg)](https://www.npmjs.com/package/slug-store) |
+| [@workspace/typescript-plugin](../typescript-plugin) | TypeScript plugin for compile-time optimization | Development |
+| [@workspace/eslint-config](../eslint-config) | Shared ESLint configuration | Development |
 
 ## 🎨 Design System
 
@@ -123,14 +179,6 @@ const buttonVariants = cva(
   }
 )
 ```
-
-## 📦 Related Packages
-
-| Package | Description | NPM |
-|---------|-------------|-----|
-| [@farajabien/slug-store-core](https://www.npmjs.com/package/@farajabien/slug-store-core) | Framework-agnostic core library | [![npm](https://img.shields.io/npm/v/@farajabien/slug-store-core.svg)](https://www.npmjs.com/package/@farajabien/slug-store-core) |
-| [@farajabien/slug-store](https://www.npmjs.com/package/@farajabien/slug-store) | React hooks with Zustand-like API | [![npm](https://img.shields.io/npm/v/@farajabien/slug-store.svg)](https://www.npmjs.com/package/@farajabien/slug-store) |
-| [@farajabien/slug-store-eslint-config](https://www.npmjs.com/package/@farajabien/slug-store-eslint-config) | Shared ESLint configuration | [![npm](https://img.shields.io/npm/v/@farajabien/slug-store-eslint-config.svg)](https://www.npmjs.com/package/@farajabien/slug-store-eslint-config) |
 
 ## 🎯 Perfect For
 

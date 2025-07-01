@@ -19,7 +19,7 @@ export function InstallationTabs() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Sparkles className="h-5 w-5" />
-                v3.0 - Unified API
+                v4.0 - Unified API
               </CardTitle>
               <CardDescription>
                 One hook for all three use cases: URL sharing, offline storage, and database sync
@@ -27,10 +27,10 @@ export function InstallationTabs() {
             </CardHeader>
             <CardContent>
               <pre className="bg-muted p-4 rounded-lg overflow-x-auto text-sm">
-{`npm install @farajabien/slug-store
+{`npm install slug-store
 
 # One hook for everything
-import { useSlugStore } from '@farajabien/slug-store'
+import { useSlugStore } from 'slug-store/client'
 
 // URL sharing
 const [state, setState] = useSlugStore('filters', initialState, { url: true })
@@ -67,7 +67,7 @@ const [state, setState] = useSlugStore('dashboard', initialState, {
             </CardHeader>
             <CardContent>
               <pre className="bg-muted p-4 rounded-lg overflow-x-auto text-sm">
-{`import { useSlugStore } from '@farajabien/slug-store'
+{`import { useSlugStore } from 'slug-store/client'
 
 function Dashboard() {
   const [state, setState] = useSlugStore('dashboard', {
@@ -100,7 +100,7 @@ function Dashboard() {
             </CardHeader>
             <CardContent>
               <pre className="bg-muted p-4 rounded-lg overflow-x-auto text-sm">
-{`import { useSlugStore } from '@farajabien/slug-store'
+{`import { useSlugStore } from 'slug-store/client'
 
 function TodoApp() {
   const [state, setState] = useSlugStore('todos', {

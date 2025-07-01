@@ -22,7 +22,7 @@ Describe any alternative solutions or features you've considered.
 ## 📝 Example Usage
 ```typescript
 // How would this feature be used?
-import { useSlugStore } from '@farajabien/slug-store'
+import { useSlugStore } from 'slug-store/client'
 
 function MyComponent() {
   const [state, setState] = useSlugStore('example', {}, {

@@ -1,4 +1,4 @@
-# Slug Store v4.0.4: The Perfect State Management Solution for AI-Built Apps
+# Slug Store v4.0.8: The Perfect State Management Solution for AI-Built Apps
 
 After 3 versions and 500+ downloads, we've finally cracked the code for zero-boilerplate, full-stack state management that works seamlessly with Next.js App Router. No database configs needed - just pure, intelligent state persistence.
 
@@ -6,7 +6,7 @@ After 3 versions and 500+ downloads, we've finally cracked the code for zero-boi
 [![npm bundle size](https://img.shields.io/bundlephobia/min/slug-store)](https://bundlephobia.com/package/slug-store)
 [![License](https://img.shields.io/npm/l/slug-store)](https://github.com/farajabien/slug-store/blob/main/LICENSE)
 
-`slug-store` v4.0.4 provides simple, powerful state management that works everywhere. One hook, infinite possibilities with intelligent Auto Config System.
+`slug-store` v4.0.8 provides simple, powerful state management that works everywhere. One hook, infinite possibilities with intelligent Auto Config System.
 
 ## 🧠 Auto Config System
 
