@@ -342,7 +342,7 @@ export class URLPersistence {
       // 2. Encryption (applied after compression)
       if (this.options.encrypt && this.options.encryptionKey) {
         processedState = await encrypt(processedState, this.options.encryptionKey);
-        prefix = 'e' + prefix; // 'e_' or 'ec_'
+        prefix = prefix ? 'e' + prefix : 'e_'; // 'e_' or 'ec_'
       }
       
       const finalPayload = prefix + processedState;

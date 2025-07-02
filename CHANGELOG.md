@@ -1,9 +1,51 @@
 # Changelog
 
-## 4.1.0 (Latest)
+## 4.1.0 (Latest) - 2025-01-27
 
-- **Feature: Hybrid Persistence Mode**: Introduced a new `hybrid: true` option that persists state to both the URL and offline storage simultaneously. This combines the shareability of URL state with the durability of offline storage, ensuring data survives refreshes while remaining shareable.
-- **Documentation**: Updated the `README.md` to include details about the new `hybrid` mode.
+### 🔧 Critical Bug Fixes
+
+**Auto-Config Override Resolution:**
+- **Fixed**: `autoConfig: true` no longer overrides explicit user settings like `offline: true` and `url: true`
+- **Fixed**: Compression consistency between saving and loading operations when `autoConfig: false`
+- **Root Cause**: Auto-config was ignoring developer intent and causing encoding/decoding mismatches
+- **Impact**: Developers can now trust their explicit persistence configuration settings
+
+**State Persistence Reliability:**
+- **Enhanced**: Page refresh persistence now works consistently across all scenarios
+- **Enhanced**: Navigation and redirect state preservation fully operational
+- **Enhanced**: Browser back/forward button state consistency maintained
+- **Enhanced**: URL state sharing works reliably without decompression errors
+
+**Technical Improvements:**
+- Updated `shouldCompress` logic to respect `autoConfig` setting: `autoConfig ? analysis?.shouldCompress : false`
+- Fixed loading logic to use consistent compression settings: `compress: autoConfig ? 'auto' : false`
+- Added comprehensive refresh and redirect testing suite
+- Enhanced popstate event handling for browser navigation
+
+### ✅ Verification & Testing
+
+- **✅ Page Refreshes**: State survives browser refresh with both URL and offline persistence
+- **✅ Navigation**: State preserved during page-to-page navigation
+- **✅ Redirects**: State correctly maintained through redirects and deep linking
+- **✅ History Navigation**: Browser back/forward buttons work seamlessly
+- **✅ URL Sharing**: Shared URLs contain state and load correctly for recipients
+
+### 📦 Package Details
+
+- **Breaking Changes**: None - this is a patch release fixing critical persistence issues
+- **Migration**: No code changes required - existing configurations will work correctly
+- **Bundle Size**: Unchanged from v4.0.14
+- **Compatibility**: Full backward compatibility maintained
+
+---
+
+## 4.0.14
+
+- **Bug Fix**: Fixed a critical bug where `autoConfig` would fail to decode URL state if a stale encryption key was present in `localStorage`. The persistence logic is now stateless, using a prefix in the encoded data itself to determine the correct decoding steps (decryption, decompression).
+- **Bug Fix**: Resolved an issue where the Share API tests were failing due to the use of invalid testing domains. The API now uses Resend's designated test emails (`onboarding@resend.dev` and `delivered@resend.dev`) in non-production environments.
+- **Documentation**: Significantly improved the main `README.md` with a clearer structure, detailed API references, and advanced usage examples.
+- **Documentation**: Added comprehensive JSDoc comments to `client.ts`, `persistence/url.ts`, `persistence/offline.ts`, and `compression.ts` to improve code clarity and maintainability.
+- **Internal**: Corrected issues in the `test-curl-suite.sh` script that were causing test failures due to improper `curl` command formatting.
 
 ## 4.0.14 (Latest)
 

@@ -165,6 +165,36 @@ export function useSlugStore<T>(
     loadState().catch(console.error);
   }, [key, getEncryptionKey, autoConfig]);
 
+  // --- Listen for URL changes from browser navigation (back/forward buttons) ---
+  useEffect(() => {
+    const handlePopState = async () => {
+      if (typeof window === 'undefined') return;
+
+      const encryptionKey = await getEncryptionKey();
+
+      const urlPersistence = new URLPersistence({
+        enabled: true,
+        paramName: key,
+        compress: 'auto',
+        encryptionKey: encryptionKey || undefined,
+        encrypt: !!encryptionKey,
+      });
+
+      const urlResult = await urlPersistence.decodeState<T>();
+      if (urlResult.success && urlResult.state !== undefined) {
+        setState(urlResult.state);
+      } else {
+        // If the state is removed from the URL, revert to the initial state
+        setState(initialState);
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [key, getEncryptionKey, initialState]);
+
   // --- Persist State on Change ---
   // This effect runs whenever the state changes to save it to the configured persistence layers.
   /**
