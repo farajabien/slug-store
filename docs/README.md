@@ -1,4 +1,4 @@
-# Slug Store v4.0.8 Documentation
+# Slug Store v4.1.1 Documentation
 
 **The State Management Solution for Next.js App Router**
 
@@ -211,4 +211,4 @@ MIT License - see [LICENSE](../LICENSE) for details.
 
 ---
 
-**Slug Store v4.0.8**: Easy state persistence across components with strategic obstruction of complexity. 
+**Slug Store v4.1.1**: Easy state persistence across components with strategic obstruction of complexity. 

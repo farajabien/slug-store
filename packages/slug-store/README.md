@@ -8,6 +8,8 @@
 
 ---
 
+Slug Store is built for state persistence in single-page applications (SPAs). Its primary job is to take your application's state (like your projects, todos, and which project you're currently viewing) and encode it into the URL. This makes it incredibly easy to create shareable links, bookmark application states, and restore sessions seamlessly.
+
 ## How It Works
 
 Slug Store provides a `useSlugStore` hook that works just like React's `useState`, but with a superpower: it automatically saves your state to the most logical place.
@@ -205,4 +207,4 @@ pnpm test
 ---
 
 **Simple, powerful, universal state management. Zero complexity, maximum value.**
-*Version 4.1.0*
+*Version 4.1.1*
