@@ -1,7 +1,7 @@
 {
   "name": "slug-store",
-  "version": "4.0.13",
-  "description": "Universal state persistence for modern web apps. Zero obstruction, maximum DevEx.",
+  "version": "4.1.0",
+  "description": "Simple, persistent state management for modern web apps.",
   "keywords": [
     "react",
     "nextjs",

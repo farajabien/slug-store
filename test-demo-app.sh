@@ -112,7 +112,7 @@ fi
 # Test 4: Share API functionality
 info "Testing share API functionality..."
 share_payload='{
-  "email": "test@example.com",
+  "email": "shawnbienvenu@gmail.com",
   "state": {
     "items": [
       {

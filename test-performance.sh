@@ -145,7 +145,7 @@ test_share_payload() {
         items+="{\"name\":\"Item $i\",\"price\":$((i*10)),\"category\":\"category$((i%5))\",\"priority\":\"medium\",\"description\":\"Test item description for item number $i\"}"
     done
     
-    payload="{\"email\":\"test@example.com\",\"state\":{\"items\":[$items],\"view\":\"grid\",\"filters\":{\"category\":\"all\"}},\"url\":\"https://example.com\"}"
+    payload="{\"email\":\"shawnbienvenu@gmail.com\",\"state\":{\"items\":[$items],\"view\":\"grid\",\"filters\":{\"category\":\"all\"}},\"url\":\"https://example.com\"}"
     
     # Measure response time
     start=$(date +%s%N)
@@ -179,7 +179,7 @@ for i in {1..1000}; do
     large_state+="{\"id\":\"$i\",\"name\":\"Very Long Item Name That Contains Many Characters And Should Test The Limits Of Our System $i\",\"price\":$((RANDOM % 1000 + 100)),\"category\":\"category$((i%10))\",\"priority\":\"high\",\"description\":\"This is a very long description that contains many words and should test how well our system handles large amounts of text data in JSON payloads. Item number $i has special characteristics.\",\"metadata\":{\"created\":\"2025-01-15T$(printf '%02d' $((i%24))):$(printf '%02d' $((i%60))):$(printf '%02d' $((i%60)))Z\",\"tags\":[\"tag1\",\"tag2\",\"tag3\"],\"extra\":\"Additional data field $i\"}}"
 done
 
-large_payload="{\"email\":\"test@example.com\",\"state\":{\"items\":[$large_state],\"view\":\"grid\",\"filters\":{\"category\":\"all\",\"priceRange\":[0,10000],\"tags\":[\"tag1\",\"tag2\"]},\"sorting\":{\"field\":\"price\",\"direction\":\"asc\"},\"pagination\":{\"page\":1,\"limit\":50}},\"url\":\"https://example.com/large-test\"}"
+large_payload="{\"email\":\"shawnbienvenu@gmail.com\",\"state\":{\"items\":[$large_state],\"view\":\"grid\",\"filters\":{\"category\":\"all\",\"priceRange\":[0,10000],\"tags\":[\"tag1\",\"tag2\"]},\"sorting\":{\"field\":\"price\",\"direction\":\"asc\"},\"pagination\":{\"page\":1,\"limit\":50}},\"url\":\"https://example.com/large-test\"}"
 
 log "Testing with payload size: $(echo -n "$large_payload" | wc -c) bytes"
 

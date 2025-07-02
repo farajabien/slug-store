@@ -1,23 +1,37 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
+## 4.1.0 (Latest)
 
-## [4.0.13] - 2025-01-27
+- **Feature: Hybrid Persistence Mode**: Introduced a new `hybrid: true` option that persists state to both the URL and offline storage simultaneously. This combines the shareability of URL state with the durability of offline storage, ensuring data survives refreshes while remaining shareable.
+- **Documentation**: Updated the `README.md` to include details about the new `hybrid` mode.
 
-### 📝 Documentation
+## 4.0.14 (Latest)
 
-- Restructured README files to provide a comprehensive, user-focused document for the npm package and a contributor-focused overview at the repository root.
+- **Bug Fix**: Fixed a critical bug where `autoConfig` would fail to decode URL state if a stale encryption key was present in `localStorage`. The persistence logic is now stateless, using a prefix in the encoded data itself to determine the correct decoding steps (decryption, decompression).
+- **Bug Fix**: Resolved an issue where the Share API tests were failing due to the use of invalid testing domains. The API now uses Resend's designated test emails (`onboarding@resend.dev` and `delivered@resend.dev`) in non-production environments.
+- **Documentation**: Significantly improved the main `README.md` with a clearer structure, detailed API references, and advanced usage examples.
+- **Documentation**: Added comprehensive JSDoc comments to `client.ts`, `persistence/url.ts`, `persistence/offline.ts`, and `compression.ts` to improve code clarity and maintainability.
+- **Internal**: Corrected issues in the `test-curl-suite.sh` script that were causing test failures due to improper `curl` command formatting.
 
----
+## 4.0.13
 
-## [4.0.12] - 2025-01-27
+- *This version was skipped due to a publishing error.*
 
-### 📝 Documentation Overhaul
+## 4.0.12
 
-- **Rewrote README.md** for clarity and simplicity, removing jargon and focusing on practical examples.
-- **Aligned Package Description** to reflect the library's universal scope beyond just Next.js.
-- **Simplified Quick Start** and added more real-world use-case examples.
-- Ensured version numbers are consistent across all documentation.
+- **Bug Fix**: Fixed an issue where URL-persisted state was not updating correctly on change due to a combination of inconsistent compression settings and double URL encoding.
+- **Feature**: Added a "Clear Old Data" button to the test component to help manage corrupted or outdated state in the URL during development.
+- **Improvement**: Enhanced the `URLPersistence.decodeState` method to be more resilient to malformed or uncompressed data by wrapping decompression in a `try-catch` block.
+- **Improvement**: Updated the `decompress` function in `compression.ts` to first check if the input is valid JSON before attempting to decompress, preventing errors with uncompressed data.
+
+## 4.0.11
+
+### 📝 Documentation Update
+
+**Package Description Alignment:**
+- Updated package description to reflect universal scope: "Universal state persistence for modern web apps. Zero obstruction, maximum DevEx."
+- Aligns with README positioning where Next.js support is optional enhancement
+- Better represents the library's broader applicability beyond Next.js
 
 ---
 

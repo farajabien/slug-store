@@ -6,13 +6,15 @@ import { Button } from '@workspace/ui/components/button'
 
 export function SlugStoreTest() {
   const [shouldPersist, setShouldPersist] = React.useState(false)
+  const [isHybrid, setIsHybrid] = React.useState(false)
   
   const [testState, setTestState] = useSlugStore('test-state', {
     count: 0,
     message: 'Hello from slug-store!'
   }, {
-    url: shouldPersist, // Only enable URL persistence after clearing old data
+    url: shouldPersist && !isHybrid,
     offline: true,
+    hybrid: isHybrid,
     autoConfig: false,
     debug: true
   })
@@ -46,6 +48,16 @@ export function SlugStoreTest() {
       return newState
     })
   }
+
+  const toggleHybridMode = () => {
+    setIsHybrid(prev => {
+      const newMode = !prev;
+      console.log(`🔧 Toggling hybrid mode ${newMode ? 'ON' : 'OFF'}`);
+      // When switching, reset state to ensure clean persistence
+      setTestState({ count: 0, message: 'Switched to ' + (newMode ? 'hybrid' : 'normal') + ' mode' });
+      return newMode;
+    });
+  };
 
   const testShare = async () => {
     try {
@@ -145,6 +157,9 @@ export function SlugStoreTest() {
           </Button>
           <Button onClick={clearOldData} variant="outline" size="sm">
             Clear Old Data
+          </Button>
+          <Button onClick={toggleHybridMode} variant={isHybrid ? "default" : "outline"} size="sm">
+            Hybrid Mode: {isHybrid ? 'On' : 'Off'}
           </Button>
         </div>
         

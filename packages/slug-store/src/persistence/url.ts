@@ -2,24 +2,47 @@
 import { compress, decompress, type CompressionAlgorithm } from '../compression.js';
 import { encrypt, decrypt } from '../encryption.js';
 
+/**
+ * Configuration options for the URLPersistence class.
+ */
 export interface URLPersistenceOptions {
+  /** Enables or disables the persistence functionality. @default false */
   enabled?: boolean;
+  /** 
+   * The compression algorithm to use. 
+   * 'auto' selects the best algorithm based on data size and browser support.
+   * @default 'auto'
+   */
   compress?: boolean | 'auto' | 'gzip' | 'brotli';
+  /** Enables or disables encryption. @default false */
   encrypt?: boolean;
+  /** The key to use for encryption. Required if `encrypt` is true. */
   encryptionKey?: string;
-  paramName?: string; // Default: 's' for 'state'
+  /** The name of the URL query parameter to store the state. @default 's' */
+  paramName?: string; 
 }
 
+/**
+ * The result of an encoding or decoding operation.
+ */
 export interface URLPersistenceResult {
+  /** Indicates whether the operation was successful. */
   success: boolean;
+  /** The generated URL after encoding the state. Only present on successful encoding. */
   url?: string;
+  /** An error message if the operation failed. */
   error?: string;
 }
 
 /**
- * Aggressively decode URL parameter that may have been encoded multiple times
- * This handles cases where the same data gets encoded multiple times through different layers
- * Continues decoding until we get valid JSON or can't decode further
+ * Decodes a URL component that may have been encoded multiple times.
+ * This function is aggressive and continues to decode until the string is no longer
+ * changing or a maximum number of attempts is reached. It is designed to handle
+ * complex and sometimes malformed URL-encoded data from various sources.
+ *
+ * @param encoded The string to decode.
+ * @param maxAttempts The maximum number of decoding passes.
+ * @returns The decoded string.
  */
 function safeDecodeURIComponent(encoded: string, maxAttempts: number = 10): string {
   let decoded = encoded;
@@ -98,7 +121,10 @@ function safeDecodeURIComponent(encoded: string, maxAttempts: number = 10): stri
 }
 
 /**
- * Check if a string is valid JSON
+ * Checks if a given string is a valid, non-null JSON object or array.
+ *
+ * @param str The string to validate.
+ * @returns True if the string is valid JSON.
  */
 function isValidJSON(str: string): boolean {
   if (!str || typeof str !== 'string') return false;
@@ -116,7 +142,11 @@ function isValidJSON(str: string): boolean {
 }
 
 /**
- * Try additional decoding methods for edge cases
+ * Attempts to apply various non-standard decoding methods to a string.
+ * This includes fixing HTML entities, escaped unicode, and double-escaped characters.
+ *
+ * @param str The string to decode.
+ * @returns The decoded string.
  */
 function tryAdditionalDecodingMethods(str: string): string {
   let result = str;
@@ -144,7 +174,11 @@ function tryAdditionalDecodingMethods(str: string): string {
 }
 
 /**
- * Try manual percentage decoding for edge cases where standard decodeURIComponent fails
+ * Manually replaces common percent-encoded characters.
+ * This is a fallback for when `decodeURIComponent` fails due to malformed input.
+ *
+ * @param str The string to decode.
+ * @returns The decoded string.
  */
 function tryManualPercentageDecoding(str: string): string {
   try {
@@ -177,7 +211,10 @@ function tryManualPercentageDecoding(str: string): string {
 }
 
 /**
- * Try base64 decoding if the string looks like base64
+ * Attempts to decode a string using Base64 if it appears to be a Base64-encoded value.
+ *
+ * @param str The string to decode.
+ * @returns The decoded string, or the original string if it's not valid Base64.
  */
 function tryBase64Decoding(str: string): string {
   try {
@@ -194,7 +231,12 @@ function tryBase64Decoding(str: string): string {
 }
 
 /**
- * Fix common JSON encoding issues
+ * Attempts to fix common syntax errors in a JSON-like string.
+ * This includes converting single quotes to double quotes, removing trailing commas,
+ * and quoting unquoted keys/values.
+ *
+ * @param str The JSON-like string to fix.
+ * @returns A potentially fixed JSON string.
  */
 function fixCommonJSONIssues(str: string): string {
   let result = str.trim();
@@ -219,7 +261,11 @@ function fixCommonJSONIssues(str: string): string {
 }
 
 /**
- * Enhanced JSON string cleaning that tries multiple approaches
+ * A comprehensive cleaning function that applies multiple strategies to produce a valid JSON string.
+ * It will try fixing common issues and applying additional decoding methods.
+ *
+ * @param str The string to clean.
+ * @returns A cleaned JSON string.
  */
 function cleanJSONString(str: string): string {
   let cleaned = str.trim();
@@ -245,6 +291,10 @@ function cleanJSONString(str: string): string {
   return cleaned;
 }
 
+/**
+ * Manages the persistence of state in the URL's query parameters.
+ * It handles serialization, compression, encryption, and robust decoding of state.
+ */
 export class URLPersistence {
   private options: Required<URLPersistenceOptions>;
 
@@ -258,60 +308,58 @@ export class URLPersistence {
     };
   }
 
+  /**
+   * Encodes a state object into a URL string.
+   * The process is: Serialize -> Compress -> Encrypt -> Add Prefix -> URL-encode.
+   *
+   * @template T The type of the state object.
+   * @param state The state object to encode.
+   * @param currentUrl The current URL to append the state to. Defaults to `window.location.href`.
+   * @returns A result object containing the success status and the new URL.
+   */
   async encodeState<T>(state: T, currentUrl?: string): Promise<URLPersistenceResult> {
     if (!this.options.enabled) {
       return { success: true };
     }
 
     try {
-      // Serialize state to JSON
       const jsonState = JSON.stringify(state);
-      console.log('🔧 URLPersistence.encodeState - Original JSON:', jsonState.substring(0, 100) + '...');
-      
-      // Compress if enabled
-      let encodedState = jsonState;
-      if (this.options.compress) {
+      let processedState = jsonState;
+      let prefix = '';
+
+      // 1. Compression
+      const shouldCompress = this.options.compress === true || 
+                             (this.options.compress === 'auto' && jsonState.length > 1000);
+      if (shouldCompress) {
         let algorithm: CompressionAlgorithm = 'auto';
-        if (typeof this.options.compress === 'string') {
+        if (typeof this.options.compress === 'string' && this.options.compress !== 'auto') {
           algorithm = this.options.compress;
         }
-        encodedState = await compress(jsonState, algorithm);
-        console.log('🔧 URLPersistence.encodeState - After compression:', encodedState.substring(0, 100) + '...');
+        processedState = await compress(processedState, algorithm);
+        prefix = 'c_';
       }
       
-      // Encrypt if enabled
+      // 2. Encryption (applied after compression)
       if (this.options.encrypt && this.options.encryptionKey) {
-        encodedState = await encrypt(encodedState, this.options.encryptionKey);
-        console.log('🔧 URLPersistence.encodeState - After encryption:', encodedState.substring(0, 100) + '...');
+        processedState = await encrypt(processedState, this.options.encryptionKey);
+        prefix = 'e' + prefix; // 'e_' or 'ec_'
       }
       
-      // Build new URL - handle both browser and Next.js environments
+      const finalPayload = prefix + processedState;
+      
+      // Build new URL
       let url: URL;
       try {
         url = new URL(currentUrl || window.location.href);
       } catch (error) {
-        // Fallback for server-side or invalid URLs
         url = new URL(currentUrl || 'http://localhost:3000');
       }
       
-      // Store the raw state (JSON or compressed) - searchParams.set() will handle encoding
-      url.searchParams.set(this.options.paramName, encodedState);
-      
-      const finalUrl = url.toString();
-      console.log('🔧 URLPersistence.encodeState - Final URL length:', finalUrl.length);
-      console.log('🔧 URLPersistence.encodeState - Parameter name:', this.options.paramName);
-      
-      // Verify we can retrieve and decode it (only in browser)
-      if (typeof window !== 'undefined') {
-        const testParam = url.searchParams.get(this.options.paramName);
-        if (testParam) {
-          console.log('🔧 URLPersistence.encodeState - Retrieved param starts with:', testParam.substring(0, 50) + '...');
-        }
-      }
+      url.searchParams.set(this.options.paramName, finalPayload);
       
       return {
         success: true,
-        url: finalUrl
+        url: url.toString()
       };
     } catch (error) {
       console.error('🔧 URLPersistence.encodeState - Error:', error);
@@ -322,45 +370,64 @@ export class URLPersistence {
     }
   }
 
+  /**
+   * Decodes state from a URL's query parameter.
+   * The process is: URL-decode -> Detect Prefix -> Decrypt -> Decompress -> Parse.
+   * It is highly robust and can handle multiply-encoded or malformed data.
+   *
+   * @template T The expected type of the state object.
+   * @param url The URL to decode from. Defaults to `window.location.href`.
+   * @returns A result object containing the success status and the decoded state.
+   */
   async decodeState<T>(url?: string): Promise<{ success: boolean; state?: T; error?: string }> {
     if (!this.options.enabled) {
       return { success: true };
     }
 
     try {
-      // Handle both browser and Next.js environments
       let targetUrl: string;
-      let encodedState: string | null = null;
+      let encodedPayload: string | null = null;
       
       if (typeof window !== 'undefined') {
-        // Browser environment
         targetUrl = url || window.location.href;
       const urlObj = new URL(targetUrl);
-        encodedState = urlObj.searchParams.get(this.options.paramName);
+        encodedPayload = urlObj.searchParams.get(this.options.paramName);
       } else if (url) {
-        // Server-side with provided URL
         const urlObj = new URL(url);
-        encodedState = urlObj.searchParams.get(this.options.paramName);
+        encodedPayload = urlObj.searchParams.get(this.options.paramName);
       } else {
-        // Server-side without URL - can't decode
         return { success: true };
       }
       
-      if (!encodedState) {
-        return { success: true }; // No state in URL is not an error
+      if (!encodedPayload) {
+        return { success: true }; 
       }
       
-      console.log('🔧 URLPersistence.decodeState - Found encoded state:', encodedState.substring(0, 50) + '...');
+      let decodedPayload = safeDecodeURIComponent(encodedPayload);
+
+      // --- New Prefix-Based Decoding Logic ---
+      let isEncrypted = false;
+      let isCompressed = false;
+
+      if (decodedPayload.startsWith('ec_')) {
+        isEncrypted = true;
+        isCompressed = true;
+        decodedPayload = decodedPayload.substring(3);
+      } else if (decodedPayload.startsWith('e_')) {
+        isEncrypted = true;
+        decodedPayload = decodedPayload.substring(2);
+      } else if (decodedPayload.startsWith('c_')) {
+        isCompressed = true;
+        decodedPayload = decodedPayload.substring(2);
+      }
       
-      // Decode from URL - handle potential multiple encoding layers
-      let decodedState = safeDecodeURIComponent(encodedState);
-      console.log('🔧 URLPersistence.decodeState - After decoding:', decodedState.substring(0, 50) + '...');
-      
-      // Decrypt if enabled
-      if (this.options.encrypt && this.options.encryptionKey) {
+      // 1. Decrypt if the prefix indicates encryption
+      if (isEncrypted) {
+        if (!this.options.encryptionKey) {
+          return { success: false, error: 'Data is encrypted, but no encryptionKey was provided.' };
+        }
         try {
-        decodedState = await decrypt(decodedState, this.options.encryptionKey);
-          console.log('🔧 URLPersistence.decodeState - After decryption:', decodedState.substring(0, 50) + '...');
+          decodedPayload = await decrypt(decodedPayload, this.options.encryptionKey);
         } catch (decryptError) {
           console.error('🔧 URLPersistence.decodeState - Decryption failed:', decryptError);
           return { 
@@ -370,26 +437,25 @@ export class URLPersistence {
         }
       }
       
-      // Decompress if needed
-      let jsonState = decodedState;
-      if (this.options.compress) {
+      // 2. Decompress if the prefix indicates compression
+      let jsonState = decodedPayload;
+      if (isCompressed) {
         try {
-          // Use auto-detection for decompression to handle any compression type
-          jsonState = await decompress(decodedState, 'auto');
-          console.log('🔧 URLPersistence.decodeState - After decompression:', jsonState.substring(0, 50) + '...');
+          jsonState = await decompress(decodedPayload, 'auto');
         } catch (decompressError) {
-          // If decompression fails, the data might not be compressed
-          console.warn('🔧 URLPersistence.decodeState - Decompression failed, treating as uncompressed:', decompressError);
-          jsonState = decodedState;
-        }
+          console.warn('🔧 URLPersistence.decodeState - Decompression failed:', decompressError);
+          // Unlike decryption, if decompression fails we can't proceed.
+           return { 
+            success: false, 
+            error: `Decompression failed: ${decompressError instanceof Error ? decompressError.message : 'Unknown error'}` 
+          };
+      }
       }
       
-      // Clean and validate JSON
       if (!jsonState) {
         return { success: false, error: 'Decoded state is empty' };
       }
       
-      // Clean the JSON string
       const cleanedJsonState = cleanJSONString(jsonState);
       console.log('🔧 URLPersistence.decodeState - Final JSON to parse:', cleanedJsonState.substring(0, 100) + '...');
       
@@ -420,6 +486,12 @@ export class URLPersistence {
     }
   }
 
+  /**
+   * Updates the browser's current URL with the new state-filled URL without a page reload.
+   * This method uses `history.replaceState`.
+   *
+   * @param url The new URL to set.
+   */
   updateURL(url: string): void {
     if (this.options.enabled && typeof window !== 'undefined') {
       console.log('🔧 URLPersistence.updateURL - Updating to:', url.substring(0, 150) + '...');
@@ -432,7 +504,11 @@ export class URLPersistence {
   }
 
   /**
-   * Debug helper to inspect URL parameter state (async for Next.js compatibility)
+   * A debug utility to inspect the raw and decoded state of the URL parameter.
+   * This is useful for troubleshooting encoding and decoding issues.
+   *
+   * @param url The URL to inspect. Defaults to `window.location.href`.
+   * @returns An object containing detailed debug information about the parameter's state.
    */
   async debugURLState(url?: string): Promise<{ 
     rawParam: string | null;

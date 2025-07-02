@@ -231,7 +231,7 @@ slug-store/
 
 ---
 
-**🚀 Slug Store v4.0.0 represents a paradigm shift in Next.js state management - delivering maximum developer value through strategic complexity obstruction.**
+**🚀 Slug Store v4.0.0 represents a paradigm shift in Next.js state management - delivering maximum developer value through strategic complexity obstruction.** 
 
 # Slug Store v4.0.9 Release Summary
 

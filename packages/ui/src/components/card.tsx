@@ -4,7 +4,7 @@ import { cn } from "@workspace/ui/lib/utils"
 
 const Card = React.forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
+  React.HTMLAttributes<HTMLDivElement> & { children: React.ReactNode }
 >(({ className, children, ...props }, ref) => (
   <div
     ref={ref}
@@ -21,7 +21,7 @@ Card.displayName = "Card"
 
 const CardHeader = React.forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
+  React.HTMLAttributes<HTMLDivElement> & { children: React.ReactNode }
 >(({ className, children, ...props }, ref) => (
   <div
     ref={ref}
@@ -35,7 +35,7 @@ CardHeader.displayName = "CardHeader"
 
 const CardTitle = React.forwardRef<
   HTMLHeadingElement,
-  React.HTMLAttributes<HTMLHeadingElement>
+  React.HTMLAttributes<HTMLHeadingElement> & { children: React.ReactNode }
 >(({ className, children, ...props }, ref) => (
   <h3
     ref={ref}
@@ -52,7 +52,7 @@ CardTitle.displayName = "CardTitle"
 
 const CardDescription = React.forwardRef<
   HTMLParagraphElement,
-  React.HTMLAttributes<HTMLParagraphElement>
+  React.HTMLAttributes<HTMLParagraphElement> & { children: React.ReactNode }
 >(({ className, children, ...props }, ref) => (
   <p
     ref={ref}
@@ -66,7 +66,7 @@ CardDescription.displayName = "CardDescription"
 
 const CardContent = React.forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
+  React.HTMLAttributes<HTMLDivElement> & { children: React.ReactNode }
 >(({ className, children, ...props }, ref) => (
   <div ref={ref} className={cn("p-6 pt-0", className)} {...props}>
     {children}
@@ -76,7 +76,7 @@ CardContent.displayName = "CardContent"
 
 const CardFooter = React.forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
+  React.HTMLAttributes<HTMLDivElement> & { children: React.ReactNode }
 >(({ className, children, ...props }, ref) => (
   <div
     ref={ref}

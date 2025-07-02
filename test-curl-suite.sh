@@ -52,8 +52,9 @@ warning() {
 run_test() {
     local test_name="$1"
     local expected_status="$2"
-    local curl_command="$3"
-    local validation_func="$4"
+    local curl_args="$3"
+    local url="$4"
+    local validation_func="$5"
     
     ((TOTAL_TESTS++))
     log "Running test: $test_name"
@@ -63,7 +64,7 @@ run_test() {
     local headers_file="$TEMP_DIR/headers_${TOTAL_TESTS}.txt"
     
     # Run curl with detailed output
-    if curl -s -w "%{http_code}" -D "$headers_file" -o "$response_file" $curl_command > "$TEMP_DIR/status_${TOTAL_TESTS}.txt" 2>&1; then
+    if curl -s -w "%{http_code}" -D "$headers_file" -o "$response_file" $curl_args "$url" > "$TEMP_DIR/status_${TOTAL_TESTS}.txt" 2>&1; then
         local actual_status=$(cat "$TEMP_DIR/status_${TOTAL_TESTS}.txt")
         local response_body=$(cat "$response_file")
         
@@ -174,48 +175,57 @@ run_test "Use Cases API - With Accept header" "200" \
 
 # Test 6: Share API - Valid POST request
 run_test "Share API - Valid POST" "200" \
-    "-X POST -H 'Content-Type: application/json' -d '{\"email\":\"test@example.com\",\"state\":{\"items\":[{\"name\":\"Test Item\",\"price\":100,\"category\":\"test\",\"priority\":\"high\"}]},\"url\":\"https://example.com/test\"}' $API_BASE/share" \
+    "-X POST -H 'Content-Type: application/json' -d '{\"email\":\"shawnbienvenu@gmail.com\",\"state\":{\"items\":[{\"name\":\"Test Item\",\"price\":100,\"category\":\"test\",\"priority\":\"high\"}]},\"url\":\"https://example.com/test\"}'" \
+    "$API_BASE/share" \
     "validate_share_success"
 
 # Test 7: Share API - Missing email
 run_test "Share API - Missing email" "400" \
-    "-X POST -H 'Content-Type: application/json' -d '{\"state\":{\"items\":[]},\"url\":\"https://example.com\"}' $API_BASE/share" \
+    "-X POST -H 'Content-Type: application/json' -d '{\"state\":{\"items\":[]},\"url\":\"https://example.com\"}'" \
+    "$API_BASE/share" \
     "validate_share_error"
 
 # Test 8: Share API - Invalid email
 run_test "Share API - Invalid email" "400" \
-    "-X POST -H 'Content-Type: application/json' -d '{\"email\":\"invalid-email\",\"state\":{\"items\":[]},\"url\":\"https://example.com\"}' $API_BASE/share" \
+    "-X POST -H 'Content-Type: application/json' -d '{\"email\":\"invalid-email\",\"state\":{\"items\":[]},\"url\":\"https://example.com\"}'" \
+    "$API_BASE/share" \
     "validate_share_error"
 
 # Test 9: Share API - Missing state
 run_test "Share API - Missing state" "400" \
-    "-X POST -H 'Content-Type: application/json' -d '{\"email\":\"test@example.com\",\"url\":\"https://example.com\"}' $API_BASE/share" \
+    "-X POST -H 'Content-Type: application/json' -d '{\"email\":\"shawnbienvenu@gmail.com\",\"url\":\"https://example.com\"}'" \
+    "$API_BASE/share" \
     "validate_share_error"
 
 # Test 10: Share API - Missing URL
 run_test "Share API - Missing URL" "400" \
-    "-X POST -H 'Content-Type: application/json' -d '{\"email\":\"test@example.com\",\"state\":{\"items\":[]}}' $API_BASE/share" \
+    "-X POST -H 'Content-Type: application/json' -d '{\"email\":\"shawnbienvenu@gmail.com\",\"state\":{\"items\":[]}}'" \
+    "$API_BASE/share" \
     "validate_share_error"
 
 # Test 11: Share API - Empty JSON
 run_test "Share API - Empty JSON" "400" \
-    "-X POST -H 'Content-Type: application/json' -d '{}' $API_BASE/share" \
+    "-X POST -H 'Content-Type: application/json' -d '{}'" \
+    "$API_BASE/share" \
     "validate_share_error"
 
 # Test 12: Share API - Invalid JSON
 run_test "Share API - Invalid JSON" "400" \
-    "-X POST -H 'Content-Type: application/json' -d 'invalid-json' $API_BASE/share" \
+    "-X POST -H 'Content-Type: application/json' -d 'invalid-json'" \
+    "$API_BASE/share" \
     "validate_share_error"
 
 # Test 13: Share API - Complex state data
 run_test "Share API - Complex state" "200" \
-    "-X POST -H 'Content-Type: application/json' -d '{\"email\":\"test@example.com\",\"state\":{\"items\":[{\"name\":\"Gaming Laptop\",\"price\":1500,\"category\":\"electronics\",\"priority\":\"high\",\"description\":\"High-end gaming laptop with RTX 4080\"},{\"name\":\"Wireless Mouse\",\"price\":80,\"category\":\"accessories\",\"priority\":\"medium\"}],\"view\":\"grid\",\"filters\":{\"category\":\"electronics\",\"priceRange\":[0,2000]}},\"url\":\"https://example.com/wishlist\"}' $API_BASE/share" \
+    "-X POST -H 'Content-Type: application/json' -d '{\"email\":\"shawnbienvenu@gmail.com\",\"state\":{\"items\":[{\"name\":\"Gaming Laptop\",\"price\":1500,\"category\":\"electronics\",\"priority\":\"high\",\"description\":\"High-end gaming laptop with RTX 4080\"},{\"name\":\"Wireless Mouse\",\"price\":80,\"category\":\"accessories\",\"priority\":\"medium\"}],\"view\":\"grid\",\"filters\":{\"category\":\"electronics\",\"priceRange\":[0,2000]}},\"url\":\"https://example.com/wishlist\"}'" \
+    "$API_BASE/share" \
     "validate_share_success"
 
 # Test 14: Share API - Large payload
 large_items=$(for i in {1..50}; do echo "{\"name\":\"Item $i\",\"price\":$((i*10)),\"category\":\"category$((i%5))\",\"priority\":\"medium\"}"; done | paste -sd,)
 run_test "Share API - Large payload" "200" \
-    "-X POST -H 'Content-Type: application/json' -d '{\"email\":\"test@example.com\",\"state\":{\"items\":[$large_items]},\"url\":\"https://example.com\"}' $API_BASE/share" \
+    "-X POST -H 'Content-Type: application/json' -d '{\"email\":\"shawnbienvenu@gmail.com\",\"state\":{\"items\":[$large_items]},\"url\":\"https://example.com\"}'" \
+    "$API_BASE/share" \
     "validate_share_success"
 
 # Test 15: Main page - GET request
@@ -326,7 +336,7 @@ log "Running security tests..."
 
 # Test 31: SQL injection attempt
 run_test "SQL Injection Test" "400" \
-    "-X POST -H 'Content-Type: application/json' -d '{\"email\":\"test@example.com\",\"state\":{\"items\":[{\"name\":\"'; DROP TABLE users; --\",\"price\":100}]},\"url\":\"https://example.com\"}' $API_BASE/share" \
+    "-X POST -H 'Content-Type: application/json' -d '{\"email\":\"shawnbienvenu@gmail.com\",\"state\":{\"items\":[{\"name\":\"'; DROP TABLE users; --\",\"price\":100}]},\"url\":\"https://example.com\"}' $API_BASE/share" \
     "validate_share_error"
 
 # Test 32: XSS attempt

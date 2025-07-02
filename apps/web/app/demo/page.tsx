@@ -29,22 +29,22 @@ export default async function DemoPage() {
               </Button>
               <Badge variant="secondary" className="px-2 py-1">
                 <Sparkles className="h-3 w-3 mr-1" />
-                v4.0 Demo
+                v4.1 Demo
               </Badge>
             </div>
             
             <div className="text-center space-y-3">
               <h1 className="text-3xl font-bold">
-                Slug Store v4.0 Interactive Demo
+                Slug Store v4.1 Interactive Demo
               </h1>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                Simple state management with Auto Config System. Every change automatically syncs with intelligent optimization!
+                Simple state management with Hybrid Persistence. Every change automatically syncs with intelligent optimization!
               </p>
               
               <div className="flex flex-wrap justify-center gap-3 text-sm">
                 <div className="flex items-center gap-1">
                   <Brain className="h-3 w-3 text-blue-500" />
-                  <span>Auto Config</span>
+                  <span>Hybrid Mode</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <Globe className="h-3 w-3 text-green-500" />
@@ -98,7 +98,7 @@ export default async function DemoPage() {
               </CardHeader>
               <CardContent>
                 <pre className="text-sm bg-muted p-4 rounded-lg overflow-x-auto">
-{`// Simple state management
+{`// Simple state management with Hybrid Persistence
 import { useSlugStore } from 'slug-store/client'
 
 function WishlistApp() {
@@ -106,9 +106,11 @@ function WishlistApp() {
     items: [],
     view: 'grid',
     filter: 'all'
+  }, {
+    hybrid: true // Persist to URL and offline storage
   })
 
-  // That's it! Auto-configured for optimal performance!
+  // That's it! Your state is now shareable and durable.
   return (
     <div>
       {wishlist.items.map(item => (

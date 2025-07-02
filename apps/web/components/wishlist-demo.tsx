@@ -30,9 +30,7 @@ export function WishlistDemo() {
     view: 'grid',
     filter: 'all',
   }, {
-    url: true,
-    offline: true,
-    autoConfig: false, // Disable auto-config to use explicit settings
+    hybrid: true,
     debug: true
   });
 

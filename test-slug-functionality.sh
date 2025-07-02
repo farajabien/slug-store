@@ -130,7 +130,7 @@ test_share_api() {
     
     # Test basic share functionality
     share_payload='{
-        "email": "test@example.com",
+        "email": "shawnbienvenu@gmail.com",
         "state": {
             "items": [
                 {"name": "Test Product", "price": 99, "category": "test", "priority": "high"}
@@ -159,7 +159,7 @@ test_share_api() {
         large_items+="{\"name\":\"Product $i\",\"price\":$((i*50)),\"category\":\"category$((i%5))\",\"priority\":\"medium\"}"
     done
     
-    large_payload="{\"email\":\"test@example.com\",\"state\":{\"items\":[$large_items],\"view\":\"list\"},\"url\":\"https://example.com/large-wishlist\"}"
+    large_payload="{\"email\":\"shawnbienvenu@gmail.com\",\"state\":{\"items\":[$large_items],\"view\":\"list\"},\"url\":\"https://example.com/large-wishlist\"}"
     
     response=$(curl -s -X POST -H 'Content-Type: application/json' -d "$large_payload" "$API_BASE/share")
     

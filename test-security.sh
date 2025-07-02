@@ -173,11 +173,11 @@ security_test "SQL Injection in Email" "Should reject malicious SQL in email fie
     "validate_sql_injection"
 
 security_test "SQL Injection in State" "Should reject malicious SQL in state data" \
-    "-X POST -H 'Content-Type: application/json' -d '{\"email\":\"test@example.com\",\"state\":{\"items\":[{\"name\":\"'; DROP TABLE items; --\",\"price\":100}]},\"url\":\"https://example.com\"}' $API_BASE/share" \
+    "-X POST -H 'Content-Type: application/json' -d '{\"email\":\"shawnbienvenu@gmail.com\",\"state\":{\"items\":[{\"name\":\"'; DROP TABLE items; --\",\"price\":100}]},\"url\":\"https://example.com\"}' $API_BASE/share" \
     "validate_sql_injection"
 
 security_test "SQL Injection in URL" "Should reject malicious SQL in URL field" \
-    "-X POST -H 'Content-Type: application/json' -d '{\"email\":\"test@example.com\",\"state\":{\"items\":[]},\"url\":\"https://example.com'; DROP TABLE urls; --\"}' $API_BASE/share" \
+    "-X POST -H 'Content-Type: application/json' -d '{\"email\":\"shawnbienvenu@gmail.com\",\"state\":{\"items\":[]},\"url\":\"https://example.com'; DROP TABLE urls; --\"}' $API_BASE/share" \
     "validate_sql_injection"
 
 # Test 2: XSS Attempts
@@ -188,11 +188,11 @@ security_test "XSS in Email" "Should reject script tags in email" \
     "validate_xss_protection"
 
 security_test "XSS in Item Name" "Should reject script tags in item names" \
-    "-X POST -H 'Content-Type: application/json' -d '{\"email\":\"test@example.com\",\"state\":{\"items\":[{\"name\":\"<script>alert(1)</script>\",\"price\":100}]},\"url\":\"https://example.com\"}' $API_BASE/share" \
+    "-X POST -H 'Content-Type: application/json' -d '{\"email\":\"shawnbienvenu@gmail.com\",\"state\":{\"items\":[{\"name\":\"<script>alert(1)</script>\",\"price\":100}]},\"url\":\"https://example.com\"}' $API_BASE/share" \
     "validate_xss_protection"
 
 security_test "XSS in URL" "Should reject script tags in URL" \
-    "-X POST -H 'Content-Type: application/json' -d '{\"email\":\"test@example.com\",\"state\":{\"items\":[]},\"url\":\"javascript:alert(1)\"}' $API_BASE/share" \
+    "-X POST -H 'Content-Type: application/json' -d '{\"email\":\"shawnbienvenu@gmail.com\",\"state\":{\"items\":[]},\"url\":\"javascript:alert(1)\"}' $API_BASE/share" \
     "validate_xss_protection"
 
 # Test 3: Path Traversal Attacks
@@ -247,7 +247,7 @@ security_test "CORS Configuration" "Should have secure CORS configuration" \
 log "Testing Input Validation..."
 
 security_test "Oversized JSON Payload" "Should reject oversized payloads" \
-    "-X POST -H 'Content-Type: application/json' -d '{\"email\":\"test@example.com\",\"state\":{\"items\":[$(printf '%*s' 100000 '' | sed 's/ /{\"name\":\"item\",\"price\":100},/g')]},\"url\":\"https://example.com\"}' $API_BASE/share" \
+    "-X POST -H 'Content-Type: application/json' -d '{\"email\":\"shawnbienvenu@gmail.com\",\"state\":{\"items\":[$(printf '%*s' 100000 '' | sed 's/ /{\"name\":\"item\",\"price\":100},/g')]},\"url\":\"https://example.com\"}' $API_BASE/share" \
     "validate_dos_protection"
 
 security_test "Invalid JSON Structure" "Should reject malformed JSON" \
@@ -255,14 +255,14 @@ security_test "Invalid JSON Structure" "Should reject malformed JSON" \
     ""
 
 security_test "Null Byte Injection" "Should reject null bytes" \
-    "-X POST -H 'Content-Type: application/json' -d '{\"email\":\"test@example.com\0\",\"state\":{\"items\":[]},\"url\":\"https://example.com\"}' $API_BASE/share" \
+    "-X POST -H 'Content-Type: application/json' -d '{\"email\":\"shawnbienvenu@gmail.com\0\",\"state\":{\"items\":[]},\"url\":\"https://example.com\"}' $API_BASE/share" \
     ""
 
 # Test 8: Authentication & Authorization
 log "Testing Authentication/Authorization..."
 
 security_test "Missing Content-Type" "Should require proper content type" \
-    "-X POST -d '{\"email\":\"test@example.com\",\"state\":{\"items\":[]},\"url\":\"https://example.com\"}' $API_BASE/share" \
+    "-X POST -d '{\"email\":\"shawnbienvenu@gmail.com\",\"state\":{\"items\":[]},\"url\":\"https://example.com\"}' $API_BASE/share" \
     ""
 
 security_test "Wrong Content-Type" "Should validate content type" \
