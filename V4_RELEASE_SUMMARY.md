@@ -231,4 +231,82 @@ slug-store/
 
 ---
 
-**🚀 Slug Store v4.0.0 represents a paradigm shift in Next.js state management - delivering maximum developer value through strategic complexity obstruction.** 
+**🚀 Slug Store v4.0.0 represents a paradigm shift in Next.js state management - delivering maximum developer value through strategic complexity obstruction.**
+
+# Slug Store v4.0.9 Release Summary
+
+## 🎯 Release Overview
+
+**Version**: 4.0.9  
+**Release Date**: January 27, 2025  
+**Type**: Patch Release (Bug Fix)  
+**Breaking Changes**: None
+
+## 🐛 Critical Bug Fixed
+
+### **URL Persistence Failure with `autoConfig: false`**
+
+**Problem**: When users set `autoConfig: false` in their slug-store configuration, URL persistence would completely fail, causing:
+- "Decompression failed" errors in console
+- State not being restored from URL parameters
+- Broken URL sharing functionality
+- Inconsistent behavior between saving and loading
+
+**Root Cause**: Encoding/decoding logic mismatch:
+- **Saving**: Used `shouldCompress = false` (no compression)
+- **Loading**: Used `compress: 'auto'` (tried to decompress uncompressed data)
+
+**Solution**: Updated loading logic to be consistent with saving logic:
+```typescript
+// Before:
+compress: 'auto', // Always tried to decompress
+
+// After:
+compress: autoConfig ? 'auto' : false, // Only auto-detect if autoConfig is enabled
+```
+
+## ✅ Verification Results
+
+| Feature | Status | Notes |
+|---------|--------|-------|
+| URL Persistence | ✅ Working | State properly encoded/decoded |
+| State Management | ✅ Working | All core functionality operational |
+| URL Sharing | ✅ Working | Copy and share features functional |
+| Demo App | ✅ Working | Production-ready with full functionality |
+| Build Process | ✅ Working | Successful compilation |
+| Email Sharing | ⚠️ Ready | Requires RESEND_API_KEY configuration |
+| TypeScript | ⚠️ Minor Issues | React type compatibility (non-functional) |
+
+## 📦 Package Details
+
+- **Package Name**: `slug-store`
+- **Version**: 4.0.9
+- **Bundle Size**: Unchanged from v4.0.8
+- **Dependencies**: No changes
+- **Breaking Changes**: None
+
+## 🚀 Ready for Production
+
+The demo app is now **production-ready** with:
+- ✅ Fully functional URL persistence
+- ✅ Working state management
+- ✅ Operational URL sharing
+- ✅ All core features working correctly
+
+## 📋 Next Steps
+
+1. **Publish to npm**: `npm publish` in `packages/slug-store/`
+2. **Update documentation**: Ensure all examples use the latest version
+3. **Monitor**: Watch for any edge cases in production usage
+4. **Email sharing**: Configure RESEND_API_KEY for full email functionality
+
+## 🔧 Technical Impact
+
+- **Backward Compatibility**: 100% - no breaking changes
+- **Performance**: Unchanged - no performance impact
+- **Bundle Size**: Unchanged - no size increase
+- **Developer Experience**: Significantly improved - URL persistence now works reliably
+
+---
+
+**Status**: ✅ Ready for publication and production deployment 

@@ -1,7 +1,7 @@
 {
   "name": "slug-store",
-  "version": "4.0.8",
-  "description": "The State Management Solution for the Next.js App Router.",
+  "version": "4.0.10",
+  "description": "Universal state persistence for modern web apps. Zero obstruction, maximum DevEx.",
   "keywords": [
     "react",
     "nextjs",

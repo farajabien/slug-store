@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
 
     // Send email
     const { data, error } = await resend.emails.send({
-      from: process.env.NEXT_PUBLIC_FROM_EMAIL || 'demo@slugstore.dev',
+      from: process.env.NEXT_PUBLIC_FROM_EMAIL || 'SlugStore <mail@fbien.com>',
       to: [email],
       subject: '🎁 Wishlist Shared with You',
       html: emailContent,

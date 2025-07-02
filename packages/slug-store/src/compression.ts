@@ -24,6 +24,12 @@ export async function compress(data: string, algorithm: CompressionAlgorithm = '
 }
 
 export async function decompress(data: string, algorithm?: CompressionAlgorithm): Promise<string> {
+  // Handle empty or invalid input
+  if (!data || typeof data !== 'string') {
+    throw new Error('Invalid input data for decompression');
+  }
+
+  // If algorithm is specified and not auto, use it directly
   if (algorithm && algorithm !== 'auto') {
     switch (algorithm) {
       case 'lz-string':
@@ -37,26 +43,53 @@ export async function decompress(data: string, algorithm?: CompressionAlgorithm)
     }
   }
 
-  // Auto-detection: try all supported algorithms until one succeeds.
+  // Auto-detection: first check if it's already valid JSON
   try {
-    const brotliResult = await decompressBrotli(data);
-    return brotliResult;
-  } catch (brotliError) {
-    // Brotli failed, try Gzip
-    try {
-      const gzipResult = await decompressGzip(data);
-      return gzipResult;
-    } catch (gzipError) {
-      // Gzip failed, try LZ-String
-      try {
-        const lzResult = decompressLZString(data);
-        return lzResult;
-      } catch (lzError) {
-        // All failed, return data as-is
-        console.warn('Decompression failed with all available algorithms.');
-        return data;
-      }
+    const parsed = JSON.parse(data);
+    // If it successfully parses as JSON and is an object/array, return as-is
+    if (typeof parsed === 'object' && parsed !== null) {
+      return data;
     }
+  } catch {
+    // Not valid JSON, continue with decompression attempts
+  }
+
+  // Try decompression algorithms in order of likelihood
+  const algorithms: Array<{ name: CompressionAlgorithm; fn: (data: string) => Promise<string> | string }> = [
+    { name: 'lz-string', fn: decompressLZString },
+    { name: 'brotli', fn: decompressBrotli },
+    { name: 'gzip', fn: decompressGzip }
+  ];
+
+  let lastError: Error | null = null;
+
+  for (const { name, fn } of algorithms) {
+    try {
+      const result = await fn(data);
+      
+      // Verify the decompressed result is valid JSON
+      try {
+        JSON.parse(result);
+        return result; // Success!
+      } catch {
+        // Not valid JSON, try next algorithm
+        continue;
+      }
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error(String(error));
+      // Try next algorithm
+      continue;
+    }
+  }
+
+  // All algorithms failed, check one more time if the original data is valid JSON
+  try {
+    JSON.parse(data);
+    console.warn('All decompression algorithms failed, but original data is valid JSON. Returning as-is.');
+        return data;
+  } catch {
+    // Original data is not valid JSON either
+    throw new Error(`All decompression algorithms failed. Last error: ${lastError?.message || 'Unknown error'}`);
   }
 }
 
@@ -68,13 +101,40 @@ function compressLZString(data: string): string {
 
 function decompressLZString(data: string): string {
   try {
+    // First check if data looks like base64
+    if (!/^[A-Za-z0-9+/]*={0,2}$/.test(data)) {
+      // Not base64, might already be decompressed
+      try {
+        JSON.parse(data);
+        return data;
+      } catch {
+        throw new Error('Data is not base64 and not valid JSON');
+      }
+    }
+
     const decoded = decodeURIComponent(escape(atob(data)));
-    // Add a check to see if the decoded data is different from the input.
-    // A successful decode should almost always result in a different string.
-    if (decoded === data) throw new Error('LZ-String input might not be compressed');
+    
+    // Verify the decoded result is valid JSON
+    try {
+      JSON.parse(decoded);
     return decoded;
+    } catch {
+      // If decoded result is not valid JSON, but original data is, return original
+      try {
+        JSON.parse(data);
+        return data;
+      } catch {
+        throw new Error('LZ-String decompression produced invalid JSON');
+      }
+    }
   } catch(e) {
-    throw new Error('Failed to decompress with LZ-String');
+    // If decompression fails, check if the data is already valid JSON
+    try {
+      JSON.parse(data);
+      return data;
+    } catch {
+      throw new Error(`Failed to decompress with LZ-String: ${e instanceof Error ? e.message : 'Unknown error'}`);
+    }
   }
 }
 

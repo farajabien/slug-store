@@ -77,6 +77,7 @@ export function useSlugStore<T>(
       const urlPersistence = new URLPersistence({ 
         enabled: true, // Always try to decode from URL
         paramName: key, 
+        compress: autoConfig ? 'auto' : false, // Only use auto-detection if autoConfig is enabled
         encryptionKey: encryptionKey || undefined,
         encrypt: !!encryptionKey // We assume it might be encrypted if a key exists
       });
@@ -102,7 +103,7 @@ export function useSlugStore<T>(
     };
 
     loadState().catch(console.error);
-  }, [key, getEncryptionKey]);
+  }, [key, getEncryptionKey, autoConfig]);
 
   // --- Persist State on Change ---
   // This effect runs whenever the state changes to save it to the configured persistence layers.
@@ -125,7 +126,7 @@ export function useSlugStore<T>(
       const shouldPersistUrl = url || (analysis?.shouldPersistInURL);
       const shouldPersistOffline = offline || (analysis?.shouldPersistOffline);
       const shouldEncrypt = (!!customEncryptionKey) || (analysis?.shouldEncrypt);
-      const shouldCompress = analysis?.shouldCompress;
+      const shouldCompress = autoConfig ? analysis?.shouldCompress : false;
       
       // Persist to URL if configured.
       const urlPersistence = new URLPersistence({

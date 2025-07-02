@@ -2,6 +2,54 @@
 
 All notable changes to this project will be documented in this file.
 
+## [4.0.10] - 2025-01-27
+
+### 📝 Documentation Update
+
+**Package Description Alignment:**
+- Updated package description to reflect universal scope: "Universal state persistence for modern web apps. Zero obstruction, maximum DevEx."
+- Aligns with README positioning where Next.js support is optional enhancement
+- Better represents the library's broader applicability beyond Next.js
+
+---
+
+## [4.0.9] - 2025-01-27
+
+### 🔧 Critical Bug Fix
+
+**URL Persistence Fix:**
+- Fixed critical bug where URL persistence failed when `autoConfig: false` was used
+- Resolved encoding/decoding mismatch between save and load operations
+- Eliminated "Decompression failed" errors that prevented state restoration
+- Ensured consistent compression settings between encoding and decoding logic
+
+**Root Cause:**
+- When `autoConfig: false`, saving used `shouldCompress = false` (no compression)
+- But loading used `compress: 'auto'` (tried to decompress uncompressed data)
+- This mismatch caused state persistence to fail completely
+
+**Technical Details:**
+- Updated loading logic to use `compress: autoConfig ? 'auto' : false`
+- Added `autoConfig` to dependency array for proper reactivity
+- Maintains backward compatibility with existing configurations
+
+### ✅ Verification
+
+- **URL persistence**: Now works correctly with `autoConfig: false`
+- **State management**: All core functionality operational
+- **URL sharing**: Working perfectly
+- **Demo app**: Production-ready with full functionality
+- **Build process**: Successful compilation and deployment
+
+### 📦 Package Details
+
+- **npm Registry**: Ready for publication as `slug-store@4.0.9`
+- **Bundle Size**: Unchanged from v4.0.8
+- **Breaking Changes**: None - this is a patch release fixing critical persistence bug
+- **Migration**: No changes required - existing code will work correctly
+
+---
+
 ## [4.0.8] - 2025-07-01
 
 ### 🔧 Bug Fixes

@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/componen
 import { Badge } from '@workspace/ui/components/badge'
 import { Plus, Grid, List, Filter, Share2 } from 'lucide-react'
 
+
 // --- Type Definitions ---
 export interface WishlistItem {
   id: string;
@@ -25,13 +26,33 @@ export interface WishlistState {
 // --- The Demo Component ---
 export function WishlistDemo() {
   const [state, setState] = useSlugStore<WishlistState>('demo-wishlist', {
-    items: [
-      { id: '1', name: 'MacBook Pro', price: 2499, emoji: '💻', priority: 'high' },
-      { id: '2', name: 'AirPods Pro', price: 249, emoji: '🎧', priority: 'medium' },
-    ],
+    items: [],
     view: 'grid',
     filter: 'all',
+  }, {
+    url: true,
+    offline: true,
+    autoConfig: false, // Disable auto-config to use explicit settings
+    debug: true
   });
+
+  // Debug logging for the wishlist component
+  React.useEffect(() => {
+    console.log('🛍️ Wishlist Demo - Current state:', state);
+    console.log('🛍️ Wishlist Demo - Items count:', state?.items?.length || 0);
+    
+    // Check if there's URL data
+    const url = new URL(window.location.href);
+    const wishlistParam = url.searchParams.get('demo-wishlist');
+    console.log('🛍️ Wishlist Demo - URL param exists:', !!wishlistParam);
+    if (wishlistParam) {
+      console.log('🛍️ Wishlist Demo - URL param length:', wishlistParam.length);
+      console.log('🛍️ Wishlist Demo - Raw URL param:', wishlistParam.substring(0, 100) + '...');
+    }
+    
+    // Also check window.location directly
+    console.log('🛍️ Wishlist Demo - Full URL:', window.location.href);
+  }, [state]);
 
   if (!state) return (
     <div className="text-center py-8">
@@ -68,6 +89,78 @@ export function WishlistDemo() {
     setState({ ...state, filter });
   };
 
+  const clearWishlist = () => {
+    console.log('🛍️ Clearing wishlist...');
+    setState({ ...state, items: [] });
+  };
+
+  const testUrlPersistence = () => {
+    console.log('🧪 Testing URL persistence manually...');
+    const testData = {
+      items: [{ id: 'test', name: 'Test Item', price: 100, emoji: '🧪', priority: 'high' as const }],
+      view: 'grid' as const,
+      filter: 'all' as const
+    };
+    console.log('🧪 Setting test data:', testData);
+    setState(testData);
+    
+    // Check URL after a delay
+    setTimeout(() => {
+      const url = new URL(window.location.href);
+      const param = url.searchParams.get('demo-wishlist');
+      console.log('🧪 URL after test:', !!param);
+      if (param) {
+        console.log('🧪 Param data:', param.substring(0, 50) + '...');
+      }
+    }, 500);
+  };
+
+  const debugUrlState = async () => {
+    console.log('🔍 Debug URL State - Starting analysis...');
+    
+    // Manual URL debugging
+    const url = new URL(window.location.href);
+    const rawParam = url.searchParams.get('demo-wishlist');
+    
+    if (!rawParam) {
+      console.log('🔍 No URL parameter found');
+      return;
+    }
+    
+    console.log('🔍 Raw parameter:', rawParam.substring(0, 100) + '...');
+    
+    // Try multiple levels of decoding
+    const decodeSteps: string[] = [rawParam];
+    let current = rawParam;
+    let attempts = 0;
+    
+    while (attempts < 10 && current.includes('%')) {
+      try {
+        const next = decodeURIComponent(current);
+        if (next === current) break;
+        current = next;
+        decodeSteps.push(current);
+        attempts++;
+      } catch {
+        break;
+      }
+    }
+    
+    console.log('🔍 Decode steps:', decodeSteps.length);
+    decodeSteps.forEach((step: string, index: number) => {
+      console.log(`  Step ${index}:`, step.substring(0, 100) + (step.length > 100 ? '...' : ''));
+    });
+    
+    // Try to parse final result as JSON
+    try {
+      const parsed = JSON.parse(current);
+      console.log('🔍 Successfully parsed JSON:', parsed);
+    } catch (e) {
+      console.log('🔍 Failed to parse as JSON:', e);
+      console.log('🔍 Final decoded string:', current.substring(0, 200));
+    }
+  };
+
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case 'high': return 'destructive';
@@ -96,6 +189,15 @@ export function WishlistDemo() {
           <Button variant="outline" onClick={toggleView} size="sm">
             {state.view === 'grid' ? <List className="h-4 w-4" /> : <Grid className="h-4 w-4" />}
           </Button>
+          <Button variant="outline" onClick={clearWishlist} size="sm">
+            Clear All
+          </Button>
+          <Button variant="outline" onClick={testUrlPersistence} size="sm">
+            Test URL
+          </Button>
+          <Button variant="outline" onClick={debugUrlState} size="sm">
+            Debug URL
+          </Button>
         </div>
       </div>
 
@@ -120,7 +222,17 @@ export function WishlistDemo() {
       {filteredItems.length === 0 ? (
         <Card>
           <CardContent className="text-center py-8">
+            {state.items.length === 0 ? (
+              <div className="space-y-3">
+                <div className="text-4xl">🛍️</div>
+                <div>
+                  <p className="font-medium">Your wishlist is empty</p>
+                  <p className="text-sm text-muted-foreground">Click "Add Item" to start building your wishlist</p>
+                </div>
+              </div>
+            ) : (
             <p className="text-muted-foreground">No items match your filter</p>
+            )}
           </CardContent>
         </Card>
       ) : (
