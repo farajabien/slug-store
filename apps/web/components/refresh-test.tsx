@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useSlugStore } from '../../../packages/slug-store/src/client';
+import { useSlugStore } from 'slug-store/client';
 
 interface RefreshTestState {
   refreshCount: number;

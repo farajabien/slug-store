@@ -17,7 +17,7 @@
     "next": "^15.2.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "slug-store": "4.0.8",
+    "slug-store": "workspace:*",
     "resend": "^3.5.0",
     "zod": "^3.24.2"
   },
