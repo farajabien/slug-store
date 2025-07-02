@@ -1,6 +1,6 @@
 {
   "name": "slug-store",
-  "version": "4.0.10",
+  "version": "4.0.13",
   "description": "Universal state persistence for modern web apps. Zero obstruction, maximum DevEx.",
   "keywords": [
     "react",

@@ -2510,7 +2510,7 @@ packages:
   isarray@2.0.5:
     resolution: {integrity: sha512-xHjhDr3cNBK0BzdUJSPXZntQUx/mwMS5Rw4A7lPJ90XGAO6ISP/ePDNuo0vhqOZU+UD5JoodwCAAoZQd3FeAKw==}
 
-  isbinaryfile@4.0.10:
+  isbinaryfile@4.0.12:
     resolution: {integrity: sha512-iHrqe5shvBUcFbmZq9zOQHBoeOhZJu6RQGrDpBgenUm/Am+F3JM2MgQj+rK3Z601fzrL5gLZWtAPH2OBaSVcyw==}
     engines: {node: '>= 8.0.0'}
 
@@ -6291,7 +6291,7 @@ snapshots:
 
   isarray@2.0.5: {}
 
-  isbinaryfile@4.0.10: {}
+  isbinaryfile@4.0.12: {}
 
   isexe@2.0.0: {}
 
@@ -6631,7 +6631,7 @@ snapshots:
       globby: 10.0.2
       handlebars: 4.7.8
       inquirer: 7.3.3
-      isbinaryfile: 4.0.10
+      isbinaryfile: 4.0.12
       lodash.get: 4.4.2
       mkdirp: 0.5.6
       resolve: 1.22.10

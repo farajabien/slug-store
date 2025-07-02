@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file.
 
+## [4.0.13] - 2025-01-27
+
+### 📝 Documentation
+
+- Restructured README files to provide a comprehensive, user-focused document for the npm package and a contributor-focused overview at the repository root.
+
+---
+
+## [4.0.12] - 2025-01-27
+
+### 📝 Documentation Overhaul
+
+- **Rewrote README.md** for clarity and simplicity, removing jargon and focusing on practical examples.
+- **Aligned Package Description** to reflect the library's universal scope beyond just Next.js.
+- **Simplified Quick Start** and added more real-world use-case examples.
+- Ensured version numbers are consistent across all documentation.
+
+---
+
 ## [4.0.10] - 2025-01-27
 
 ### 📝 Documentation Update

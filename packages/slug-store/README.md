@@ -1,369 +1,167 @@
-# Slug Store v4.0.8: The Perfect State Management Solution for AI-Built Apps
+# Slug Store v4.0.13: Simple State Management for Modern Web Apps
 
-After 3 versions and 500+ downloads, we've finally cracked the code for zero-boilerplate, full-stack state management that works seamlessly with Next.js App Router. No database configs needed - just pure, intelligent state persistence.
+**Universal state persistence that works everywhere. No complex setup, powerful state management that saves your data where it makes sense.**
 
-[![npm](https://img.shields.io/npm/v/slug-store)](https://www.npmjs.com/package/slug-store)
-[![npm bundle size](https://img.shields.io/bundlephobia/min/slug-store)](https://bundlephobia.com/package/slug-store)
+[![npm](https://img.shields.io/npm/v/slug-store/latest.svg)](https://www.npmjs.com/package/slug-store)
+[![npm bundle size](https://img.shields.io/bundlephobia/minzip/slug-store)](https://bundlephobia.com/package/slug-store)
 [![License](https://img.shields.io/npm/l/slug-store)](https://github.com/farajabien/slug-store/blob/main/LICENSE)
 
-`slug-store` v4.0.8 provides simple, powerful state management that works everywhere. One hook, infinite possibilities with intelligent Auto Config System.
+---
 
-## 🧠 Auto Config System
+## How It Works
 
-Slug Store automatically detects your data patterns and optimizes accordingly:
+Slug Store automatically saves your app's state in the best place possible:
 
-```typescript
-// Small, shareable data → URL persistence
-const [filters, setFilters] = useSlugStore('filters', { category: 'tech', sort: 'newest' });
-// ✅ Automatically persisted in URL for sharing
+- **Small data** → Saved in the URL (so you can share links with the current state)
+- **Large data** → Saved in your browser's storage (so it survives page refreshes)  
+- **Sensitive data** → Automatically encrypted for security
 
-// Large data → Offline storage  
-const [products, setProducts] = useSlugStore('products', { items: Array(1000).fill('...') });
-// ✅ Automatically compressed and stored offline
+You just use it like a normal React state hook, and it handles the rest.
 
-// Sensitive data → Encryption
-const [user, setUser] = useSlugStore('user', { email: 'user@example.com', password: 'secret' });
-// ✅ Automatically encrypted for security
-```
+## Quick Start
 
-## 📦 Installation
-
+**1. Install**
 ```bash
 npm install slug-store
-# or
-pnpm add slug-store
 ```
 
-## 🎯 Quick Start
-
-### Simple State Management (Recommended)
-
+**2. Use it in your component**
 ```typescript
-import { useSlugStore } from 'slug-store/client'
+import { useSlugStore } from 'slug-store/client';
 
-function TodoApp() {
-  const [todos, setTodos] = useSlugStore('todos', [], {
-    url: true,        // Share via URL
-    offline: true,    // Store offline
-    autoConfig: true  // Auto-optimize
-  })
-
-  return (
-    <div>
-      {todos.map(todo => (
-        <div key={todo.id}>{todo.text}</div>
-      ))}
-      <button onClick={() => setTodos([...todos, { id: Date.now(), text: 'New todo' }])}>
-        Add Todo
-      </button>
-    </div>
-  )
-}
-```
-
-That's it! Your state is now:
-
-✅ Persisted across page refreshes  
-✅ Shareable via URL  
-✅ Optimized automatically  
-✅ Type-safe end-to-end  
-
-## 🚀 Advanced Examples
-
-### E-commerce Filters
-
-```typescript
-import { useSlugStore } from 'slug-store/client'
-
-function ProductFilters() {
-  const [filters, setFilters] = useSlugStore('product-filters', {
-    category: 'all',
-    price: [0, 1000],
-    sort: 'newest'
-  }, {
-    url: true,        // Shareable filters
-    autoConfig: true  // Auto-optimize
-  })
-
-  return (
-    <div>
-      <select 
-        value={filters.category} 
-        onChange={(e) => setFilters({ ...filters, category: e.target.value })}
-      >
-        <option value="all">All Categories</option>
-        <option value="tech">Tech</option>
-        <option value="books">Books</option>
-      </select>
-    </div>
-  )
-}
-```
-
-### Shopping Cart
-
-```typescript
-import { useSlugStore } from 'slug-store/client'
-
-function ShoppingCart() {
-  const [cart, setCart] = useSlugStore('cart', {
+function MyApp() {
+  const [state, setState] = useSlugStore('my-app', {
     items: [],
-    total: 0
+    filter: 'all'
   }, {
-    offline: true,    // Persistent cart
-    autoConfig: true  // Auto-compress large carts
-  })
-
-  const addItem = (product) => {
-    setCart({
-      ...cart,
-      items: [...cart.items, product],
-      total: cart.total + product.price
-    })
-  }
+    url: true,        // Save in URL for sharing
+    offline: true     // Save in browser storage
+  });
 
   return (
     <div>
-      {cart.items.map(item => (
-        <div key={item.id}>{item.name} - ${item.price}</div>
-      ))}
-      <div>Total: ${cart.total}</div>
-    </div>
-  )
-}
-```
-
-### User Preferences
-
-```typescript
-import { useSlugStore } from 'slug-store/client'
-
-function UserSettings() {
-  const [preferences, setPreferences] = useSlugStore('user-preferences', {
-    theme: 'light',
-    language: 'en',
-    notifications: true
-  }, {
-    offline: true,    // Always available
-    autoConfig: true  // Auto-encrypt sensitive data
-  })
-
-  return (
-    <div>
-      <button onClick={() => setPreferences({ ...preferences, theme: 'dark' })}>
-        Toggle Theme
+      <button onClick={() => setState({ ...state, items: [...state.items, 'new item'] })}>
+        Add Item
       </button>
+      <p>Items: {state.items.length}</p>
     </div>
-  )
+  );
 }
 ```
 
-## 📚 Complete API Reference
+**That's it!** Your state is now:
+- ✅ **Saved in the URL** - Share links with current state
+- ✅ **Saved in browser storage** - Survives page refreshes
+- ✅ **Automatically optimized** - Compressed when needed
+- ✅ **Type-safe** - Full TypeScript support
 
-### Core Hook
+## Examples
 
-#### `useSlugStore<T>(key, initialState, options?)`
-
-The main hook for state management with persistence.
-
-**Parameters:**
-- `key` (string): Unique identifier for the state
-- `initialState` (T): Initial state value
-- `options` (SlugStoreOptions): Configuration options
-
-**Returns:** `[state, setState]` - React state tuple
-
-**Options:**
+### Shopping Cart (URL + Browser Storage)
 ```typescript
-interface SlugStoreOptions {
-  /** Persist state in the URL. */
-  url?: boolean;
-  /** Persist state in offline storage (localStorage or IndexedDB). */
-  offline?: boolean;
-  /** Automatically determine the best persistence strategy. */
-  autoConfig?: boolean;
-  /** Custom encryption key. If not provided, one will be generated for auto-config. */
-  encryptionKey?: string;
-  /** Development-only: Logs the auto-config analysis to the console. */
-  debug?: boolean;
-}
+const [cart, setCart] = useSlugStore('cart', {
+  items: [],
+  total: 0
+}, {
+  url: true,      // Save in URL so users can share their cart
+  offline: true   // Save in browser so it survives refreshes
+});
 ```
 
-### Utility Functions
-
-#### `getSlug(): string`
-
-Returns the current window's URL.
-
+### User Preferences (Browser Storage Only)
 ```typescript
-import { getSlug } from 'slug-store/client'
-
-const currentUrl = getSlug()
-console.log(currentUrl) // "https://myapp.com/dashboard?state=..."
+const [preferences, setPreferences] = useSlugStore('preferences', {
+  theme: 'light',
+  language: 'en'
+}, {
+  offline: true   // Just save in browser, no need for URL
+});
 ```
 
-#### `shareSlug(options?): Promise<void>`
-
-Shares the current URL using the Web Share API. Falls back to copying the URL to clipboard if Web Share is not available.
-
+### Form Data (URL Only)
 ```typescript
-import { shareSlug } from 'slug-store/client'
-
-// Share with default options
-await shareSlug()
-
-// Share with custom title and text
-await shareSlug({
-  title: 'My App',
-  text: 'Check out this amazing state!'
-})
+const [filters, setFilters] = useSlugStore('filters', {
+  category: 'all',
+  price: 'any'
+}, {
+  url: true       // Save in URL so users can bookmark filtered views
+});
 ```
 
-**Options:**
-```typescript
-interface ShareSlugOptions {
-  /** The title of the content to be shared. */
-  title?: string;
-  /** The text of the content to be shared. */
-  text?: string;
-}
-```
+## Auto Configuration
 
-#### `copySlug(): Promise<void>`
-
-Copies the current URL to the clipboard.
+Don't want to think about where to save your data? Use auto-config:
 
 ```typescript
-import { copySlug } from 'slug-store/client'
-
-await copySlug()
-// URL is now in the clipboard
+const [state, setState] = useSlugStore('my-app', initialState, {
+  autoConfig: true  // Slug Store decides the best storage strategy
+});
 ```
 
-#### `getSlugData<T>(key, options?): Promise<T | undefined>`
+Slug Store will automatically:
+- Save small data in the URL for sharing
+- Save large data in browser storage
+- Encrypt sensitive data
+- Compress data when it helps
 
-Retrieves and decodes state data from the URL for a specific key.
+## Sharing
+
+Share your app's current state with a simple function:
 
 ```typescript
-import { getSlugData } from 'slug-store/client'
+import { shareSlug, copySlug } from 'slug-store/client';
 
-// Get data from URL
-const userData = await getSlugData('user')
-console.log(userData) // { name: 'John', preferences: {...} }
+// Share via native share dialog (mobile) or copy to clipboard (desktop)
+await shareSlug({ 
+  title: 'Check out my cart!', 
+  text: 'I found some great items' 
+});
 
-// Get encrypted data
-const secureData = await getSlugData('secure', {
-  encryptionKey: 'my-secret-key'
-})
+// Or just copy the URL to clipboard
+await copySlug();
 ```
 
-**Parameters:**
-- `key` (string): The key for the state in the URL
-- `options` (object): Optional configuration
-  - `encryptionKey` (string): Encryption key if the data is encrypted
+## Next.js Support
 
-**Returns:** The decoded state object, or `undefined` if not found or on error
+Slug Store works great with Next.js, but it's completely optional. You get extra benefits like:
 
-### Complete Import Example
+- Server-side state loading
+- Automatic revalidation
+- Better performance optimizations
 
 ```typescript
-import { 
-  useSlugStore, 
-  getSlug, 
-  shareSlug, 
-  copySlug, 
-  getSlugData 
-} from 'slug-store/client'
+// Next.js specific features (optional)
+import { createNextState } from 'slug-store/server';
+import { getUserFromDb, saveUserToDb } from '@/app/actions';
 
-// Use the hook
-const [state, setState] = useSlugStore('my-key', initialState, options)
-
-// Use utilities
-const url = getSlug()
-await shareSlug({ title: 'My App' })
-await copySlug()
-const data = await getSlugData('my-key')
+export const UserState = createNextState({
+  // Your function to load data from a database or API
+  loader: (id: string) => getUserFromDb(id),
+  // Your Server Action to update the data
+  updater: (user) => saveUserToDb(user),
+});
 ```
 
-## 🔧 Advanced Usage
+## Package Details
 
-### Custom Encryption
+- **Version**: 4.0.13
+- **Size**: ~6KB gzipped
+- **Works with**: Any React app (Next.js support is optional)
+- **TypeScript**: Full support included
 
-```typescript
-import { useSlugStore } from 'slug-store/client'
+## Development
 
-function SecureApp() {
-  const [sensitiveData, setSensitiveData] = useSlugStore('secure', {
-    apiKey: 'secret-key',
-    userToken: 'jwt-token'
-  }, {
-    encryptionKey: 'my-custom-encryption-key',
-    url: true,
-    offline: true
-  })
+```bash
+# Start all packages in watch mode
+pnpm dev
 
-  // Data is automatically encrypted before storage
-}
+# Build all packages
+pnpm build
+
+# Run all tests
+pnpm test
 ```
 
-### Manual State Decoding
+---
 
-```typescript
-import { getSlugData } from 'slug-store/client'
-
-// Decode state from a specific URL
-const url = 'https://myapp.com/dashboard?user=eyJkYXRhIjoiZXhhbXBsZSJ9'
-const userData = await getSlugData('user', { url })
-
-// Decode encrypted state
-const secureData = await getSlugData('secure', {
-  encryptionKey: 'my-key',
-  url: 'https://myapp.com/secure?secure=encrypted-data'
-})
-```
-
-### Development Debugging
-
-```typescript
-import { useSlugStore } from 'slug-store/client'
-
-function DebugApp() {
-  const [state, setState] = useSlugStore('debug', initialState, {
-    autoConfig: true,
-    debug: true // Logs auto-config decisions to console
-  })
-
-  // Check browser console for auto-config analysis
-}
-```
-
-## 🎯 Use Cases
-
-### 1. **URL Sharing** - Share application state via URL
-```typescript
-const [filters, setFilters] = useSlugStore('filters', defaultFilters, { url: true })
-// URL: https://myapp.com/products?filters=eyJjYXRlZ29yeSI6InRlY2gifQ==
-```
-
-### 2. **Offline Persistence** - Store data locally for offline access
-```typescript
-const [cart, setCart] = useSlugStore('cart', [], { offline: true })
-// Data persists across browser sessions
-```
-
-### 3. **Auto-Optimization** - Let Slug Store decide the best strategy
-```typescript
-const [data, setData] = useSlugStore('data', largeDataset, { autoConfig: true })
-// Automatically compressed, encrypted, and stored optimally
-```
-
-## 🚀 Performance
-
-- **Bundle Size**: ~5KB gzipped
-- **Zero Dependencies**: Pure TypeScript/JavaScript
-- **Tree Shakeable**: Only import what you use
-- **SSR Compatible**: Works with Next.js App Router
-
-## 📄 License
-
-MIT License - see [LICENSE](https://github.com/farajabien/slug-store/blob/main/LICENSE) for details.
+**Simple, powerful, universal state management. Zero complexity, maximum value.**
