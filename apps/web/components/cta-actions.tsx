@@ -29,7 +29,7 @@ export function CTAActions() {
         </Button>
         <Button variant="outline" size="lg" className="text-lg px-8 py-4" onClick={openNpmPackage}>
           <Code2 className="mr-2 h-5 w-5" />
-          npm install @farajabien/slug-store
+          npm install slug-store
         </Button>
         <Button variant="outline" size="lg" className="text-lg px-8 py-4" onClick={openGitHub}>
           <Star className="mr-2 h-5 w-5" />

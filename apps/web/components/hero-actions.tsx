@@ -12,7 +12,7 @@ export function HeroActions() {
   }
 
   const openNpmPackage = () => {
-    window.open('https://www.npmjs.com/package/@farajabien/slug-store', '_blank')
+    window.open('https://www.npmjs.com/package/slug-store', '_blank')
   }
 
   return (

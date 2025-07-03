@@ -32,7 +32,7 @@
       {
         "id": "unified-package-approach",
         "question": "How does the unified Slug Store package work?",
-        "answer": "**One Package, Everything Included**: `@farajabien/slug-store` contains client hooks, server functions, and core encoding - all in one install. **Two Clear Use Cases**: 1) Share state via URLs (dashboards, filters, configurations), 2) Store state in database (user preferences, private data). **Zero Obstruction**: Works with React, Next.js, Supabase, Firebase, PostgreSQL, MongoDB - no configuration needed. Import what you need: everything, client-only, or server-only.",
+        "answer": "**One Package, Everything Included**: `slug-store` contains client hooks, server functions, and core encoding - all in one install. **Two Clear Use Cases**: 1) Share state via URLs (dashboards, filters, configurations), 2) Store state in database (user preferences, private data). **Zero Obstruction**: Works with React, Next.js, Supabase, Firebase, PostgreSQL, MongoDB - no configuration needed. Import what you need: everything, client-only, or server-only.",
         "category": "paradigm", 
         "tags": ["unified", "single-package", "architecture", "simplicity"]
       }
@@ -62,7 +62,7 @@
       {
         "id": "quick-start",
         "question": "What's the fastest way to get started?",
-        "answer": "Install once: `npm install @farajabien/slug-store`. **For React**: Use `useSlugStore` hook for automatic persistence. **Simple example**: ```tsx\nconst [state, setState, { isLoading, error }] = useSlugStore('my-app', { count: 0 }, { url: true })\n\nif (isLoading) return <div>Loading...</div>\nif (error) return <div>Error: {error.message}</div>\n```\nEverything works out of the box - no configuration needed! Check our live demo at slugstore.fbien.com for examples.",
+        "answer": "Install once: `npm install slug-store`. **For React**: Use `useSlugStore` hook for automatic persistence. **Simple example**: ```tsx\nconst [state, setState, { isLoading, error }] = useSlugStore('my-app', { count: 0 }, { url: true })\n\nif (isLoading) return <div>Loading...</div>\nif (error) return <div>Error: {error.message}</div>\n```\nEverything works out of the box - no configuration needed! Check our live demo at slugstore.fbien.com for examples.",
         "category": "basics",
         "tags": ["installation", "quick-start"]
       }
@@ -226,7 +226,7 @@
       {
         "id": "vanilla-js",
         "question": "Can I use it with vanilla JavaScript?",
-        "answer": "Absolutely! The core package is framework-agnostic: ```js\nimport { encodeState, decodeState } from '@farajabien/slug-store-core'\n\n// Manual URL management\nconst state = { items: [] }\nconst slug = await encodeState(state)\nwindow.history.replaceState({}, '', `?state=${slug}`)\n```",
+        "answer": "Absolutely! The core package is framework-agnostic: ```js\nimport { encodeState, decodeState } from 'slug-store-core'\n\n// Manual URL management\nconst state = { items: [] }\nconst slug = await encodeState(state)\nwindow.history.replaceState({}, '', `?state=${slug}`)\n```",
         "category": "frameworks",
         "tags": ["vanilla", "no-framework", "javascript"]
       }
@@ -265,7 +265,7 @@
       {
         "id": "from-zustand",
         "question": "How do I migrate from Zustand?",
-        "answer": "Easy! Replace `import { create } from 'zustand'` with `import { create } from '@farajabien/slug-store'`. Add options for persistence: `create(storeFunction, { compress: true })` for URL sharing or use `saveUserState()` for database storage. Your existing store logic stays the same - just add powerful persistence!",
+        "answer": "Easy! Replace `import { create } from 'zustand'` with `import { create } from 'slug-store'`. Add options for persistence: `create(storeFunction, { compress: true })` for URL sharing or use `saveUserState()` for database storage. Your existing store logic stays the same - just add powerful persistence!",
         "category": "migration",
         "tags": ["zustand", "migration", "stores"]
       },

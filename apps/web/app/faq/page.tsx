@@ -308,9 +308,9 @@ export default function FAQPage() {
                 <ArrowRight className="mr-2 h-5 w-5" />
                 Try Interactive Demo
               </Button>
-              <Button variant="outline" size="lg" className="text-lg px-8 py-4" onClick={() => window.open('https://www.npmjs.com/package/@farajabien/slug-store', '_blank')}>
+              <Button variant="outline" size="lg" className="text-lg px-8 py-4" onClick={() => window.open('https://www.npmjs.com/package/slug-store', '_blank')}>
                 <Code2 className="mr-2 h-5 w-5" />
-                npm install @farajabien/slug-store
+                npm install slug-store
               </Button>
               <Button variant="outline" size="lg" className="text-lg px-8 py-4" onClick={() => window.open('https://github.com/farajabien/slug-store', '_blank')}>
                 <ExternalLink className="mr-2 h-5 w-5" />
